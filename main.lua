@@ -33,12 +33,40 @@
 function love.load()
 	load_option()
 	gamestate.registerEvents()
-	gamestate.switch(game)
+	gamestate.switch(main_menu)
 end
 
--- function love.update(dt)
-      -- Timer.update(dt)
--- end
+-----------------------------Main_menu----------------------------
+
+function main_menu:init()
+	fond = love.graphics.newImage("/textures/menu/720/fond.png")
+	button_start = button_new(600,150,"/textures/menu/720/barre_start.png")
+	button_option = button_new(600,350,"/textures/menu/720/barre_option.png")
+	button_exit = button_new(600,550,"/textures/menu/720/barre_exit.png")
+	
+end
+
+function main_menu:draw()
+	love.graphics.draw( fond, 0, 0)
+	button_start:draw()
+	button_option:draw()
+	button_exit:draw()
+end
+
+function main_menu:update(dt)
+
+end
+
+function main_menu:mousepressed(x, y, button)
+	if button_start:isPress(x,y,button) then
+		gamestate.switch(game)
+	elseif button_exit:isPress(x,y,button) then
+		love.event.push("quit")
+	end
+end
+
+
+------------------------------Game---------------------------------
 
 function game:init()
     
@@ -69,10 +97,6 @@ function game:init()
     click=0
    
 end
-
-
----------
-
 
 function game:draw()
     love.graphics.setIcon(icone)
@@ -176,7 +200,6 @@ function game:update(dt)
     end 
 end
 
-
 function game:mousepressed(x, y, button)
     cursor_x=(x+camera.x)--/scale
     cursor_y=(y+camera.y)--/scale
@@ -201,3 +224,5 @@ function game:keypressed(key)
 		gamestate.push(pause)
     end
 end
+
+---------------------------------------------------------------------
