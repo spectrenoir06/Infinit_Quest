@@ -1,4 +1,2 @@
 Infinit_Quest
 =============
-
-Zboob
