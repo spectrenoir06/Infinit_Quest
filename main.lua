@@ -1,31 +1,47 @@
-   	require "/fonction/json"
-	require "/fonction/map"
-    require "/fonction/sprite"
+   
+	------------- LIB ----------------
+	require "/lib/android/json"
+	require "/lib/spectre/map"
+    require "/lib/spectre/sprite"
+	require "/lib/spectre/button" 
+    require "/lib/spectre/camera"
+	gamestate = require "/lib/hump/gamestate"
+	----------------------------------
+	
+	--------function------------------
     require "/fonction/perso"
     require "/fonction/dispinfo"  
-    require "/fonction/Button" 
-    require "/fonction/camera"
-    require "/fonction/data"  
-    require "/map/mapinfo"
     require "/fonction/Itemsprite"  
-    require "/fonction/datapnj"
+    require "/fonction/pnj"
+	require "/fonction/set_resolution"
+	require "/fonction/option"
+    ----------------------------------
+	
+	require "/fonction/data"  
+	require "/fonction/datapnj"
     require "/fonction/dataobj"
-    require "/fonction/pnj" 
+    require "/map/mapinfo"
 	
-	
- 
-function love.load()
-
 	--G_port = "4321"
 	--G_host = "192.168.10.8"
 	--require "/android/android"
+	
+	game = {}
+	pause = {}
+	main_menu = {}
+  
+function love.load()
+	load_option()
+	gamestate.registerEvents()
+	gamestate.switch(game)
+end
 
-    if love.keyboard.isDown( "up" ) and love.keyboard.isDown( "down" ) then
-        mobile=true
-    end
-    resolution = 64
-    icone=( love.graphics.newImage( "icone.png" ) )
-    love.graphics.setIcon(icone)
+-- function love.update(dt)
+      -- Timer.update(dt)
+-- end
+
+function game:init()
+    
     loadmaps()
     --love.graphics.setMode( 16*resolution, 9*resolution)
     info=true
@@ -36,27 +52,6 @@ function love.load()
     
     
     steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution) --,data.map[1]["map"])
-    
-    if mobile then
-        scale=1
-    elseif resolution == 64 then
-        love.graphics.setMode( 20*resolution, 11.25*resolution)
-        scale=1
-    elseif resolution== 32 then
-        love.graphics.setMode( 25*resolution, 15*resolution,false, true, 0 )
-        scale=1.25
-    elseif resolution== 40 then
-        love.graphics.setMode( 20*resolution, 12*resolution,false, true, 0 )
-        scale=1
-    end
-        
-        
-    steve.sprite:addAnimation({9,10,11})
-    steve.sprite:addAnimation({0,1,2})
-    steve.sprite:addAnimation({3,4,5})
-    steve.sprite:addAnimation({6,7,8})
-    
-    
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     map = steve:getmap()
@@ -76,10 +71,10 @@ function love.load()
 end
 
 
------------
+---------
 
 
-function love.draw()
+function game:draw()
     love.graphics.setIcon(icone)
     love.graphics.scale(scale,scale)
     steve:getmap():draw(0,0)
@@ -109,7 +104,7 @@ function love.draw()
     end
 end
 
-function love.update(dt)
+function game:update(dt)
     --map = steve:getmap()
     steve:update(dt)
     click = love.mouse.isDown( "l" )
@@ -182,12 +177,12 @@ function love.update(dt)
 end
 
 
-function love.mousepressed(x, y, button)
+function game:mousepressed(x, y, button)
     cursor_x=(x+camera.x)--/scale
     cursor_y=(y+camera.y)--/scale
 end
     
-function love.keypressed(key)
+function game:keypressed(key)
     if key == "kp+" then
         if steve:getnbslot()<9 then
             steve:setslot(steve:getnbslot()+1)
@@ -202,5 +197,7 @@ function love.keypressed(key)
         else
             info=true
         end
+	elseif key == "p" then
+		gamestate.push(pause)
     end
 end

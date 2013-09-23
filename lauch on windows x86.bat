@@ -1,3 +1,3 @@
 ﻿@ECHO OFF
 
-start "" ./windows/x86/love .
+start "" ./love_bin/windows/x86/love .
