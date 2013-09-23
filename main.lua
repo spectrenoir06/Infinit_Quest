@@ -10,12 +10,23 @@
     require "/fonction/Itemsprite"  
     require "/fonction/datapnj"
     require "/fonction/dataobj"
-    require "/fonction/pnj" 
-	
-	
- 
+    require "/fonction/pnj"
+    gamestate = require "/lib/hump/gamestate"
+	game = {}
+	pause = {}
+	main_menu = {}
+  
 function love.load()
+	
+	gamestate.registerEvents()
+	gamestate.switch(game)
+end
 
+-- function love.update(dt)
+      -- Timer.update(dt)
+-- end
+
+function game:init()
 	--G_port = "4321"
 	--G_host = "192.168.10.8"
 	--require "/android/android"
@@ -76,10 +87,10 @@ function love.load()
 end
 
 
------------
+---------
 
 
-function love.draw()
+function game:draw()
     love.graphics.setIcon(icone)
     love.graphics.scale(scale,scale)
     steve:getmap():draw(0,0)
@@ -109,7 +120,7 @@ function love.draw()
     end
 end
 
-function love.update(dt)
+function game:update(dt)
     --map = steve:getmap()
     steve:update(dt)
     click = love.mouse.isDown( "l" )
@@ -182,12 +193,12 @@ function love.update(dt)
 end
 
 
-function love.mousepressed(x, y, button)
+function game:mousepressed(x, y, button)
     cursor_x=(x+camera.x)--/scale
     cursor_y=(y+camera.y)--/scale
 end
     
-function love.keypressed(key)
+function game:keypressed(key)
     if key == "kp+" then
         if steve:getnbslot()<9 then
             steve:setslot(steve:getnbslot()+1)
@@ -202,5 +213,7 @@ function love.keypressed(key)
         else
             info=true
         end
+	elseif key == "p" then
+		gamestate.push(pause)
     end
 end
