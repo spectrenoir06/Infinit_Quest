@@ -209,7 +209,7 @@ function perso:colision(x,y) -- return true si perso en colision au coordoner
 end
 function perso:scancol(x,y) -- return true si colision
 	local idsol, idblock, x, y, pnj = self:getblock(x,y)
-		print(idsol,idblock)
+		--print(idsol,idblock)
 	local blockDataSol = data.tab[idsol]
 	local blockDataBlock = data.tab[idblock]
 	if idblock==nil or idsol==nil then

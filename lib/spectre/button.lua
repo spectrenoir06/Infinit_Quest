@@ -58,6 +58,11 @@ function button:draw()
     love.graphics.draw( self.image, self.x, self.y)
 end
 
+function button:update()
+    self.x2=self.x+self.image:getWidth()
+    self.y2=self.y+self.image:getHeight()
+end
+
 function inv:draw(perso)
     love.graphics.print("V",self.x+(perso.slot-1)*resolution+15,self.y-20)
     love.graphics.draw(self.image, self.x-resolution/8, self.y-resolution/8)

@@ -6,6 +6,7 @@
 	require "/lib/spectre/button" 
     require "/lib/spectre/camera"
 	gamestate = require "/lib/hump/gamestate"
+	Timer = require "/lib/hump/timer"
 	----------------------------------
 	
 	--------function------------------
@@ -40,27 +41,38 @@ end
 
 function main_menu:init()
 	fond = love.graphics.newImage("/textures/menu/720/fond.png")
-	button_start = button_new(600,150,"/textures/menu/720/barre_start.png")
-	button_option = button_new(600,350,"/textures/menu/720/barre_option.png")
-	button_exit = button_new(600,550,"/textures/menu/720/barre_exit.png")
-	
+	hero = love.graphics.newImage("/textures/menu/720/hero.png")
+	button_start = button_new(1000,150,"/textures/menu/720/barre_start.png")
+	button_option = button_new(1000,350,"/textures/menu/720/barre_option.png")
+	button_exit = button_new(1000,550,"/textures/menu/720/barre_exit.png")
+	Timer.tween(3, button_start, {x=600}, 'bounce')
+	Timer.tween(3, button_option, {x=600}, 'bounce')
+	Timer.tween(3, button_exit, {x=600}, 'bounce')
 end
 
 function main_menu:draw()
 	love.graphics.draw( fond, 0, 0)
+	love.graphics.draw( hero, -button_start.x+700, 40 )
 	button_start:draw()
 	button_option:draw()
 	button_exit:draw()
 end
 
 function main_menu:update(dt)
-
+	Timer.update(dt)
+	button_start:update()
+	button_option:update()
+	button_exit:update()
 end
 
 function main_menu:mousepressed(x, y, button)
 	if button_start:isPress(x,y,button) then
+		print("button start")
 		gamestate.switch(game)
+	elseif button_option:isPress(x,y,button) then
+		print("button option")
 	elseif button_exit:isPress(x,y,button) then
+		print("button quit")
 		love.event.push("quit")
 	end
 end
