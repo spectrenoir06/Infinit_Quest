@@ -1,6 +1,6 @@
    
 	------------- LIB ----------------
-	require "/lib/android/json"
+	require "/lib/json/json"
 	require "/lib/spectre/map"
     require "/lib/spectre/sprite"
 	require "/lib/spectre/button" 
