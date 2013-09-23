@@ -1,5 +1,5 @@
    	require "/fonction/json"
-	require "/fonction/map"
+	  require "/fonction/map"
     require "/fonction/sprite"
     require "/fonction/perso"
     require "/fonction/dispinfo"  
