@@ -45,9 +45,9 @@ function main_menu:init()
 	button_start = button_new(1000,150,"/textures/menu/720/barre_start.png")
 	button_option = button_new(1000,350,"/textures/menu/720/barre_option.png")
 	button_exit = button_new(1000,550,"/textures/menu/720/barre_exit.png")
-	Timer.tween(3, button_start, {x=600}, 'bounce')
-	Timer.tween(3, button_option, {x=600}, 'bounce')
-	Timer.tween(3, button_exit, {x=600}, 'bounce')
+	Timer.tween(3, button_start, {x=600}, 'out-back')
+	Timer.tween(3, button_option, {x=600}, 'out-back')
+	Timer.tween(3, button_exit, {x=600}, 'out-back')
 end
 
 function main_menu:draw()
