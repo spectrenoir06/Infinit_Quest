@@ -25,6 +25,11 @@ function perso_new(fichier,LX,LY,map)
     a.texture = fichier
     a.sprite = sprite_new(fichier,LX,LY)
     a.vie = 100
+	
+	a.sprite:addAnimation({9,10,11})
+    a.sprite:addAnimation({0,1,2})
+    a.sprite:addAnimation({3,4,5})
+    a.sprite:addAnimation({6,7,8})
 
     a.speed = 4 * resolution
     a.direction = 1
@@ -92,9 +97,9 @@ function perso:update(dt)
     if ( self.dx~=0 or self.dy ~=0) and not self:colision(self.posX+(dt*self.dx*self.speed),self.posY+(dt*self.dy*self.speed)) then
         self:setX( self.posX +(dt*self.dx*self.speed) )
         self:setY( self.posY +(dt*self.dy*self.speed) )
-		--self.sprite:play()
+		self.sprite:play()
     else
-		--self.sprite:stop()
+		self.sprite:stop()
 		--print("stop")
         self.dy = 0
 		self.dx = 0

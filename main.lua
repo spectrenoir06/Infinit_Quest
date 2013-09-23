@@ -1,17 +1,26 @@
-   	require "/lib/android/json"
+   
+	------------- LIB ----------------
+	require "/lib/android/json"
 	require "/lib/spectre/map"
     require "/lib/spectre/sprite"
+	require "/lib/spectre/button" 
+    require "/lib/spectre/camera"
+	gamestate = require "/lib/hump/gamestate"
+	----------------------------------
+	
+	--------function------------------
     require "/fonction/perso"
     require "/fonction/dispinfo"  
-    require "/lib/spectre/button" 
-    require "/lib/spectre/camera"
-    require "/fonction/data"  
-    require "/map/mapinfo"
     require "/fonction/Itemsprite"  
-    require "/fonction/datapnj"
-    require "/fonction/dataobj"
     require "/fonction/pnj"
-    gamestate = require "/lib/hump/gamestate"
+	require "/fonction/set_resolution"
+	require "/fonction/option"
+    ----------------------------------
+	
+	require "/fonction/data"  
+	require "/fonction/datapnj"
+    require "/fonction/dataobj"
+    require "/map/mapinfo"
 	
 	--G_port = "4321"
 	--G_host = "192.168.10.8"
@@ -22,7 +31,7 @@
 	main_menu = {}
   
 function love.load()
-	
+	load_option()
 	gamestate.registerEvents()
 	gamestate.switch(game)
 end
@@ -32,13 +41,7 @@ end
 -- end
 
 function game:init()
-
-    if love.keyboard.isDown( "up" ) and love.keyboard.isDown( "down" ) then
-        mobile=true
-    end
-    resolution = 64
-    icone=( love.graphics.newImage( "icone.png" ) )
-    love.graphics.setIcon(icone)
+    
     loadmaps()
     --love.graphics.setMode( 16*resolution, 9*resolution)
     info=true
@@ -49,27 +52,6 @@ function game:init()
     
     
     steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution) --,data.map[1]["map"])
-    
-    if mobile then
-        scale=1
-    elseif resolution == 64 then
-        love.graphics.setMode( 20*resolution, 11.25*resolution)
-        scale=1
-    elseif resolution== 32 then
-        love.graphics.setMode( 25*resolution, 15*resolution,false, true, 0 )
-        scale=1.25
-    elseif resolution== 40 then
-        love.graphics.setMode( 20*resolution, 12*resolution,false, true, 0 )
-        scale=1
-    end
-        
-        
-    steve.sprite:addAnimation({9,10,11})
-    steve.sprite:addAnimation({0,1,2})
-    steve.sprite:addAnimation({3,4,5})
-    steve.sprite:addAnimation({6,7,8})
-    
-    
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     map = steve:getmap()
