@@ -1,10 +1,10 @@
-   	require "/fonction/json"
-	require "/fonction/map"
-    require "/fonction/sprite"
+   	require "/lib/android/json"
+	require "/lib/spectre/map"
+    require "/lib/spectre/sprite"
     require "/fonction/perso"
     require "/fonction/dispinfo"  
-    require "/fonction/Button" 
-    require "/fonction/camera"
+    require "/lib/spectre/button" 
+    require "/lib/spectre/camera"
     require "/fonction/data"  
     require "/map/mapinfo"
     require "/fonction/Itemsprite"  
@@ -12,6 +12,11 @@
     require "/fonction/dataobj"
     require "/fonction/pnj"
     gamestate = require "/lib/hump/gamestate"
+	
+	--G_port = "4321"
+	--G_host = "192.168.10.8"
+	--require "/android/android"
+	
 	game = {}
 	pause = {}
 	main_menu = {}
@@ -27,9 +32,6 @@ end
 -- end
 
 function game:init()
-	--G_port = "4321"
-	--G_host = "192.168.10.8"
-	--require "/android/android"
 
     if love.keyboard.isDown( "up" ) and love.keyboard.isDown( "down" ) then
         mobile=true
