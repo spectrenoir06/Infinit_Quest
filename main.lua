@@ -19,8 +19,7 @@
     ----------------------------------
 	
 	require "/fonction/data"  
-	--require "/fonction/datapnj"
-    require "/fonction/dataobj"
+   -- require "/fonction/dataobj"
     require "/map/mapinfo"
 	
 	--G_port = "4321"
