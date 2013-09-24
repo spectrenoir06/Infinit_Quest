@@ -83,7 +83,7 @@ function game:init()
     require "/fonction/dispinfo"  
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
-	require "/map/mapinfo"
+	--require "/map/mapinfo"
 	
 	loadmaps()
     --love.graphics.setMode( 16*resolution, 9*resolution)

@@ -1,7 +1,6 @@
 function loadmaps()
-    for i=1,data.map.nb do
-        local mapdata = data.map[i]
-        data.map[i].map = map_new(mapdata.fichier,mapdata.texture,mapdata.music)
+    for k,v in pairs(data.map) do
+        v.map = map_new(v.fichier,v.texture,v.music)
     end
 end
 
