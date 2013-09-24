@@ -19,7 +19,7 @@
     ----------------------------------
 	
 	require "/fonction/data"  
-	require "/fonction/datapnj"
+	--require "/fonction/datapnj"
     require "/fonction/dataobj"
     require "/map/mapinfo"
 	
