@@ -1,7 +1,7 @@
    
 	------------- LIB ----------------
 	require "/lib/json/json"
-	require "/lib/spectre/map"
+	require "/lib/spectre/map_json"
     require "/lib/spectre/sprite"
 	require "/lib/spectre/button" 
     require "/lib/spectre/camera"

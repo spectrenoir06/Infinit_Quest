@@ -1,9 +1,9 @@
 
 data.map = {}
-data.map["nb"] = 4
+data.map["nb"] = 3
 
 data.map[1] = {
-    fichier = "/map/1/1.lua",
+    fichier = "/map/1/1.json",
 	texture = "tileset.png",
 	X = 100 ,
 	Y = 0 ,
@@ -11,7 +11,7 @@ data.map[1] = {
 }
 
 data.map[2] = {
-    fichier = "/map/2/2.lua",
+    fichier = "/map/2/2.json",
 	texture = "tileset.png",
 	X = 800 ,
 	Y = 800 ,
@@ -19,7 +19,7 @@ data.map[2] = {
 }
 
 data.map[3] = {
-    fichier = "/map/3/3.lua",
+    fichier = "/map/3/3.json",
 	texture = "tileset.png",
 	X = 0 ,
 	Y = 0 ,
