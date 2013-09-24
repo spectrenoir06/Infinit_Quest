@@ -10,17 +10,12 @@
 	----------------------------------
 	
 	--------function------------------
-    require "/fonction/perso"
-    require "/fonction/dispinfo"  
-    require "/fonction/Itemsprite"  
-    require "/fonction/pnj"
 	require "/fonction/set_resolution"
 	require "/fonction/option"
     ----------------------------------
 	
 	require "/fonction/data"  
    -- require "/fonction/dataobj"
-    require "/map/mapinfo"
 	
 	--G_port = "4321"
 	--G_host = "192.168.10.8"
@@ -80,8 +75,17 @@ end
 ------------------------------Game---------------------------------
 
 function game:init()
-    
-    loadmaps()
+
+
+    import_data("/data/data.json")
+	
+    require "/fonction/perso"
+    require "/fonction/dispinfo"  
+    require "/fonction/Itemsprite"  
+    require "/fonction/pnj"
+	require "/map/mapinfo"
+	
+	loadmaps()
     --love.graphics.setMode( 16*resolution, 9*resolution)
     info=true
     up,down,left,right=0,0,0,0
