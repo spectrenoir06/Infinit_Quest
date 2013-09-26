@@ -122,16 +122,17 @@ function game:draw()
 	--cam:lookAt(steve:getX()-9*resolution, steve:getY()-5.5*resolution)
 	cam:lookAt(steve:getX(), steve:getY())
 	
-    -- if cam.x<0 then
-        -- cam.x = 0
-    -- elseif cam.x>steve:getmap():getLX()*resolution-(20*resolution) then
-        -- cam.x = steve:getmap():getLX()*resolution-(20*resolution)
-    -- end
-    -- if cam.y<0 then
-        -- cam.y = 0
-    -- elseif cam.y>steve:getmap():getLY()*resolution-(11.25*resolution) then
-        -- cam.y = steve:getmap():getLY()*resolution-(11.25*resolution)
-    -- end
+    if cam.x<love.graphics.getWidth()/2 then
+         cam.x = love.graphics.getWidth()/2
+    elseif cam.x>steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
+         cam.x = steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
+    end
+	
+    if cam.y<love.graphics.getHeight()/2 then
+        cam.y = love.graphics.getHeight()/2
+    elseif cam.y>steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
+         cam.y = steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
+     end
 	
     love.graphics.setIcon(icone)
 	
@@ -236,21 +237,28 @@ function game:keypressed(key)
     if key == "kp+" then
         if steve:getnbslot()<9 then
             steve:setslot(steve:getnbslot()+1)
-			cam:rotate(math.pi/6)
         end
     elseif key == "kp-" then
         if steve:getnbslot()>1 then
             steve:setslot(steve:getnbslot()-1)
         end
-    elseif key == "i" then
+	end
+	
+    if key == "i" then
         if info then
             info=false
         else
             info=true
         end
-	elseif key == "p" then
+	end
+	
+	if key == "p" then
 		gamestate.push(pause)
     end
+	
+	if key=="e" then
+		cam:zoom(1.1)
+	end
 end
 
 ---------------------------------------------------------------------

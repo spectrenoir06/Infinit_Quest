@@ -7,4 +7,5 @@ function love.conf(t)
     t.console = true           -- Attach a console (boolean, Windows only)
 	t.screen.vsync = true
     --t.android_native_screen = true
+	t.screen.fsaa = 10
 end
