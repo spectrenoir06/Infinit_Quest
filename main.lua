@@ -4,7 +4,8 @@
 	require "/lib/spectre/map_json"
     require "/lib/spectre/sprite"
 	require "/lib/spectre/button" 
-    require "/lib/spectre/camera"
+    --require "/lib/spectre/camera"
+	camera = require "/lib/hump/camera"
 	gamestate = require "/lib/hump/gamestate"
 	Timer = require "/lib/hump/timer"
 	----------------------------------
@@ -28,6 +29,7 @@
 function love.load()
 	load_option()
 	gamestate.registerEvents()
+	cam = camera(0,0)
 	gamestate.switch(main_menu)
 end
 
@@ -76,7 +78,7 @@ end
 
 function game:init()
 
-
+	cam:attach()
     import_data("/data/data.json")
 	
     require "/fonction/perso"
@@ -114,23 +116,26 @@ function game:init()
 end
 
 function game:draw()
+  
     love.graphics.setIcon(icone)
     love.graphics.scale(scale,scale)
     steve:getmap():draw(0,0)
     steve:draw()
 	steve:getmap():drawdeco(0,0)
 	
-	camera:setPosition(steve:getX()-9*resolution, steve:getY()-5.5*resolution)
-    if camera.x<0 then
-        camera.x = 0
-    elseif camera.x>steve:getmap():getLX()*resolution-(20*resolution) then
-        camera.x = steve:getmap():getLX()*resolution-(20*resolution)
-    end
-    if camera.y<0 then
-        camera.y = 0
-    elseif camera.y>steve:getmap():getLY()*resolution-(11.25*resolution) then
-        camera.y = steve:getmap():getLY()*resolution-(11.25*resolution)
-    end
+	-- cam:lookAt(steve:getX()-9*resolution, steve:getY()-5.5*resolution)
+    -- if cam.x<0 then
+        -- cam.x = 0
+    -- elseif cam.x>steve:getmap():getLX()*resolution-(20*resolution) then
+        -- cam.x = steve:getmap():getLX()*resolution-(20*resolution)
+    -- end
+    -- if cam.y<0 then
+        -- cam.y = 0
+    -- elseif cam.y>steve:getmap():getLY()*resolution-(11.25*resolution) then
+        -- cam.y = steve:getmap():getLY()*resolution-(11.25*resolution)
+    -- end
+	
+	cam:lookAt(320,320)
 	
     if info then
         dispinfo(640,0)
@@ -216,14 +221,16 @@ function game:update(dt)
 end
 
 function game:mousepressed(x, y, button)
-    cursor_x=(x+camera.x)--/scale
-    cursor_y=(y+camera.y)--/scale
+	cursor_x , cursor_y = cam:worldCoords(x,y)
+    -- cursor_x=(x+camera.x)--/scale
+    -- cursor_y=(y+camera.y)--/scale
 end
     
 function game:keypressed(key)
     if key == "kp+" then
         if steve:getnbslot()<9 then
             steve:setslot(steve:getnbslot()+1)
+			cam:rotate(math.pi/6)
         end
     elseif key == "kp-" then
         if steve:getnbslot()>1 then

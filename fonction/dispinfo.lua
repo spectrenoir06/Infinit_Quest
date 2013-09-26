@@ -54,7 +54,7 @@ function dispinfo(x,y)
     love.graphics.print("y1 = "..steve.posY-32,x+300,y+280)
 	
     
-    love.graphics.print("camera.x = "..camera.x,x+10,y+290)
-    love.graphics.print("camera.y = "..camera.y,x+10,y+310)
+    love.graphics.print("camera.x = "..cam.x,x+10,y+290)
+    love.graphics.print("camera.y = "..cam.y,x+10,y+310)
     
 end

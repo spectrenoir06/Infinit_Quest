@@ -141,16 +141,16 @@ function map:update(nb)
     end
 end
 function map:draw(x,y)
-    love.graphics.draw(self.spriteBatch_sol,math.floor(x-camera.x),math.floor(y-camera.y))
-    love.graphics.draw(self.spriteBatch_block,math.floor(x-camera.x),math.floor(y-camera.y))
+    love.graphics.draw(self.spriteBatch_sol,math.floor(x),math.floor(y))
+    love.graphics.draw(self.spriteBatch_block,math.floor(x),math.floor(y))
     
     for k,v in ipairs(self.pnj) do
-        v.sprite:drawframe((v.x*resolution)-camera.x,(v.y*resolution)-camera.y,1)
+        v.sprite:drawframe((v.x*resolution),(v.y*resolution),1)
     end
 end
 
 function map:drawdeco(x,y)
-    love.graphics.draw(self.spriteBatch_deco,math.floor(x-camera.x),math.floor(y-camera.y))
+    love.graphics.draw(self.spriteBatch_deco,math.floor(x),math.floor(y))
 end
 
 function map:gettile(x,y)

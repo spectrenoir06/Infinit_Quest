@@ -132,7 +132,7 @@ end
 
 -------------------------------------------------------------------------------------------------------------------------------
 function perso:draw()
-    self.sprite:draw((self.posX-self.LX/2)-camera.x,self.posY-self.LY/2-camera.y)
+    self.sprite:draw((self.posX-self.LX/2),self.posY-self.LY/2)
 end
 
 function perso:setPos(tilex,tiley,dir,map)
