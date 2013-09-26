@@ -29,7 +29,7 @@
 function love.load()
 	load_option()
 	gamestate.registerEvents()
-	cam = camera(0,0)
+	cam = camera()
 	gamestate.switch(main_menu)
 end
 
@@ -116,14 +116,12 @@ function game:init()
 end
 
 function game:draw()
-  
-    love.graphics.setIcon(icone)
-    love.graphics.scale(scale,scale)
-    steve:getmap():draw(0,0)
-    steve:draw()
-	steve:getmap():drawdeco(0,0)
+
+	cam:attach()	
 	
-	-- cam:lookAt(steve:getX()-9*resolution, steve:getY()-5.5*resolution)
+	--cam:lookAt(steve:getX()-9*resolution, steve:getY()-5.5*resolution)
+	cam:lookAt(steve:getX(), steve:getY())
+	
     -- if cam.x<0 then
         -- cam.x = 0
     -- elseif cam.x>steve:getmap():getLX()*resolution-(20*resolution) then
@@ -135,7 +133,14 @@ function game:draw()
         -- cam.y = steve:getmap():getLY()*resolution-(11.25*resolution)
     -- end
 	
-	cam:lookAt(320,320)
+    love.graphics.setIcon(icone)
+	
+    love.graphics.scale(scale,scale)
+    steve:getmap():draw(0,0)
+    steve:draw()
+	steve:getmap():drawdeco(0,0)
+	
+	cam:detach()
 	
     if info then
         dispinfo(640,0)
@@ -146,6 +151,7 @@ function game:draw()
         A_key:draw()
         keypad:draw()
     end
+	
 end
 
 function game:update(dt)
