@@ -120,7 +120,7 @@ function game:draw()
 	cam:attach()	
 	
 	--cam:lookAt(steve:getX()-9*resolution, steve:getY()-5.5*resolution)
-	cam:lookAt(steve:getX(), steve:getY())
+	cam:lookAt(math.floor(steve:getX()), math.floor(steve:getY()))
 	
     if cam.x<love.graphics.getWidth()/2 then
          cam.x = love.graphics.getWidth()/2
