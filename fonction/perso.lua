@@ -71,39 +71,31 @@ function perso:update(dt)
     self.sprite:update(dt)
 
 	self:isOn()
-    if up==1 then
-      self:setdirection(1)
-      self.dy = -1
-      self.dx = 0
-    elseif down==1 then
-      self:setdirection(2)
-      self.dx = 0
-      self.dy = 1
-    elseif left==1 then
-      self:setdirection(3)
-      self.dy = 0
-      self.dx = -1
-    elseif right==1 then
-      self.dy = 0
-      self:setdirection(4)
-      self.dx = 1
-    else
-		self.dy = 0
-		self.dx = 0
-	end
+
 	if key_a == 1 then
 		self:use()
 	end
     if ( self.dx~=0 or self.dy ~=0) and not self:colision(self.posX+(dt*self.dx*self.speed),self.posY+(dt*self.dy*self.speed)) then
         self:setX( self.posX +(dt*self.dx*self.speed) )
         self:setY( self.posY +(dt*self.dy*self.speed) )
-		self.sprite:play()
+		--self.sprite:play()
     else
-		self.sprite:stop()
+		if self.dx<0 then
+			self:setX( math.ceil(self.posX +(dt*self.dx*self.speed)/64))
+		elseif self.dx>0 then
+			self:setX( math.floor(self.posX +(dt*self.dx*self.speed)/64))
+		end
+		if self.dy<0 then
+			self:setY( math.ceil(self.posY +(dt*self.dy*self.speed)/64))
+			print(math.ceil(self.posY +(dt*self.dy*self.speed)/64))
+		elseif self.dy>0 then
+			self:setY( math.floor(self.posY +(dt*self.dx*self.speed)/64))
+		end
+		--self.sprite:stop()
 		--print("stop")
-        self.dy = 0
-		self.dx = 0
     end
+	self.dy = 0
+	self.dx = 0
 	if (self.posX < 0) or (self.posX>self.map.map.LX*resolution) then
 		print("------------------")
 		print("scan map:")
@@ -384,4 +376,28 @@ end
 function perso:scanMap()
 	
 
+end
+
+function perso:GoUp()
+	self:setdirection(1)
+    self.dy = -1
+    self.dx = 0
+end
+
+function perso:GoDown()
+	self:setdirection(2)
+    self.dy = 1
+    self.dx = 0
+end
+
+function perso:GoLeft()
+	self:setdirection(3)
+    self.dy = 0
+    self.dx = -1
+end
+
+function perso:GoRight()
+	self:setdirection(4)
+    self.dy = 0
+    self.dx = 1
 end

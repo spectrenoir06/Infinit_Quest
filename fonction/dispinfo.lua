@@ -24,11 +24,11 @@ function dispinfo(x,y)
     
     love.graphics.print("dx = "..steve.dx,x+10,y+110)
     love.graphics.print("dy = "..steve.dy,x+10,y+120)
-    love.graphics.print("up = "..up,x+10,y+140)
-    love.graphics.print("down = "..down,x+10,y+155)
-    love.graphics.print("left = "..left,x+10,y+170)
-    love.graphics.print("right = "..right,x+10,y+185)
-    love.graphics.print("key_a = "..key_a,x+10,y+200)
+    -- love.graphics.print("up = "..up,x+10,y+140)
+    -- love.graphics.print("down = "..down,x+10,y+155)
+    -- love.graphics.print("left = "..left,x+10,y+170)
+    -- love.graphics.print("right = "..right,x+10,y+185)
+    -- love.graphics.print("key_a = "..key_a,x+10,y+200)
 
     --if  steve:getblock() then
        -- love.graphics.print("Id Sol devant = "..steve:getblock(),x+10,y+230)

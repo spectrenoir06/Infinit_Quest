@@ -170,29 +170,19 @@ function game:update(dt)
         --end
         touche = keypad:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click)
         if touche==1 or not love.keyboard.isDown( "up" ) then
-            up=1
-        else
-            up=0
+            steve:GoUp()
         end
         if touche == 2 or not love.keyboard.isDown( "down" ) then
-            down=1
-        else
-            down=0
+            steve:GoDown()
         end
         if touche==3 or not love.keyboard.isDown( "left" ) then
-            left=1
-        else
-            left=0
+            steve:GoLeft()
         end
         if touche==4 or not love.keyboard.isDown( "right" ) then
-            right=1
-        else
-            right=0
+            steve:GoRight()
         end
         if A_key:isPress(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then
-            key_a=1
-        else
-            key_a=0
+            steve:use()
         end
     else
         --if touchemobil:isPress(love.mouse.getX( )*scale,love.mouse.getY( )*scale,click) then
@@ -200,29 +190,16 @@ function game:update(dt)
          --   love.timer.sleep( 0.5 )
        -- end
         if love.keyboard.isDown( "up" ) then
-            up=1
-        else
-            up=0
-        end
-        if love.keyboard.isDown( "down" ) then
-            down=1
-        else
-            down=0
-        end
-        if love.keyboard.isDown( "left" ) then
-            left=1
-        else
-            left=0
-        end
-        if love.keyboard.isDown( "right" ) then
-            right=1
-        else
-            right=0
+            steve:GoUp()
+        elseif love.keyboard.isDown( "down" ) then
+            steve:GoDown()
+        elseif love.keyboard.isDown( "left" ) then
+            steve:GoLeft()
+        elseif love.keyboard.isDown( "right" ) then
+           steve:GoRight()
         end
         if love.keyboard.isDown( " " ) then
-            key_a=1
-        else
-            key_a=0
+            steve:use()
         end
     end 
 end
