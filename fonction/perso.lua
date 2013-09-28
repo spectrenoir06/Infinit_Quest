@@ -33,13 +33,12 @@ function perso_new(fichier,LX,LY,map)
 
     a.speed = 4 * resolution
     a.direction = 1
-	a.hitbox = {25,0,25,32}
     a.dx = 0
     a.dy =0
 	a.X1 = a.posX - a.LX/2
 	a.Y1 = a.posY - a.LY/2
 	a.X2 = a.posX + a.LX/2
-	a.Y1 = a.posY + a.LY/2
+	a.Y2 = a.posY + a.LY/2
     
     
     a.inv={}
@@ -75,24 +74,60 @@ function perso:update(dt)
 	if key_a == 1 then
 		self:use()
 	end
-    if ( self.dx~=0 or self.dy ~=0) and not self:colision(self.posX+(dt*self.dx*self.speed),self.posY+(dt*self.dy*self.speed)) then
-        self:setX( self.posX +(dt*self.dx*self.speed) )
-        self:setY( self.posY +(dt*self.dy*self.speed) )
-		--self.sprite:play()
-    else
-		if self.dx<0 then
-			self:setX( math.ceil(self.posX +(dt*self.dx*self.speed)/64))
-		elseif self.dx>0 then
-			self:setX( math.floor(self.posX +(dt*self.dx*self.speed)/64))
+	--print(self.posY % (resolution)/resolution)
+	local grid = resolution/2
+	
+	if self.dx~=0 or self.dy ~=0 then
+	
+		if self.dx~=0 and (self.posY % (grid))~=0 then
+			--print(self.posY % grid /grid)
+			if ((self.posY % (grid)/grid)<=0.5) then
+				if (((self.posY - dt*self.speed)%grid)/grid)>0.5 then
+					self:setY(math.floor(self.posY/grid)*grid)
+				else
+					self:setY(self.posY -(dt*self.speed))
+				end
+			else
+				if (((self.posY +(dt*self.speed))%grid)<0.5) then
+					self:setY(math.ceil(self.posY/grid)*grid)
+				else
+					self:setY(self.posY +(dt*self.speed))
+				end
+			end
+		elseif self.dy~=0 and (self.posX % (grid))~=0 then
+			print(self.posX % grid /grid)
+			if ((self.posX % (grid)/grid)<=0.5) then
+				if (((self.posX - dt*self.speed)%grid)/grid)>0.5 then
+					self:setX(math.floor(self.posX/grid)*grid)
+				else
+					self:setX(self.posX -(dt*self.speed))
+				end
+			else
+				if (((self.posX +(dt*self.speed))%grid)<0.5) then
+					self:setX(math.ceil(self.posX/grid)*grid)
+				else
+					self:setX(self.posX +(dt*self.speed))
+				end
+			end
+		elseif not self:colision(dt) then
+			self:setX( self.posX +(dt*self.dx*self.speed) )
+			self:setY( self.posY +(dt*self.dy*self.speed) )
+			--self.sprite:play()
+		else
+			if self.dx<0 then
+				self:setX( math.ceil(self.posX +(dt*self.dx*self.speed)/64))
+			elseif self.dx>0 then
+				self:setX( math.floor(self.posX +(dt*self.dx*self.speed)/64))
+			end
+			if self.dy<0 then
+				self:setY( math.ceil(self.posY +(dt*self.dy*self.speed)/64))
+				-- print(math.ceil(self.posY +(dt*self.dy*self.speed)/64))
+			elseif self.dy>0 then
+				self:setY( math.floor(self.posY +(dt*self.dx*self.speed)/64))
+			end
+			--self.sprite:stop()
+			--print("stop")
 		end
-		if self.dy<0 then
-			self:setY( math.ceil(self.posY +(dt*self.dy*self.speed)/64))
-			print(math.ceil(self.posY +(dt*self.dy*self.speed)/64))
-		elseif self.dy>0 then
-			self:setY( math.floor(self.posY +(dt*self.dx*self.speed)/64))
-		end
-		--self.sprite:stop()
-		--print("stop")
     end
 	self.dy = 0
 	self.dx = 0
@@ -172,7 +207,7 @@ function perso:setY(y)
 	self.X1 = self.posX -self.LX/2
 	self.Y1 = self.posY -self.LY/2
 	self.X2 = self.posX +self.LX/2
-	self.Y1 = self.posY +self.LY/2
+	self.Y2 = self.posY +self.LY/2
 end
 
 
@@ -188,16 +223,12 @@ function perso:setvie(x)
     self.vie=x
 end
 
-function perso:colision(x,y) -- return true si perso en colision au coordoner
+function perso:colision(dt) -- return true si perso en colision au coordoner
 
-	local X1 = x - self.hitbox[1]
-	local Y1 = y - self.hitbox[2]
-	local X2 = x + self.hitbox[3]
-	local Y2 = y + self.hitbox[4]
-    return self:scancol(math.floor((X1)/resolution),math.floor((Y1)/resolution))
-		or self:scancol(math.floor((X2)/resolution),math.floor((Y1)/resolution))
-		or self:scancol(math.floor((X1)/resolution),math.floor((Y2)/resolution))
-		or self:scancol(math.floor((X2)/resolution),math.floor((Y2)/resolution))
+		return self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+			or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+			or self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+			or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
 end
 function perso:scancol(x,y) -- return true si colision
 	local idsol, idblock, x, y, pnj = self:getblock(x,y)
