@@ -320,17 +320,20 @@ end
 -------------------------------------------------
 function perso:use()
 	local posX , posY , X1 , Y1 , X2 ,Y2 = self:getPos()
+	local x,y = 0,0
+	
 	if self:getdirection()==1 then
-		block = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)-1)
-		--print("use:",math.floor(X1/resolution),math.floor(Y1/resolution)-1)
+		x,y = math.floor(X1/resolution) , math.floor(Y1/resolution)-1
     elseif	self:getdirection()==2 then
-		block = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)+1)
+		x,y = math.floor(X1/resolution),math.floor(Y1/resolution)+1
 	elseif self:getdirection()==3 then
-		block = self:getblock(math.floor(X1/resolution)-1,math.floor(Y1/resolution))
+		x,y = math.floor(X1/resolution)-1,math.floor(Y1/resolution)
 	elseif self:getdirection()==4 then
-		block = self:getblock(math.floor(X1/resolution)+1,math.floor(Y1/resolution))
+		x,y = math.floor(X1/resolution)+1,math.floor(Y1/resolution)
 	end
-			
+	
+	local block = self:getblock(x,y)
+	
     if data.tab[block.idblock].use then
 		data.tab[block.idblock].use(block.tileX,block.tiley)
 	elseif data.tab[block.idsol].use then
@@ -371,18 +374,18 @@ function perso:use()
 end
 
 function perso:isOn()
-    local idsol, idblock, x, y, pnj,obj = self:getblock(math.floor(self:getX()/resolution),math.floor(self:getY()/resolution))
-    if idblock  == nil then
+    local block = self:getblock(math.floor(self:getX()/resolution),math.floor(self:getY()/resolution))
+    if block.idblock  == nil then
         error("Id non valide")
     else
         blockdata = data.tab[idblock]
-        --if blockdata.isOn then
-            -- blockdata.isOn(x,y)
-        --elseif obj then
-            -- if obj.data.isOn then
-                -- obj.data.isOn()
-            -- end
-        -- end
+        if data.tab[block.idsol].isOn then
+            data.tab[block.idsol].isOn(block.tilex,block.tiley)
+        elseif block.obj then
+            if block.obj.data.isOn then
+                block.obj.data.isOn()
+            end
+        end
     end
 end
 
