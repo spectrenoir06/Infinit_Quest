@@ -82,7 +82,20 @@ end
 ------------------------------Game---------------------------------
 
 function game:init()
-
+	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
+	p:setEmissionRate(1000)
+	p:setSpeed(300, 400)
+	p:setSizes(2, 1)
+	p:setColors(220, 105, 20, 255, 194, 30, 18, 0)
+	p:setPosition(400, 300)
+	p:setLifetime(0.1)
+	p:setParticleLife(0.2)
+	p:setDirection(0)
+	p:setSpread(360)
+	p:setTangentialAcceleration(1000)
+	p:setRadialAcceleration(-2000)
+	p:stop()
+	
 	cam:attach()
     import_data("/data/data.json")
 	
@@ -145,7 +158,7 @@ function game:draw()
     steve:getmap():draw(0,0)
     steve:draw()
 	steve:getmap():drawdeco(0,0)
-	
+	love.graphics.draw(p, 0, 0)
 	cam:detach()
 	
     if info then
@@ -162,6 +175,7 @@ end
 
 function game:update(dt)
     --map = steve:getmap()
+	p:update(dt)
     steve:update(dt)
     click = love.mouse.isDown( "l" )
  
@@ -239,8 +253,10 @@ function game:keypressed(key)
     end
 	
 	if key=="e" then
-		cam:zoom(1.1)
+		p:start()
+		p:setPosition(steve.posX, steve.posY)
 	end
+
 end
 
 ---------------------------------------------------------------------

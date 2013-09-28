@@ -87,7 +87,7 @@ function perso:update(dt)
 	
 	
 	if self.dx~=0 or self.dy ~=0 then -- si mouvement
-	
+		self.sprite:play()
 		if self.dx~=0 and (self.Y1 % (grid))~=0 then --si mouvement sur X mais Y pas sur le grid
 			--print(self.posY % grid /grid)
 			if ((self.Y1 % (grid)/grid)<=0.5) then -- realignement en -y
@@ -136,9 +136,10 @@ function perso:update(dt)
 				-- print(math.floor((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution)
 				self:setY1(math.floor((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution) -- si colision en +y position arrondie au tile au dessous
 			end
-			self.sprite:stop()
 			--print("stop")
 		end
+	else
+		self.sprite:stop()
     end
 	self:updatePos()
 	self.dy = 0

@@ -61,12 +61,12 @@ end
 
 function sprite:setAnim(nb,frame)
 	self.animation = nb
-    self.timer = 0
-    if frame then
-        self.position = frame
-    else
-        self.position = 1
-    end
+    --self.timer = 0
+    -- if frame then
+        -- self.position = frame
+    -- else
+        -- self.position = 1
+    -- end
     
 end
 
