@@ -26,7 +26,12 @@
 	pause = {}
 	main_menu = {}
   
-function love.load()
+function love.load(arg)
+  if arg[#arg] == "-debug" then
+      require("mobdebug").start()
+      --socket.select = function() return {} end
+  end
+  
 	load_option()
 	gamestate.registerEvents()
 	cam = camera()
@@ -144,7 +149,7 @@ function game:draw()
 	cam:detach()
 	
     if info then
-        dispinfo(640,0)
+        dispinfo(800,0)
     end
     --invent:draw(steve)
     --touchemobil:draw()

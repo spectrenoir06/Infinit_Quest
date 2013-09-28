@@ -12,7 +12,7 @@ function perso_new(fichier,LX,LY,map)
     a.LY = LY
 	
 	for k,v in ipairs(data.map) do
-		if (v.X<(a.globalPosX/resolution)) and (v.Y<(a.globalPosX/resolution)) then
+		if (v.X<(a.globalPosX/resolution)) and (v.Y<(a.globalPosX/resolution)) then -- 
 			if ((a.globalPosX-v.X*resolution) < v.map.LX*resolution) and ((a.globalPosY-v.Y*resolution) < v.map.LY*resolution) then
 				a.map = data.map[k]
 				a.posX = a.globalPosX - v.X * resolution
@@ -67,71 +67,84 @@ end
 
 
 function perso:update(dt)
+	self:updatePos()
     self.sprite:update(dt)
-
-	self:isOn()
+	
+	--self:isOn()
 
 	if key_a == 1 then
 		self:use()
 	end
-	--print(self.posY % (resolution)/resolution)
+	
 	local grid = resolution/2
 	
-	if self.dx~=0 or self.dy ~=0 then
 	
-		if self.dx~=0 and (self.posY % (grid))~=0 then
+	-- if old ~= (self.X1 % grid /grid) then
+		--print(self.X1 % grid /grid)
+	-- end
+	--old = self.X1 % grid /grid
+	
+	
+	
+	if self.dx~=0 or self.dy ~=0 then -- si mouvement
+	
+		if self.dx~=0 and (self.Y1 % (grid))~=0 then --si mouvement sur X mais Y pas sur le grid
 			--print(self.posY % grid /grid)
-			if ((self.posY % (grid)/grid)<=0.5) then
-				if (((self.posY - dt*self.speed)%grid)/grid)>0.5 then
-					self:setY(math.floor(self.posY/grid)*grid)
+			if ((self.Y1 % (grid)/grid)<=0.5) then -- realignement en -y
+				if (((self.Y1 - dt*self.speed)%grid)/grid)>0.5 then
+					self:setY1(math.floor(self.Y1/grid)*grid)
 				else
-					self:setY(self.posY -(dt*self.speed))
+					self:setY1(self.Y1 -(dt*self.speed))
 				end
 			else
-				if (((self.posY +(dt*self.speed))%grid)<0.5) then
-					self:setY(math.ceil(self.posY/grid)*grid)
+				if (((self.Y1 +(dt*self.speed))%grid)<0.5) then --realignement en +y
+					self:setY1(math.ceil(self.Y1/grid)*grid)
 				else
-					self:setY(self.posY +(dt*self.speed))
+					self:setY1(self.Y1 +(dt*self.speed))
 				end
 			end
-		elseif self.dy~=0 and (self.posX % (grid))~=0 then
-			print(self.posX % grid /grid)
-			if ((self.posX % (grid)/grid)<=0.5) then
-				if (((self.posX - dt*self.speed)%grid)/grid)>0.5 then
-					self:setX(math.floor(self.posX/grid)*grid)
+		elseif self.dy~=0 and (self.X1 % (grid))~=0 then --si mouvement sur Y mais X pas sur le grid
+			--print(self.X1 % grid /grid)
+			if ((self.X1 % (grid)/grid)<=0.5) then
+				if (((self.X1 - dt*self.speed)%grid)/grid)>0.5 then -- realignement en -x
+					self:setX1(math.floor(self.X1/grid)*grid)
 				else
-					self:setX(self.posX -(dt*self.speed))
+					self:setX1(self.X1 -(dt*self.speed))
 				end
 			else
-				if (((self.posX +(dt*self.speed))%grid)<0.5) then
-					self:setX(math.ceil(self.posX/grid)*grid)
+				if (((self.X1 +(dt*self.speed))%grid)<0.5) then -- realignement en +y
+					self:setX1(math.ceil(self.X1/grid)*grid)
 				else
-					self:setX(self.posX +(dt*self.speed))
+					self:setX1(self.X1 +(dt*self.speed))
 				end
 			end
-		elseif not self:colision(dt) then
-			self:setX( self.posX +(dt*self.dx*self.speed) )
-			self:setY( self.posY +(dt*self.dy*self.speed) )
+		elseif not self:colision(dt) then -- si aligner sur l'axe perpendiculaire au mouvement ( si +x alors y%grid = 0 ) et pas de colision
+			self:setX1( self.X1 +(dt*self.dx*self.speed) ) -- mouvement sur X
+			self:setY1( self.Y1 +(dt*self.dy*self.speed) ) -- mouvement sur Y
 			--self.sprite:play()
 		else
 			if self.dx<0 then
-				self:setX( math.ceil(self.posX +(dt*self.dx*self.speed)/64))
+				self:setX1(math.ceil((self.X1 +(dt*self.dx*self.speed))/resolution)*resolution) -- si colision en -x position arrondie au tile a gauche
 			elseif self.dx>0 then
-				self:setX( math.floor(self.posX +(dt*self.dx*self.speed)/64))
+				self:setX1(math.floor((self.X1 +(dt*self.dx*self.speed))/resolution)*resolution) -- si colision en + position arrondie au tile e droite 
 			end
 			if self.dy<0 then
-				self:setY( math.ceil(self.posY +(dt*self.dy*self.speed)/64))
+				self:setY1(math.ceil((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution) -- si colision en -y position arrondie au tile au dessus
 				-- print(math.ceil(self.posY +(dt*self.dy*self.speed)/64))
 			elseif self.dy>0 then
-				self:setY( math.floor(self.posY +(dt*self.dx*self.speed)/64))
+				-- print("pos = " .. self.Y1 +(dt*self.dy*self.speed))
+				-- print(math.floor((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution)
+				self:setY1(math.floor((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution) -- si colision en +y position arrondie au tile au dessous
 			end
-			--self.sprite:stop()
+			self.sprite:stop()
 			--print("stop")
 		end
     end
+	self:updatePos()
 	self.dy = 0
 	self.dx = 0
-	if (self.posX < 0) or (self.posX>self.map.map.LX*resolution) then
+	
+	if (self.posX < 0) or (self.posX>self.map.map.LX*resolution) then -- si perso sort de la map local
 		print("------------------")
 		print("scan map:")
 		for k,v in ipairs(data.map) do
@@ -153,13 +166,13 @@ function perso:update(dt)
 			end
 		end
 	end
-	
+	self:updatePos()
 	
 end
 
 -------------------------------------------------------------------------------------------------------------------------------
 function perso:draw()
-    self.sprite:draw((self.posX-self.LX/2),self.posY-self.LY/2)
+    self.sprite:draw(math.floor(self.X1),math.floor(self.Y1)) 
 end
 
 function perso:setPos(tilex,tiley,dir,map)
@@ -201,6 +214,12 @@ function perso:setX(x)
 	self.Y2 = self.posY +self.LY/2
 end
 
+function perso:setX1(x)
+	self.X1 = x
+	self.X2 = x + self.LY
+	self.posX = x + (self.LX/2)
+end
+
 function perso:setY(y)
 	self.posY = y
 	self.globalPosY = self.map.Y*resolution + y
@@ -208,6 +227,20 @@ function perso:setY(y)
 	self.Y1 = self.posY -self.LY/2
 	self.X2 = self.posX +self.LX/2
 	self.Y2 = self.posY +self.LY/2
+end
+
+function perso:setY1(y)
+	self.Y1 = y
+	self.Y2 = y + self.LY
+	self.posY = y + (self.LY/2)
+end
+
+function perso:updatePos()
+	self.X2 = self.X1 + self.LY
+	--self.posX = self.X1 + (self.LX/2)
+	
+	--self.Y2 = self.Y1 + self.LY
+	--self.posY = self.Y1 + (self.LY/2)
 end
 
 
@@ -224,14 +257,32 @@ function perso:setvie(x)
 end
 
 function perso:colision(dt) -- return true si perso en colision au coordoner
-
-		return self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
-			or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
-			or self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
-			or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+	local retour = self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+				or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+				or self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+				or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+				
+				
+		if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
+			print("x1,y1=true")
+		end
+		if self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
+			print("x2,y1=true")
+			
+		end
+		if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution)) then
+			print("x1,y2=true")
+		end
+		if self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution)) then
+			print("x2,y2=true")
+			print(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+		end
+		
+		
+	return retour
 end
-function perso:scancol(x,y) -- return true si colision
-	local idsol, idblock, x, y, pnj = self:getblock(x,y)
+function perso:scancol(tilex,tiley) -- return true si colision
+	local idsol, idblock, x, y, pnj = self:getblock(tilex,tiley)
 		--print(idsol,idblock)
 	local blockDataSol = data.tab[idsol]
 	local blockDataBlock = data.tab[idblock]
