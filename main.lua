@@ -174,16 +174,16 @@ function game:update(dt)
         --    love.timer.sleep( 0.5 )
         --end
         touche = keypad:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click)
-        if touche==1 or not love.keyboard.isDown( "up" ) then
+        if touche==1 then --or not love.keyboard.isDown( "up" ) then
             steve:GoUp()
         end
-        if touche == 2 or not love.keyboard.isDown( "down" ) then
+        if touche == 2 then --or not love.keyboard.isDown( "down" ) then
             steve:GoDown()
         end
-        if touche==3 or not love.keyboard.isDown( "left" ) then
+        if touche==3 then --  or not love.keyboard.isDown( "left" ) then
             steve:GoLeft()
         end
-        if touche==4 or not love.keyboard.isDown( "right" ) then
+        if touche==4 then --or not love.keyboard.isDown( "right" ) then
             steve:GoRight()
         end
         if A_key:isPress(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then

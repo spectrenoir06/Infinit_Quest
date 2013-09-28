@@ -72,9 +72,9 @@ function perso:update(dt)
 	
 	--self:isOn()
 
-	if key_a == 1 then
-		self:use()
-	end
+	-- if key_a == 1 then
+		-- self:use()
+	-- end
 	
 	local grid = resolution/2
 	
@@ -310,13 +310,13 @@ end
 function perso:use()
 	local posX , posY , X1 , Y1 , X2 ,Y2 = self:getPos()
 	if self:getdirection()==1 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(posX/resolution),math.floor(Y1/resolution))
+		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)-1)
     elseif	self:getdirection()==2 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(posX/resolution),math.ceil(Y2/resolution))
+		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)+1)
 	elseif self:getdirection()==3 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution),math.floor(posY/resolution))
+		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution)-1,math.floor(Y1/resolution))
 	elseif self:getdirection()==4 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.ceil(X2/resolution),math.ceil(posY/resolution))
+		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution)+1,math.floor(Y1/resolution))
 	end
 		
     if idblock then
