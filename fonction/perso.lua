@@ -146,6 +146,9 @@ function perso:update(dt)
 	
 	if (self.posX < 0) or (self.posX>self.map.map.LX*resolution) then -- si perso sort de la map local
 		print("------------------")
+		print("globalPosX"..self.globalPosX)
+		print("globalPosY"..self.globalPosY)
+		print(""                )
 		print("scan map:")
 		for k,v in ipairs(data.map) do
 			print("map "..k)
@@ -159,8 +162,10 @@ function perso:update(dt)
 					print("= goto map "..k)
 					print("------------------")
 					self.map = data.map[k]
-					self.posX = self.globalPosX - v.X * resolution
-					self.posY = self.globalPosY - v.Y * resolution
+					self:setPosX(self.globalPosX - v.X * resolution)
+					self:setPosY(self.globalPosY - v.Y * resolution)
+					
+					
 					break
 				end
 			end
@@ -197,50 +202,40 @@ function perso:getY()
 end
 
 function perso:getPos()
-	self.X1 = self.posX -self.LX/2
-	self.Y1 = self.posY -self.LY/2
-	self.X2 = self.posX +self.LX/2
-	self.Y2 = self.posY +self.LY/2
+	self:updatePos()
     return self.posX , self.posY , self.X1 ,  self.Y1 , self.X2 , self.Y2
 end
 
 
-function perso:setX(x)
+function perso:setPosX(x)
 	self.posX = x
-	self.globalPosX = self.map.X*resolution + x
 	self.X1 = self.posX -self.LX/2
-	self.Y1 = self.posY -self.LY/2
-	self.X2 = self.posX +self.LX/2
-	self.Y2 = self.posY +self.LY/2
+	self:updatePos()
 end
 
 function perso:setX1(x)
 	self.X1 = x
-	self.X2 = x + self.LY
-	self.posX = x + (self.LX/2)
+	self:updatePos()
 end
 
-function perso:setY(y)
+function perso:setPosY(y)
 	self.posY = y
-	self.globalPosY = self.map.Y*resolution + y
-	self.X1 = self.posX -self.LX/2
 	self.Y1 = self.posY -self.LY/2
-	self.X2 = self.posX +self.LX/2
-	self.Y2 = self.posY +self.LY/2
+	self:updatePos()
 end
 
 function perso:setY1(y)
 	self.Y1 = y
-	self.Y2 = y + self.LY
-	self.posY = y + (self.LY/2)
+	self:updatePos()
 end
 
 function perso:updatePos()
 	self.X2 = self.X1 + self.LY
-	--self.posX = self.X1 + (self.LX/2)
-	
-	--self.Y2 = self.Y1 + self.LY
-	--self.posY = self.Y1 + (self.LY/2)
+	self.posX = self.X1 + (self.LX/2)
+	self.Y2 = self.Y1 + self.LY
+	self.posY = self.Y1 + (self.LY/2)
+	self.globalPosX = self.map.X*resolution + self.posX
+	self.globalPosY = self.map.Y*resolution + self.posY
 end
 
 
@@ -257,34 +252,31 @@ function perso:setvie(x)
 end
 
 function perso:colision(dt) -- return true si perso en colision au coordoner
-	-- local retour = self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
-				-- or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
-				-- or self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
-				-- or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution)-1,math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+	return self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+		or self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+		or self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution))
+		or self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution))
 				
 				
-		if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
-			print("x1,y1=true")
-			return true
-		end
-		if self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
-			print("x2,y1=true")
-			return true
+		-- if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
+			-- print("x1,y1=true")
+			-- return true
+		-- end
+		-- if self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
+			-- print("x2,y1=true")
+			-- return true
 			
-		end
-		if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution)) then
-			print("x1,y2=true")
-			return true
-		end
-		if self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution)) then
-			print("x2,y2=true")
-			print("X2="..self.X2/64 .."   Y2="..self.Y2/64)
-			print(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
-			return true
-		end
-		
-		
-	-- return retour
+		-- end
+		-- if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution)) then
+			-- print("x1,y2=true")
+			-- return true
+		-- end
+		-- if self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution)) then
+			-- print("x2,y2=true")
+			-- print("X2="..self.X2/64 .."   Y2="..self.Y2/64)
+			-- print(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+			-- return true
+		-- end
 end
 function perso:scancol(tilex,tiley) -- return true si colision
 	local idsol, idblock, x, y, pnj = self:getblock(tilex,tiley)
