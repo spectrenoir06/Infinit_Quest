@@ -159,7 +159,7 @@ function map:gettile(x,y)
     if x<0 or y<0 or x>=self.LX or y>=self.LY then
         return nil
     else
-        return self.map_sol[x+1][y+1],self.map_block[x+1][y+1]
+        return self.map_sol[x+1][y+1],self.map_block[x+1][y+1],self.map_deco[x+1][y+1]
     end
 end
 

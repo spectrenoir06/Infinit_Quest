@@ -279,14 +279,14 @@ function perso:colision(dt) -- return true si perso en colision au coordoner
 		-- end
 end
 function perso:scancol(tilex,tiley) -- return true si colision
-	local idsol, idblock, x, y, pnj = self:getblock(tilex,tiley)
+	local block = self:getblock(tilex,tiley)
 		--print(idsol,idblock)
-	local blockDataSol = data.tab[idsol]
-	local blockDataBlock = data.tab[idblock]
-	if idblock==nil or idsol==nil then
+	local blockDataSol = data.tab[block.idsol]
+	local blockDataBlock = data.tab[block.idblock]
+	if block.idblock==nil or block.idsol==nil then
 		return false
 	else
-		return not blockDataSol.pass or not blockDataBlock.pass or pnj
+		return not blockDataSol.pass or not blockDataBlock.pass or block.pnj
 	end
 end
 
@@ -301,47 +301,73 @@ end
 
 
 function perso:getblock(tilex,tiley)
-        local idsol, idblock = self.map.map:gettile(tilex,tiley)
+
+        local idsol, idblock, iddeco = self.map.map:gettile(tilex,tiley)
         local pnj = self.map.map:getPnj(tilex,tiley)
         local obj = self.map.map:getObj(tilex,tiley)
-        return idsol,idblock,tilex,tiley,pnj,obj
+		local tab =
+		{pnj=pnj,
+		 idsol = idsol,
+		 idblock = idblock,
+		 iddeco = iddeco,
+		 obj = obj,
+		 pnj = pnj,
+		 tilex=tilex,
+		 tiley=tiley,
+		}
+        return tab
 end
 -------------------------------------------------
 function perso:use()
 	local posX , posY , X1 , Y1 , X2 ,Y2 = self:getPos()
 	if self:getdirection()==1 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)-1)
+		block = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)-1)
+		--print("use:",math.floor(X1/resolution),math.floor(Y1/resolution)-1)
     elseif	self:getdirection()==2 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)+1)
+		block = self:getblock(math.floor(X1/resolution),math.floor(Y1/resolution)+1)
 	elseif self:getdirection()==3 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution)-1,math.floor(Y1/resolution))
+		block = self:getblock(math.floor(X1/resolution)-1,math.floor(Y1/resolution))
 	elseif self:getdirection()==4 then
-		idsol,idblock,x,y,pnj,obj = self:getblock(math.floor(X1/resolution)+1,math.floor(Y1/resolution))
+		block = self:getblock(math.floor(X1/resolution)+1,math.floor(Y1/resolution))
 	end
-		
-    if idblock then
-        blockdata = data.tab[idblock]
-    end
-    local main = data.tab[self:getslot()]
-    if main.type == "block" then
-        if idblock==0 and not pnj then
+			
+    if data.tab[block.idblock].use then
+		data.tab[block.idblock].use(block.tileX,block.tiley)
+	elseif data.tab[block.idsol].use then
+		data.tab[block.idsol].use(block.tileX,block.tiley)
+    elseif block.pnj then
+		if block.pnj.data.talk then
+			block.pnj.data.talk()
+		end
+	end
+	
+	--if blockdata.use then
+                -- blockdata.use(x,y)
+            -- elseif pnj then
+                -- if pnj.data.talk then
+                    -- pnj.data.talk()
+                -- end
+	
+    -- local main = data.tab[self:getslot()]
+    -- if main.type == "block" then
+        -- if idblock==0 and not pnj then
             --self:place()
-        else
-            if blockdata.use then
-                blockdata.use(x,y)
-            elseif pnj then
-                if pnj.data.talk then
-                    pnj.data.talk()
-                end
-            end
-        end
-    elseif main.type == "item" then
-        if blockdata.use then
-                blockdata.use(x,y)
-        elseif main.use then
-            main.use(x,y)
-        end
-    end 
+        -- else
+            -- if blockdata.use then
+                -- blockdata.use(x,y)
+            -- elseif pnj then
+                -- if pnj.data.talk then
+                    -- pnj.data.talk()
+                -- end
+            -- end
+        -- end
+    -- elseif main.type == "item" then
+        -- if blockdata.use then
+                -- blockdata.use(x,y)
+        -- elseif main.use then
+            -- main.use(x,y)
+        -- end
+    -- end 
 end
 
 function perso:isOn()
