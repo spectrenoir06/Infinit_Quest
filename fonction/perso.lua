@@ -257,29 +257,34 @@ function perso:setvie(x)
 end
 
 function perso:colision(dt) -- return true si perso en colision au coordoner
-	local retour = self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
-				or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
-				or self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
-				or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+	-- local retour = self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+				-- or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution))
+				-- or self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+				-- or self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution)-1,math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
 				
 				
 		if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
 			print("x1,y1=true")
+			return true
 		end
-		if self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
+		if self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor((self.Y1+dt*self.dy*self.speed)/resolution)) then
 			print("x2,y1=true")
+			return true
 			
 		end
-		if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution)) then
+		if self:scancol(math.floor((self.X1+dt*self.dx*self.speed)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution)) then
 			print("x1,y2=true")
+			return true
 		end
-		if self:scancol(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution)) then
+		if self:scancol(math.floor(((self.X2+dt*self.dx*self.speed)-1)/resolution),math.floor(((self.Y2+dt*self.dy*self.speed)-1)/resolution)) then
 			print("x2,y2=true")
+			print("X2="..self.X2/64 .."   Y2="..self.Y2/64)
 			print(math.floor((self.X2+dt*self.dx*self.speed)/resolution),math.floor((self.Y2+dt*self.dy*self.speed)/resolution))
+			return true
 		end
 		
 		
-	return retour
+	-- return retour
 end
 function perso:scancol(tilex,tiley) -- return true si colision
 	local idsol, idblock, x, y, pnj = self:getblock(tilex,tiley)
