@@ -40,6 +40,9 @@ function start_screen:init()
 	start = love.graphics.newImage("/textures/menu/720/start/start.png")
 	avatar = love.graphics.newImage("/textures/menu/720/start/avatar.png")
 	
+	intro_music  = love.audio.newSource("/music/intro.mp3")
+	love.audio.play(intro_music)
+	
 	cam:zoomTo(love.graphics.getHeight()/720)
 	
 	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
@@ -56,7 +59,7 @@ function start_screen:init()
 	p:setRadialAcceleration(0,0)
 	p:stop()
 	--Timer.tween(1.5, avatar, {pos = {y = 550}}, 'linear')
-	Timer.add(5,function() gamestate.switch(main_menu) end)
+	Timer.add(6,function() gamestate.switch(main_menu) end)
 end
 
 function start_screen:draw()
@@ -216,6 +219,11 @@ end
 ------------------------------Game---------------------------------
 
 function game:init()
+
+	love.audio.stop(intro_music)
+	music = love.audio.newSource("/music/main.mp3")
+	love.audio.play(music)
+
 	cam:zoomTo(1)
 	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
 	p:setEmissionRate(1000)
