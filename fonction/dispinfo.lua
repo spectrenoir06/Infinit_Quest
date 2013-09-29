@@ -24,6 +24,10 @@ function dispinfo(x,y)
     
     love.graphics.print("dx = "..steve.dx,x+10,y+110)
     love.graphics.print("dy = "..steve.dy,x+10,y+120)
+	
+	love.graphics.print("rot = "..cam.rot.." rad",x+10,y+150)
+	love.graphics.print("rot = "..(cam.rot/math.pi) * 180  .." °",x+10,y+165)
+	
     -- love.graphics.print("up = "..up,x+10,y+140)
     -- love.graphics.print("down = "..down,x+10,y+155)
     -- love.graphics.print("left = "..left,x+10,y+170)

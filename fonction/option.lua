@@ -1,5 +1,4 @@
 function load_option()
-
 	resolution = 64  -- taile des tiles
     icone=( love.graphics.newImage( "icone.png" ) )  -- icone de la fenetre
     love.graphics.setIcon(icone)

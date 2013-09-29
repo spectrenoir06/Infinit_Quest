@@ -49,14 +49,19 @@ function main_menu:init()
 	Timer.tween(3, button_start, {x=600}, 'out-back')
 	Timer.tween(3, button_option, {x=600}, 'out-back')
 	Timer.tween(3, button_exit, {x=600}, 'out-back')
+	cam:zoomTo(1.5)
 end
 
 function main_menu:draw()
+	cam:lookAt(1280/2,720/2)
+	cam:attach()
 	love.graphics.draw( fond, 0, 0)
 	love.graphics.draw( hero, -button_start.x+700, 40 )
 	button_start:draw()
 	button_option:draw()
 	button_exit:draw()
+	cam:detach()
+	love.graphics.print(cam.scale,10,10)
 end
 
 function main_menu:update(dt)
@@ -66,7 +71,8 @@ function main_menu:update(dt)
 	button_exit:update()
 end
 
-function main_menu:mousepressed(x, y, button)
+function main_menu:mousepressed(Sx, Sy, button)
+	local x,y = cam:mousepos()
 	if button_start:isPress(x,y,button) then
 		print("button start")
 		gamestate.switch(game)
@@ -78,10 +84,20 @@ function main_menu:mousepressed(x, y, button)
 	end
 end
 
+function main_menu:keypressed(key)
+	if key=="escape" then
+		love.event.push("quit")
+	end
+	if key=="a" then
+		cam:zoom(1.1)
+	end
+end
+
 
 ------------------------------Game---------------------------------
 
 function game:init()
+	cam:zoomTo(1)
 	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
 	p:setEmissionRate(1000)
 	p:setSpeed(300, 400)
@@ -96,7 +112,7 @@ function game:init()
 	p:setRadialAcceleration(-2000)
 	p:stop()
 	
-	cam:attach()
+	
     import_data("/data/data.json")
 	
     require "/fonction/perso"
@@ -134,11 +150,8 @@ function game:init()
 end
 
 function game:draw()
-
-	cam:attach()	
-	
-	--cam:lookAt(steve:getX()-9*resolution, steve:getY()-5.5*resolution)
-	cam:lookAt(math.floor(steve:getX()), math.floor(steve:getY()))
+	--love.graphics.setIcon(icone)
+	cam:lookAt(math.floor(steve.X1), math.floor(steve.Y1))
 	
     if cam.x<love.graphics.getWidth()/2 then
          cam.x = love.graphics.getWidth()/2
@@ -150,23 +163,20 @@ function game:draw()
         cam.y = love.graphics.getHeight()/2
     elseif cam.y>steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
          cam.y = steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
-     end
-	
-    love.graphics.setIcon(icone)
-	
-    love.graphics.scale(scale,scale)
-    steve:getmap():draw(0,0)
-    steve:draw()
-	steve:getmap():drawdeco(0,0)
-	love.graphics.draw(p, 0, 0)
-	cam:detach()
+    end
+	cam:attach()	 			-- mode camera
+    steve:getmap():draw(0,0)  	-- afficher map
+    steve:draw() 				-- afficher perso
+	steve:getmap():drawdeco(0,0)-- afficher map deco
+	love.graphics.draw(p, 0, 0)	-- afficher particule
+	cam:detach()				-- fin du mode camera
 	
     if info then
-        dispinfo(800,0)
+        dispinfo(love.graphics.getWidth()-448,0)	-- cadre info
     end
     --invent:draw(steve)
     --touchemobil:draw()
-    if mobile then
+    if mobile then -- aff touche mobil
         A_key:draw()
         keypad:draw()
     end
@@ -174,40 +184,32 @@ function game:draw()
 end
 
 function game:update(dt)
-    --map = steve:getmap()
-	p:update(dt)
-    steve:update(dt)
-    click = love.mouse.isDown( "l" )
+
+    steve:update(dt)  -- update steve
+	p:update(dt) --update particule
+	
+    local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
     if invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then
         steve:setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
     end   
-    if mobile then
-        --if touchemobil:isPress(love.mouse.getX( )*scale,love.mouse.getY( )*scale,click) then
-        --    mobile=false
-        --    love.timer.sleep( 0.5 )
-        --end
-        touche = keypad:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click)
-        if touche==1 then --or not love.keyboard.isDown( "up" ) then
+	
+    if mobile then -- mode tactile mobil
+        local touche = keypad:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click)
+        if touche==1 then
             steve:GoUp()
-        end
-        if touche == 2 then --or not love.keyboard.isDown( "down" ) then
+        elseif touche == 2 then
             steve:GoDown()
-        end
-        if touche==3 then --  or not love.keyboard.isDown( "left" ) then
+        elseif touche==3 then 
             steve:GoLeft()
-        end
-        if touche==4 then --or not love.keyboard.isDown( "right" ) then
+        elseif touche==4 then
             steve:GoRight()
-        end
+		end
+		
         if A_key:isPress(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then
             steve:use()
         end
-    else
-        --if touchemobil:isPress(love.mouse.getX( )*scale,love.mouse.getY( )*scale,click) then
-         --   mobile=true
-         --   love.timer.sleep( 0.5 )
-       -- end
+    else -- mode clavier
         if love.keyboard.isDown( "up" ) then
             steve:GoUp()
         elseif love.keyboard.isDown( "down" ) then
@@ -224,9 +226,7 @@ function game:update(dt)
 end
 
 function game:mousepressed(x, y, button)
-	cursor_x , cursor_y = cam:worldCoords(x,y)
-    -- cursor_x=(x+camera.x)--/scale
-    -- cursor_y=(y+camera.y)--/scale
+
 end
     
 function game:keypressed(key)
@@ -256,6 +256,15 @@ function game:keypressed(key)
 		p:start()
 		p:setPosition(steve.posX, steve.posY)
 	end
+	
+	if key=="escape" then
+		love.event.push("quit")
+	end
+	
+	if key=="o" then
+		cam:rotate(math.pi/8)
+	end
+
 
 end
 
