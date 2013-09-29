@@ -21,22 +21,60 @@
 	--G_host = "192.168.10.8"
 	--require "/android/android"
 	
+	start_screen = {}
 	game = {}
 	option = {}
 	pause = {}
 	main_menu = {}
   
 function love.load(arg)
-  if arg[#arg] == "-debug" then
-      require("mobdebug").start()
-      --socket.select = function() return {} end
-  end
   
 	load_option()
 	gamestate.registerEvents()
 	cam = camera()
-	gamestate.switch(main_menu)
+	gamestate.switch(start_screen)
 end
+-----------------------------start_screen---------------------------
+
+function start_screen:init()
+	start = love.graphics.newImage("/textures/menu/720/start/start.png")
+	avatar = love.graphics.newImage("/textures/menu/720/start/avatar.png")
+	
+	cam:zoomTo(love.graphics.getHeight()/720)
+	
+	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
+	p:setEmissionRate(300)
+	p:setSpeed(300, 400)
+	p:setSizes(0.5, 0.5,0.1,0.5,0.01)
+	p:setColors(255, 255, 0, 128, 255, 125, 32, 255,192,92,32,255,240,64,32,255)
+	p:setPosition(100+(avatar:getWidth( )/2), 100+(avatar:getHeight( )/2))
+	p:setLifetime(-1)
+	p:setParticleLife(0.5,2)
+	p:setDirection(270)
+	p:setSpread(360)
+	p:setTangentialAcceleration(0,0)
+	p:setRadialAcceleration(0,0)
+	p:stop()
+	--Timer.tween(1.5, avatar, {pos = {y = 550}}, 'linear')
+	Timer.add(5,function() gamestate.switch(main_menu) end)
+end
+
+function start_screen:draw()
+	cam:lookAt(1280/2,720/2)
+	cam:attach()
+	love.graphics.draw( start, 0, 0)
+	love.graphics.draw(p, 0, 0)
+	love.graphics.draw( avatar, 100, 100 )
+	p:start()
+	--p:setPosition(steve.posX, steve.posY)
+	cam:detach()
+end
+
+function start_screen:update(dt)
+	Timer.update(dt)
+	p:update(dt)
+end
+
 
 -----------------------------Main_menu----------------------------
 function main_menu:init()
@@ -84,13 +122,16 @@ function main_menu:mousepressed(Sx, Sy, button)
 	local x,y = cam:mousepos()
 	if button_start:isPress(x,y,button) then
 		print("button start")
-		gamestate.switch(game)
+		Timer.tween(1.5, button_start, {x=1280}, 'linear')
+		Timer.tween(1.5, button_option, {x=1280}, 'linear')
+		Timer.tween(1.5, button_exit, {x=1280}, 'linear')
+		Timer.add(2,function() gamestate.switch(game) end)
 	elseif button_option:isPress(x,y,button) then
 		print("button option")
 		Timer.tween(1.5, button_start, {x=1280}, 'linear')
 		Timer.tween(1.5, button_option, {x=1280}, 'linear')
 		Timer.tween(1.5, button_exit, {x=1280}, 'linear')
-		Timer.add(2,function() gamestate.switch(option) end)
+		Timer.add(1.5,function() gamestate.switch(option) end)
 		--gamestate.switch(option)
 	elseif button_exit:isPress(x,y,button) then
 		print("button quit")
@@ -100,7 +141,12 @@ end
 
 function main_menu:keypressed(key)
 	if key=="escape" then
-		love.event.push("quit")
+		print("button option")
+		Timer.tween(1.5, button_start, {x=1280}, 'linear')
+		Timer.tween(1.5, button_option, {x=1280}, 'linear')
+		Timer.tween(1.5, button_exit, {x=1280}, 'linear')
+		Timer.add(1.5,function() love.event.push("quit") end)
+		
 	end
 end
 
@@ -156,7 +202,7 @@ function option:mousepressed(Sx, Sy, button)
 		Timer.tween(1.5, button_1, {x=1280}, 'linear')
 		Timer.tween(1.5, button_2, {x=1280}, 'linear')
 		Timer.tween(1.5, button_3, {x=1280}, 'linear')
-		Timer.add(2,function() gamestate.switch(main_menu) end)
+		Timer.add(1.5,function() gamestate.switch(main_menu) end)
 	end
 	
 end
