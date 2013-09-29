@@ -11,7 +11,6 @@
 	----------------------------------
 	
 	--------function------------------
-	require "/fonction/set_resolution"
 	require "/fonction/option"
     ----------------------------------
 	
@@ -23,6 +22,7 @@
 	--require "/android/android"
 	
 	game = {}
+	option = {}
 	pause = {}
 	main_menu = {}
   
@@ -39,17 +39,26 @@ function love.load(arg)
 end
 
 -----------------------------Main_menu----------------------------
-
 function main_menu:init()
 	fond = love.graphics.newImage("/textures/menu/720/fond.png")
 	hero = love.graphics.newImage("/textures/menu/720/hero.png")
-	button_start = button_new(1000,150,"/textures/menu/720/barre_start.png")
-	button_option = button_new(1000,350,"/textures/menu/720/barre_option.png")
-	button_exit = button_new(1000,550,"/textures/menu/720/barre_exit.png")
-	Timer.tween(3, button_start, {x=600}, 'out-back')
-	Timer.tween(3, button_option, {x=600}, 'out-back')
-	Timer.tween(3, button_exit, {x=600}, 'out-back')
-	cam:zoomTo(1.5)
+	
+	button_start = button_new(1280,150,"/textures/menu/720/barre_start.png")
+	button_option = button_new(1280,350,"/textures/menu/720/barre_option.png")
+	button_exit = button_new(1280,550,"/textures/menu/720/barre_exit.png")
+	
+	cam:zoomTo(love.graphics.getHeight()/720)
+end
+
+function main_menu:enter()
+	
+	button_start.x=1280
+	button_option.x=1280
+	button_exit.x=1280
+	
+	Timer.tween(1.5, button_start, {x=600}, 'linear')
+	Timer.tween(1.5, button_option, {x=600}, 'linear')
+	Timer.tween(1.5, button_exit, {x=600}, 'linear')
 end
 
 function main_menu:draw()
@@ -78,6 +87,11 @@ function main_menu:mousepressed(Sx, Sy, button)
 		gamestate.switch(game)
 	elseif button_option:isPress(x,y,button) then
 		print("button option")
+		Timer.tween(1.5, button_start, {x=1280}, 'linear')
+		Timer.tween(1.5, button_option, {x=1280}, 'linear')
+		Timer.tween(1.5, button_exit, {x=1280}, 'linear')
+		Timer.add(2,function() gamestate.switch(option) end)
+		--gamestate.switch(option)
 	elseif button_exit:isPress(x,y,button) then
 		print("button quit")
 		love.event.push("quit")
@@ -88,11 +102,70 @@ function main_menu:keypressed(key)
 	if key=="escape" then
 		love.event.push("quit")
 	end
-	if key=="a" then
-		cam:zoom(1.1)
-	end
 end
 
+----------------------------Option-----------------------------
+
+function option:init()
+
+	button_1 = button_new(1280,150,"/textures/menu/720/barre.png")
+	button_2 = button_new(1280,350,"/textures/menu/720/barre.png")
+	button_3 = button_new(1280,550,"/textures/menu/720/barre_exit.png")
+	
+end
+
+function option:enter()
+	
+	button_1.x = 1280
+	button_2.x = 1280
+	button_3.x = 1280
+	
+	Timer.tween(3, button_1, {x=600}, 'out-back')
+	Timer.tween(3, button_2, {x=600}, 'out-back')
+	Timer.tween(3, button_3, {x=600}, 'out-back')
+	
+end
+
+
+function option:draw()
+	cam:attach()
+	love.graphics.draw( fond, 0, 0)
+	button_1:draw()
+	button_2:draw()
+	button_3:draw()
+	cam:detach()
+end
+
+function option:update(dt)
+	Timer.update(dt)
+	button_1:update()
+	button_2:update()
+	button_3:update()
+end
+
+function option:mousepressed(Sx, Sy, button)
+
+	local x,y = cam:mousepos()
+	
+	if button_1:isPress(x,y,button) then
+		print("button_1")
+	elseif button_2:isPress(x,y,button) then
+		print("button_2")
+	elseif button_3:isPress(x,y,button) then
+		print("button_3")
+		Timer.tween(1.5, button_1, {x=1280}, 'linear')
+		Timer.tween(1.5, button_2, {x=1280}, 'linear')
+		Timer.tween(1.5, button_3, {x=1280}, 'linear')
+		Timer.add(2,function() gamestate.switch(main_menu) end)
+	end
+	
+end
+
+function option:keypressed(key)
+	if key=="escape" then
+		love.event.push("quit")
+	end
+end
 
 ------------------------------Game---------------------------------
 
@@ -190,7 +263,7 @@ function game:update(dt)
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
-    if invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then
+    if invent:get(love.mouse.getX( ),love.mouse.getY( ),click) then
         steve:setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
     end   
 	

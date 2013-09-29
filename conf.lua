@@ -9,3 +9,4 @@ function love.conf(t)
     --t.android_native_screen = true
 	t.screen.fsaa = 10
 end
+
