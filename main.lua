@@ -45,12 +45,15 @@ function start_screen:init()
 	
 	cam:zoomTo(love.graphics.getHeight()/720)
 	
-	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
-	p:setEmissionRate(300)
+	pos = {}
+	pos.X , pos.Y = 0-avatar:getWidth(),0-avatar:getHeight()
+	
+	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 1000 )
+	p:setEmissionRate(400)
 	p:setSpeed(300, 400)
 	p:setSizes(0.5, 0.5,0.1,0.5,0.01)
 	p:setColors(255, 255, 0, 128, 255, 125, 32, 255,192,92,32,255,240,64,32,255)
-	p:setPosition(100+(avatar:getWidth( )/2), 100+(avatar:getHeight( )/2))
+	p:setPosition(pos.X+avatar:getWidth()/2,pos.Y+avatar:getHeight()/1.5)
 	p:setLifetime(-1)
 	p:setParticleLife(0.5,2)
 	p:setDirection(270)
@@ -58,16 +61,21 @@ function start_screen:init()
 	p:setTangentialAcceleration(0,0)
 	p:setRadialAcceleration(0,0)
 	p:stop()
-	--Timer.tween(1.5, avatar, {pos = {y = 550}}, 'linear')
-	Timer.add(6,function() gamestate.switch(main_menu) end)
+	
+	Timer.tween(5, pos, {X=love.graphics.getWidth()/2-avatar:getWidth()/2}, 'out-back')
+	Timer.tween(5, pos, {Y=love.graphics.getHeight()/2-avatar:getHeight()/2}, 'bounce')
+	
+	Timer.add(6,function() gamestate.switch(main_menu) end)	
+	
 end
 
 function start_screen:draw()
 	cam:lookAt(1280/2,720/2)
 	cam:attach()
 	love.graphics.draw( start, 0, 0)
+	p:setPosition(pos.X+avatar:getWidth()/2,pos.Y+avatar:getHeight()/2)
 	love.graphics.draw(p, 0, 0)
-	love.graphics.draw( avatar, 100, 100 )
+	love.graphics.draw( avatar, pos.X , pos.Y  )
 	p:start()
 	--p:setPosition(steve.posX, steve.posY)
 	cam:detach()
@@ -97,12 +105,14 @@ function main_menu:enter()
 	button_option.x=1280
 	button_exit.x=1280
 	
-	Timer.tween(1.5, button_start, {x=600}, 'linear')
-	Timer.tween(1.5, button_option, {x=600}, 'linear')
-	Timer.tween(1.5, button_exit, {x=600}, 'linear')
+	effect1 = Timer.tween(1.5, button_start, {x=600}, 'linear')
+	effect2 = Timer.tween(1.5, button_option, {x=600}, 'linear')
+	effect3 = Timer.tween(1.5, button_exit, {x=600}, 'linear')
+	
 end
 
 function main_menu:draw()
+
 	cam:lookAt(1280/2,720/2)
 	cam:attach()
 	love.graphics.draw( fond, 0, 0)
@@ -112,6 +122,7 @@ function main_menu:draw()
 	button_exit:draw()
 	cam:detach()
 	love.graphics.print(cam.scale,10,10)
+	
 end
 
 function main_menu:update(dt)
@@ -125,16 +136,33 @@ function main_menu:mousepressed(Sx, Sy, button)
 	local x,y = cam:mousepos()
 	if button_start:isPress(x,y,button) then
 		print("button start")
-		Timer.tween(1.5, button_start, {x=1280}, 'linear')
-		Timer.tween(1.5, button_option, {x=1280}, 'linear')
-		Timer.tween(1.5, button_exit, {x=1280}, 'linear')
-		Timer.add(2,function() gamestate.switch(game) end)
+		
+		Timer.cancel(effect1)
+		Timer.cancel(effect2)
+		Timer.cancel(effect3)
+		
+		local temp = ((1.5/680)*(1280-button_start.x))
+		
+		Timer.tween(temp, button_start, {x=1280}, 'linear')
+		Timer.tween(temp, button_option, {x=1280}, 'linear')
+		Timer.tween(temp, button_exit, {x=1280}, 'linear')
+		Timer.add(temp,function() gamestate.switch(game) end)
+		
 	elseif button_option:isPress(x,y,button) then
 		print("button option")
-		Timer.tween(1.5, button_start, {x=1280}, 'linear')
-		Timer.tween(1.5, button_option, {x=1280}, 'linear')
-		Timer.tween(1.5, button_exit, {x=1280}, 'linear')
-		Timer.add(1.5,function() gamestate.switch(option) end)
+		
+		Timer.cancel(effect1)
+		Timer.cancel(effect2)
+		Timer.cancel(effect3)
+		
+		local temp = ((1.5/680)*(1280-button_start.x))
+		print((1280-button_start.x),temp)
+		
+		Timer.tween(temp, button_start, {x=1280}, 'linear')
+		Timer.tween(temp, button_option, {x=1280}, 'linear')
+		Timer.tween(temp, button_exit, {x=1280}, 'linear')
+		
+		Timer.add(temp,function() gamestate.switch(option) end)
 		--gamestate.switch(option)
 	elseif button_exit:isPress(x,y,button) then
 		print("button quit")
@@ -144,12 +172,7 @@ end
 
 function main_menu:keypressed(key)
 	if key=="escape" then
-		print("button option")
-		Timer.tween(1.5, button_start, {x=1280}, 'linear')
-		Timer.tween(1.5, button_option, {x=1280}, 'linear')
-		Timer.tween(1.5, button_exit, {x=1280}, 'linear')
-		Timer.add(1.5,function() love.event.push("quit") end)
-		
+		love.event.push("quit")
 	end
 end
 
@@ -169,9 +192,9 @@ function option:enter()
 	button_2.x = 1280
 	button_3.x = 1280
 	
-	Timer.tween(3, button_1, {x=600}, 'out-back')
-	Timer.tween(3, button_2, {x=600}, 'out-back')
-	Timer.tween(3, button_3, {x=600}, 'out-back')
+	effect1 = Timer.tween(1.5, button_1, {x=600}, 'linear')
+	effect2 = Timer.tween(1.5, button_2, {x=600}, 'linear')
+	effect3 = Timer.tween(1.5, button_3, {x=600}, 'linear')
 	
 end
 
@@ -202,10 +225,17 @@ function option:mousepressed(Sx, Sy, button)
 		print("button_2")
 	elseif button_3:isPress(x,y,button) then
 		print("button_3")
-		Timer.tween(1.5, button_1, {x=1280}, 'linear')
-		Timer.tween(1.5, button_2, {x=1280}, 'linear')
-		Timer.tween(1.5, button_3, {x=1280}, 'linear')
-		Timer.add(1.5,function() gamestate.switch(main_menu) end)
+		Timer.cancel(effect1)
+		Timer.cancel(effect2)
+		Timer.cancel(effect3)
+		
+		local temp = ((1.5/680)*(1280-button_1.x))
+		
+		Timer.tween(temp, button_1, {x=1280}, 'linear')
+		Timer.tween(temp, button_2, {x=1280}, 'linear')
+		Timer.tween(temp, button_3, {x=1280}, 'linear')
+		
+		Timer.add(temp,function() gamestate.switch(main_menu) end)
 	end
 	
 end
