@@ -277,6 +277,7 @@ function perso:colision(dt) -- return true si perso en colision au coordoner
 			-- return true
 		-- end
 end
+
 function perso:scancol(tilex,tiley) -- return true si colision
 	local block = self:getblock(tilex,tiley)
 		--print(idsol,idblock)

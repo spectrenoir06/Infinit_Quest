@@ -17,7 +17,7 @@ function new_mob()
 	a.Y2 = a.Y + a.LY/2
 	
     a.texture = "/textures/64/mob.png"
-    a.sprite = sprite_new("/textures/64/sprite.png",a.LX,a.LY)
+    a.sprite = sprite_new("/textures/64/mob.png",a.LX,a.LY)
     a.vie = 100
 	
 	a.sprite:addAnimation({9,10,11})
@@ -39,9 +39,9 @@ end
 function mob:update(dt)
 
 	self.sprite:update(dt)
-	print(dist(steve.posX,steve.posY,monster.X,monster.Y)/64)
+	--print(dist(steve.posX,steve.posY,monster.X,monster.Y)/64)
 	if dist(steve.posX,steve.posY,monster.X,monster.Y)/64 < 5 then
-		print("ennemi en vu")
+		--print("ennemi en vu")
 	end
 	
 end

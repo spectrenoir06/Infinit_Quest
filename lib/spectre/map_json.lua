@@ -139,7 +139,19 @@ function map:update(nb)
             end
         end
     end
+	
+	if self.map_col==nil then
+		self.map_col = {}
+		for x=1,(self.LX) do
+            for y=1,(self.LY) do
+				self.map_col[x] = {}
+                self.map_col[x][y] = self:scancol(x,y)
+            end
+        end 
+	end
+	
 end
+
 function map:draw(x,y)
     love.graphics.draw(self.spriteBatch_sol,math.floor(x),math.floor(y))
     love.graphics.draw(self.spriteBatch_block,math.floor(x),math.floor(y))
@@ -147,6 +159,14 @@ function map:draw(x,y)
     for k,v in ipairs(self.pnj) do
         v.sprite:drawframe((v.x*resolution),(v.y*resolution),1)
     end
+	
+	for x=1,(self.LX) do
+        for y=1,(self.LY) do
+			print(self.map_col)
+            love.graphics.print(self.map_col[1],x*64,y*64)
+        end
+    end 
+	
 end
 
 function map:drawdeco(x,y)
@@ -229,6 +249,48 @@ function map:getObj(tileX,tileY)
             end
         end
     end
+end
+
+function map:scancol(tilex,tiley) -- return true si colision
+	local block = self:getblock(tilex,tiley)
+		--print(idsol,idblock)
+	local blockDataSol = data.tab[block.idsol]
+	local blockDataBlock = data.tab[block.idblock]
+	if block.idblock==nil or block.idsol==nil then
+		return false
+	else
+		return not blockDataSol.pass or not blockDataBlock.pass or block.pnj
+	end
+end
+
+function map:scancol(tilex,tiley) -- return true si colision
+	local block = self:getblock(tilex,tiley)
+		--print(idsol,idblock)
+	local blockDataSol = data.tab[block.idsol]
+	local blockDataBlock = data.tab[block.idblock]
+	if block.idblock==nil or block.idsol==nil then
+		return false
+	else
+		return not blockDataSol.pass or not blockDataBlock.pass or block.pnj
+	end
+end
+
+function map:getblock(tilex,tiley)
+
+        local idsol, idblock, iddeco = self:gettile(tilex,tiley)
+        local pnj = self:getPnj(tilex,tiley)
+        local obj = self:getObj(tilex,tiley)
+		local tab =
+		{pnj=pnj,
+		 idsol = idsol,
+		 idblock = idblock,
+		 iddeco = iddeco,
+		 obj = obj,
+		 pnj = pnj,
+		 tilex=tilex,
+		 tiley=tiley,
+		}
+        return tab
 end
 
 
