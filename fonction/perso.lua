@@ -132,8 +132,6 @@ function perso:update(dt)
 				self:setY1(math.ceil((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution) -- si colision en -y position arrondie au tile au dessus
 				-- print(math.ceil(self.posY +(dt*self.dy*self.speed)/64))
 			elseif self.dy>0 then
-				-- print("pos = " .. self.Y1 +(dt*self.dy*self.speed))
-				-- print(math.floor((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution)
 				self:setY1(math.floor((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution) -- si colision en +y position arrondie au tile au dessous
 			end
 			--print("stop")

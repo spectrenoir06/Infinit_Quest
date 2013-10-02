@@ -54,8 +54,10 @@ function dispinfo(x,y)
     
     love.graphics.print("slot de l'inventaire = "..steve:getnbslot(),x+10,y+270)
     
-    love.graphics.print("x1 = "..steve.posX-32,x+300,y+270)
-    love.graphics.print("y1 = "..steve.posY-32,x+300,y+280)
+    love.graphics.print("x1 = "..steve.X1,x+300,y+270)
+    love.graphics.print("y1 = "..steve.Y1,x+300,y+280)
+	love.graphics.print("x2 = "..steve.X2,x+300,y+295)
+    love.graphics.print("y2 = "..steve.Y2,x+300,y+305)
 	
     
     love.graphics.print("camera.x = "..cam.x,x+10,y+290)
