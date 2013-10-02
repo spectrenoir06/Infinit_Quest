@@ -32,7 +32,7 @@ function love.load(arg)
 	load_option()
 	gamestate.registerEvents()
 	cam = camera()
-	gamestate.switch(start_screen)
+	gamestate.switch(game)
 end
 -----------------------------start_screen---------------------------
 
@@ -250,9 +250,9 @@ end
 
 function game:init()
 
-	love.audio.stop(intro_music)
-	music = love.audio.newSource("/music/main.mp3")
-	love.audio.play(music)
+	--love.audio.stop(intro_music)
+	--music = love.audio.newSource("/music/main.mp3")
+	--love.audio.play(music)
 
 	cam:zoomTo(1)
 	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
@@ -276,33 +276,30 @@ function game:init()
     require "/fonction/dispinfo"  
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
-	--require "/map/mapinfo"
+	require "/fonction/mob"
 	
 	loadmaps()
     --love.graphics.setMode( 16*resolution, 9*resolution)
     info=true
-    up,down,left,right=0,0,0,0
-    move=false
+    --up,down,left,right=0,0,0,0
+    --move=false
     cursor_x=0
     cursor_y=0
     
     
-    steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution) --,data.map[1]["map"])
+    steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
+	monster = new_mob()
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
-    map = steve:getmap()
-    
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
-    
-    --love.audio.play(steve.map.music)
     invent = inv_new(5.375*resolution,10*resolution,"/textures/"..resolution.."/inv.png")
-    --touchemobil = button_new(432*(resolution/32),16*(resolution/32),"/textures/mobil"..resolution..".png")
     A_key = button_new(16*resolution,9*resolution,"/textures/"..resolution.."/A.png")
     keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
-    touche=0
-    mouse_x=0
-    mouse_y=0
-    click=0
+	
+    -- touche=0
+    -- mouse_x=0
+    -- mouse_y=0
+    -- click=0
    
 end
 
@@ -315,17 +312,20 @@ function game:draw()
     elseif cam.x>steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
          cam.x = steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
     end
-	
     if cam.y<love.graphics.getHeight()/2 then
         cam.y = love.graphics.getHeight()/2
     elseif cam.y>steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
          cam.y = steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
     end
+	
 	cam:attach()	 			-- mode camera
-    steve:getmap():draw(0,0)  	-- afficher map
+    
+	steve:getmap():draw(0,0)  	-- afficher map
     steve:draw() 				-- afficher perso
+	monster:draw()
 	steve:getmap():drawdeco(0,0)-- afficher map deco
 	love.graphics.draw(p, 0, 0)	-- afficher particule
+	
 	cam:detach()				-- fin du mode camera
 	
     if info then
@@ -343,6 +343,7 @@ end
 function game:update(dt)
 
     steve:update(dt)  -- update steve
+	monster:update(dt)
 	p:update(dt) --update particule
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
@@ -379,7 +380,8 @@ function game:update(dt)
         if love.keyboard.isDown( " " ) then
             steve:use()
         end
-    end 
+    end
+	
 end
 
 function game:mousepressed(x, y, button)
