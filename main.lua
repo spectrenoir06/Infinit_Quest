@@ -278,6 +278,12 @@ function game:init()
     require "/fonction/pnj"
 	require "/fonction/mob"
 	
+	Grid = require("/lib/jumper/grid") -- The grid class
+	Pathfinder = require ("/lib/jumper/pathfinder") -- The pathfinder lass
+	
+	test()
+	
+	
 	loadmaps()
     --love.graphics.setMode( 16*resolution, 9*resolution)
     info=true
@@ -421,10 +427,47 @@ function game:keypressed(key)
 	end
 	
 	if key=="o" then
-		cam:rotate(math.pi/8)
+		test()
 	end
 
 
 end
 
 ---------------------------------------------------------------------
+
+function test()
+
+		local map = {
+		{0,1,0,1,0 },
+		{0,1,0,1,0 },
+		{0,1,1,1,0 },
+		{0,0,0,0,0 },
+	}
+	-- Value for walkable tiles
+	local walkable = 0
+
+	-- Library setup
+
+
+	-- Creates a grid object
+	local grid = Grid(map)
+	
+	for k,v in pairs(grid) do
+	print(k,v)
+	end
+	-- Creates a pathfinder object using Jump Point Search
+	local myFinder = Pathfinder(grid,'JPS', walkable) 
+
+	-- Define start and goal locations coordinates
+	local startx, starty = 1,1
+	local endx, endy = 5,1
+
+	-- Calculates the path, and its length
+	local path, length = myFinder:getPath(startx, starty, endx, endy)
+	if path then
+	  print(length)
+		for node, count in ipairs (path:iter()) do
+		  print(count, node.x, node.y)
+		end
+	end
+end
