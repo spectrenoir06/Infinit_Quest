@@ -1,6 +1,7 @@
 function loadmaps()
     for k,v in pairs(data.map) do
         v.map = map_new(v.fichier,v.texture,v.music)
+		v.map:createMapCol()
     end
 end
 
@@ -139,17 +140,6 @@ function map:update(nb)
             end
         end
     end
-	
-	if self.map_col==nil then
-		self.map_col = {}
-		for x=1,(self.LX) do
-            for y=1,(self.LY) do
-				self.map_col[x] = {}
-                self.map_col[x][y] = self:scancol(x,y)
-            end
-        end 
-	end
-	
 end
 
 function map:draw(x,y)
@@ -160,12 +150,12 @@ function map:draw(x,y)
         v.sprite:drawframe((v.x*resolution),(v.y*resolution),1)
     end
 	
-	for x=1,(self.LX) do
-        for y=1,(self.LY) do
-			print(self.map_col)
-            love.graphics.print(self.map_col[1],x*64,y*64)
-        end
-    end 
+	for x=1,self.LX do
+		for y=1,self.LY do
+			--print(self.map_col[x][y])
+			love.graphics.print(self.map_col[x][y],x*64+32,y*64+32)
+		end
+	end
 	
 end
 
@@ -291,6 +281,22 @@ function map:getblock(tilex,tiley)
 		 tiley=tiley,
 		}
         return tab
+end
+
+function map:createMapCol()
+
+	self.map_col = {}
+	for x=1,self.LX do
+	self.map_col[x] = {}
+		for y=1,self.LY do
+			if self:scancol(x,y) then
+				self.map_col[x][y] = 1 
+			else
+				self.map_col[x][y] = 0
+			end
+		end
+	end
+	
 end
 
 
