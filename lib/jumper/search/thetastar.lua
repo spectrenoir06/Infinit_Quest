@@ -3,9 +3,11 @@
 
 if (...) then
 	
+	local _PATH = (...):gsub('%.search.thetastar$','')
+
 	-- Depandancies
-	local Heuristics   = require ('/lib/jumper/core/heuristics')
-	local astar_search = require ('/lib/jumper/search/astar')
+	local Heuristics   = require (_PATH .. '.core.heuristics')
+	local astar_search = require (_PATH .. '.search.astar')
 
 	-- Internalization
 	local ipairs = ipairs

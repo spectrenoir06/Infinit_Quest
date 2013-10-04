@@ -9,9 +9,9 @@ if (...) then
 	local huge = math.huge
 
 	-- Dependancies
-
-	local Heuristics = require ('/lib/jumper/core/heuristics')
-	local Heap = require ('/lib/jumper/core/bheap')
+	local _PATH = (...):match('(.+)%.search.astar$')
+	local Heuristics = require (_PATH .. '.core.heuristics')
+	local Heap = require (_PATH.. '.core.bheap')
 
 	-- Updates G-cost
 	local function computeCost(node, neighbour, finder, clearance)

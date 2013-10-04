@@ -278,8 +278,7 @@ function game:init()
     require "/fonction/pnj"
 	require "/fonction/mob"
 	
-	Grid = require("/lib/jumper/grid") -- The grid class
-	Pathfinder = require ("/lib/jumper/pathfinder") -- The pathfinder lass
+
 	
 	test()
 	
@@ -437,12 +436,9 @@ end
 
 function test()
 
-		local map = {
-		{0,1,0,1,0 },
-		{0,1,0,1,0 },
-		{0,1,1,1,0 },
-		{0,0,0,0,0 },
-	}
+	Grid = require("lib.jumper.grid") -- The grid class
+	Pathfinder = require ("lib.jumper.pathfinder") -- The pathfinder lass
+
 	-- Value for walkable tiles
 	local walkable = 0
 
@@ -450,13 +446,18 @@ function test()
 
 
 	-- Creates a grid object
-	local grid = Grid(map)
+	grid = Grid({
+		{0,1,0,1,0 },
+		{0,1,0,1,0 },
+		{0,1,1,1,0 },
+		{0,0,0,0,0 },
+	})
 	
 	for k,v in pairs(grid) do
 	print(k,v)
 	end
 	-- Creates a pathfinder object using Jump Point Search
-	local myFinder = Pathfinder(grid,'JPS', walkable) 
+	local myFinder = Pathfinder:new(grid, 'ASTAR', 0)
 
 	-- Define start and goal locations coordinates
 	local startx, starty = 1,1
@@ -464,10 +465,12 @@ function test()
 
 	-- Calculates the path, and its length
 	local path, length = myFinder:getPath(startx, starty, endx, endy)
-	if path then
-	  print(length)
-		for node, count in ipairs (path:iter()) do
-		  print(count, node.x, node.y)
-		end
-	end
+	print(length)
+if path then
+  print(('Path found! Length: %.2f'):format(length))
+    for node, count in path:iter() do
+      print(('Step: %d - x: %d - y: %d'):format(count, node.x, node.y))
+    end
+end
+
 end

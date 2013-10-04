@@ -9,12 +9,13 @@ local _RELEASEDATE = ""
 if (...) then
 
   -- Dependencies
-  local Utils     = require ('lib/jumper/core/utils')
-  local Assert    = require ('lib/jumper/core/assert')
-  local Heap      = require ('lib/jumper/core/bheap')
-  local Heuristic = require ('lib/jumper/core/heuristics')
-  local Grid      = require ('lib/jumper/grid')
-  local Path      = require ('lib/jumper/core/path')
+  local _PATH = (...):gsub('%.pathfinder$','')
+	local Utils     = require (_PATH .. '.core.utils')
+	local Assert    = require (_PATH .. '.core.assert')
+  local Heap      = require (_PATH .. '.core.bheap')
+  local Heuristic = require (_PATH .. '.core.heuristics')
+  local Grid      = require (_PATH .. '.grid')
+  local Path      = require (_PATH .. '.core.path')
 
   -- Internalization
   local t_insert, t_remove = table.insert, table.remove
@@ -35,12 +36,12 @@ if (...) then
 	-- @finder Finders
 	-- @see Pathfinder:getFinders
   local Finders = {
-    ['ASTAR']     = require ('/lib/jumper/search/astar'),
-    ['DIJKSTRA']  = require ('/lib/jumper/search/dijkstra'),
-    ['THETASTAR'] = require ('/lib/jumper/search/thetastar'),
-    ['BFS']       = require ('/lib/jumper/search/bfs'),
-    ['DFS']       = require ('/lib/jumper/search/dfs'),
-    ['JPS']       = require ('/lib/jumper/search/jps')
+    ['ASTAR']     = require (_PATH .. '.search.astar'),
+    ['DIJKSTRA']  = require (_PATH .. '.search.dijkstra'),
+    ['THETASTAR'] = require (_PATH .. '.search.thetastar'),
+    ['BFS']       = require (_PATH .. '.search.bfs'),
+    ['DFS']       = require (_PATH .. '.search.dfs'),
+    ['JPS']       = require (_PATH .. '.search.jps')
   }
 
   -- Will keep track of all nodes expanded during the search
@@ -147,9 +148,8 @@ if (...) then
   -- @tparam grid grid a `grid`
 	-- @treturn pathfinder self (the calling `pathfinder` itself, can be chained)
 	-- @usage myFinder:setGrid(myGrid)
-	
   function Pathfinder:setGrid(grid)
-  --assert(Assert.inherits(grid, Grid), 'Wrong argument #1. Expected a \'grid\' object')
+    assert(Assert.inherits(grid, Grid), 'Wrong argument #1. Expected a \'grid\' object')
     self._grid = grid
     self._grid._eval = self._walkable and type(self._walkable) == 'function'
     return self

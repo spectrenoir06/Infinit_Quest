@@ -2,7 +2,7 @@
 
 if (...) then
 
-  local astar_search = require ('/lib/jumper/search/astar')
+  local astar_search = require ((...):gsub('%.dijkstra$','.astar'))
   -- Dijkstra is similar to aStar, with no heuristic
   local dijkstraHeuristic = function() return 0 end
 

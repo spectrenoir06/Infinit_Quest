@@ -3,7 +3,8 @@
 if (...) then
 	
 	-- Dependancies
-	local Utils = require ('lib/jumper/core/utils')
+	local _PATH = (...):gsub('%.core.assert$','')
+	local Utils = require (_PATH .. '.core.utils')
 	
 	-- Local references
 	local lua_type = type

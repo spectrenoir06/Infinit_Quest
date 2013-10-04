@@ -3,8 +3,9 @@
 if (...) then
 
   -- Dependancies
-  local Heuristics = require ('/lib/jumper/core/heuristics')
-	local Heap = require ('/lib/jumper/core/bheap')
+  local _PATH = (...):match('(.+)%.search.jps$')
+  local Heuristics = require (_PATH .. '.core.heuristics')
+	local Heap = require (_PATH.. '.core.bheap')
 
   -- Internalization
   local max, abs = math.max, math.abs

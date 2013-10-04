@@ -11,9 +11,9 @@ if (...) then
   local _PATH = (...):gsub('%.grid$','')
 
 	-- Local references
-  local Utils = require ("lib/jumper/core/utils")
-  local Assert = require ("lib/jumper/core/assert")
-  local Node = require ("lib/jumper/core/node")
+  local Utils = require (_PATH .. '.core.utils')
+  local Assert = require (_PATH .. '.core.assert')
+  local Node = require (_PATH .. '.core.node')
 
 	-- Local references
   local pairs = pairs

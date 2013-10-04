@@ -10,7 +10,8 @@
 if (...) then
 	
   -- Dependencies
-  local Heuristic = require ('lib/jumper/core/heuristics')
+	local _PATH = (...):match('(.+)%.path$')
+  local Heuristic = require (_PATH .. '.heuristics')
 	
 	 -- Local references
   local abs, max = math.abs, math.max

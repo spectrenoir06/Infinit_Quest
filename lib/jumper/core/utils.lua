@@ -3,8 +3,9 @@
 if (...) then
 
 	-- Dependencies
-	local Path = require ('lib/jumper/core/path')
-	local Node = require ('lib/jumper/core/node')
+	local _PATH = (...):gsub('%.utils$','')
+	local Path = require (_PATH .. '.path')
+	local Node = require (_PATH .. '.node')
 
 	-- Local references
 	local pairs = pairs
