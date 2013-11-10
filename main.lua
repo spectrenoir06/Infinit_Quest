@@ -280,7 +280,7 @@ function game:init()
 	
 
 	
-	test()
+	--test()
 	
 	
 	loadmaps()
@@ -426,7 +426,7 @@ function game:keypressed(key)
 	end
 	
 	if key=="o" then
-		test()
+		--test()
 	end
 
 
@@ -434,43 +434,43 @@ end
 
 ---------------------------------------------------------------------
 
-function test()
+-- -- function test()
 
-	Grid = require("lib.jumper.grid") -- The grid class
-	Pathfinder = require ("lib.jumper.pathfinder") -- The pathfinder lass
+	-- -- Grid = require("lib.jumper.grid") -- The grid class
+	-- -- Pathfinder = require ("lib.jumper.pathfinder") -- The pathfinder lass
 
 	-- Value for walkable tiles
-	local walkable = 0
+	-- -- local walkable = 0
 
 	-- Library setup
 
 
 	-- Creates a grid object
-	grid = Grid({
-		{0,1,0,1,0 },
-		{0,1,0,1,0 },
-		{0,1,1,1,0 },
-		{0,0,0,0,0 },
-	})
+	-- -- grid = Grid({
+		-- -- {0,1,0,1,0 },
+		-- -- {0,1,0,1,0 },
+		-- -- {0,1,1,1,0 },
+		-- -- {0,0,0,0,0 },
+	-- -- })
 	
-	for k,v in pairs(grid) do
-	print(k,v)
-	end
+	-- -- for k,v in pairs(grid) do
+	-- -- print(k,v)
+	-- -- end
 	-- Creates a pathfinder object using Jump Point Search
-	local myFinder = Pathfinder:new(grid, 'ASTAR', 0)
+	-- -- local myFinder = Pathfinder:new(grid, 'ASTAR', 0)
 
 	-- Define start and goal locations coordinates
-	local startx, starty = 1,1
-	local endx, endy = 5,1
+	-- -- local startx, starty = 1,1
+	-- -- local endx, endy = 5,1
 
 	-- Calculates the path, and its length
-	local path, length = myFinder:getPath(startx, starty, endx, endy)
-	print(length)
-if path then
-  print(('Path found! Length: %.2f'):format(length))
-    for node, count in path:iter() do
-      print(('Step: %d - x: %d - y: %d'):format(count, node.x, node.y))
-    end
-end
+	-- -- local path, length = myFinder:getPath(startx, starty, endx, endy)
+	-- -- print(length)
+-- -- if path then
+  -- -- print(('Path found! Length: %.2f'):format(length))
+    -- -- for node, count in path:iter() do
+      -- -- print(('Step: %d - x: %d - y: %d'):format(count, node.x, node.y))
+    -- -- end
+-- -- end
 
-end
+-- -- end

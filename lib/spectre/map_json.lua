@@ -153,7 +153,8 @@ function map:draw(x,y)
 	for x=1,self.LX do
 		for y=1,self.LY do
 			--print(self.map_col[x][y])
-			love.graphics.print(self.map_col[x][y],x*64+32,y*64+32)
+			--love.graphics.print(self.map_col[x][y].."\nx = "..x.."\ny = "..y,(x)*64,(y)*64)
+			--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 		end
 	end
 	
