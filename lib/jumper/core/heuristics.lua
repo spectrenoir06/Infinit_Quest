@@ -13,7 +13,6 @@
 -- Jumper features some built-in distance heuristics, namely `MANHATTAN`, `EUCLIDIAN`, `DIAGONAL`, `CARDINTCARD`.
 -- You can also supply your own heuristic function, following the same template as above.
 
-
 local abs = math.abs
 local sqrt = math.sqrt
 local sqrt2 = sqrt(2)
