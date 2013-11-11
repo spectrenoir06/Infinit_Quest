@@ -324,7 +324,7 @@ function game:init()
 	
 	myFinder = Pathfinder(grid, 'ASTAR',walkable)
 	myFinder:setMode('ORTHOGONAL')
-	--myFinder:setHeuristic('CARDINTCARD')
+	myFinder:setHeuristic('CARDINTCARD')
 	
 	path = myFinder:getPath(10, 10, 28, 14)
 	
@@ -378,7 +378,7 @@ function game:draw()
 		for x=1,grid:getWidth() do
 			for y=1,grid:getHeight() do
 				--print(self.map_col[x][y])
-				--love.graphics.print(grid._map[y+1][x+1],(x)*64+32,(y)*64+20)
+				love.graphics.print(grid._map[y-1][x-1],(x-1)*64+32,(y-1)*64+20)
 				--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 			end
 		end
@@ -484,7 +484,7 @@ function game:keypressed(key)
 	if key=="o" then
 		print("O")
 		
-		path = myFinder:getPath(10, 10,math.floor(steve:getX()/64), math.floor(steve:getY()/64))
+		path = myFinder:getPath(8, 12,math.floor(steve:getX()/64), math.floor(steve:getY()/64))
 		if path then
 			print(('Path found! Length: %.2f'):format(path:getLength()))
 			for node, count in path:nodes() do
