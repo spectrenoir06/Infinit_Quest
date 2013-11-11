@@ -275,12 +275,12 @@ function map:createMapCol()
 
 	self.map_col = {}
 	for y=0,self.LY-1 do
-		self.map_col[y+1] = {}
+		self.map_col[y] = {}
 		for x=0,self.LX-1 do
 			if self:scancol(x,y) then
-				self.map_col[y+1][x+1] = 1 
+				self.map_col[y][x] = 1 
 			else
-				self.map_col[y+1][x+1] = 0
+				self.map_col[y][x] = 0
 			end
 		end
 	end

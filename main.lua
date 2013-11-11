@@ -317,7 +317,7 @@ function game:init()
 	for y=0,steve:getmap().LY-1 do
 		test = ""
 		for x=0,steve:getmap().LX-1 do
-			test = test..(grid._map[y+1][x+1])
+			test = test..(grid._map[y][x])
 		end
 		print(test)
 	end
@@ -364,7 +364,8 @@ function game:draw()
 	if path then
 		for node, count in path:nodes() do
 				love.graphics.setColor( 255, 0, 0)
-				love.graphics.point( node:getX(), node:getY() )
+				love.graphics.setPointSize( 20 )
+				love.graphics.point( node:getX()*64+32, node:getY()*64+32 )
 				love.graphics.setColor(255, 255, 255)
 		end
 	end
@@ -377,7 +378,7 @@ function game:draw()
 		for x=1,grid:getWidth() do
 			for y=1,grid:getHeight() do
 				--print(self.map_col[x][y])
-				love.graphics.print(grid._map[y][x],(x-1)*64+32,(y-1)*64+20)
+				--love.graphics.print(grid._map[y+1][x+1],(x)*64+32,(y)*64+20)
 				--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 			end
 		end
@@ -482,8 +483,8 @@ function game:keypressed(key)
 	
 	if key=="o" then
 		print("O")
-		love.graphics.setPointSize( 5 )
-		path = myFinder:getPath(10, 10,math.floor(steve:getX()/64)+1, math.floor(steve:getY()/64)+1)
+		
+		path = myFinder:getPath(10, 10,math.floor(steve:getX()/64), math.floor(steve:getY()/64))
 		if path then
 			print(('Path found! Length: %.2f'):format(path:getLength()))
 			for node, count in path:nodes() do
