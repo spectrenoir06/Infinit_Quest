@@ -7,7 +7,6 @@
 -- made with regards of their `f` cost. From a given node being examined, the `pathfinder` will expand the search 
 -- to the next neighbouring node having the lowest `f` cost. See `core.bheap` for more details.
 -- 
-
 if (...) then
 
 	local assert = assert

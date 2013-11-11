@@ -21,7 +21,6 @@ if (...) then
     end
 
   end
-
   -- Calculates a path.
   -- Returns the path from location `<startX, startY>` to location `<endX, endY>`.
   return function (finder, startNode, endNode, clearance, toClear)
