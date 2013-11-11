@@ -351,16 +351,16 @@ function game:draw()
 	end
 	
 		for x=1,grid:getWidth() do
-		for y=1,grid:getHeight() do
-			--print(self.map_col[x][y])
-			if grid:isWalkableAt(x, y) then
-				love.graphics.print("true",(x)*64+32,(y)*64+32)
-			else
-				love.graphics.print("false",(x)*64+32,(y)*64+32)
+			for y=1,grid:getHeight() do
+				--print(self.map_col[x][y])
+				if grid:isWalkableAt(x, y) then
+					love.graphics.print("true",(x-1)*64+32,(y-1)*64+20)
+				else
+					love.graphics.print("false",(x-1)*64+32,(y-1)*64+20)
+				end
+				--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 			end
-			--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 		end
-	end
 	
 	cam:detach()				-- fin du mode camera
 	
@@ -469,19 +469,18 @@ function game:keypressed(key)
 				print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
 			end
 		end
-		
-	for y=1,grid:getHeight() do
-		str = " "
-		for x=1,grid:getWidth() do
-			--print(self.map_col[x][y])
-			if grid:isWalkableAt(x, y) then
-				str = str.."0"
-			else
-				str = str .. "1"
+		for y=1,grid:getHeight() do
+			str = " "
+			for x=1,grid:getWidth() do
+				--print(self.map_col[x][y])
+				if grid:isWalkableAt(x, y) then
+					str = str.."0"
+				else
+					str = str .. "1"
+				end
 			end
+			print(str)
 		end
-		print(str)
-	end
 		
 	end
 
@@ -495,9 +494,7 @@ function test()
 	
 	
 	grid = Grid(steve:getmap().map_sol)
-	
-	
-	
+
 	myFinder = Pathfinder(grid, 'ASTAR',0)
 	myFinder:getMode('ORTHOGONAL')
 	myFinder:setHeuristic('CARDINTCARD')
