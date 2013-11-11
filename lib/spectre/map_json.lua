@@ -153,7 +153,7 @@ function map:draw(x,y)
 	for x=1,self.LX do
 		for y=1,self.LY do
 			--print(self.map_col[x][y])
-			--love.graphics.print(self.map_col[x][y].."\nx = "..x.."\ny = "..y,(x)*64,(y)*64)
+			--love.graphics.print(self.map_col[x][y],(x)*64+32,(y)*64+32)
 			--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 		end
 	end
@@ -287,10 +287,10 @@ end
 function map:createMapCol()
 
 	self.map_col = {}
-	for x=1,self.LX do
+	for x=0,self.LX-1 do
 	self.map_col[x] = {}
-		for y=1,self.LY do
-			if self:scancol(x,y) then
+		for y=0,self.LY-1 do
+			if self:scancol(x+1,y+1) then
 				self.map_col[x][y] = 1 
 			else
 				self.map_col[x][y] = 0

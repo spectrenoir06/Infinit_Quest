@@ -48,19 +48,21 @@ function start_screen:init()
 	pos = {}
 	pos.X , pos.Y = 0-avatar:getWidth(),0-avatar:getHeight()
 	
-	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 1000 )
-	p:setEmissionRate(400)
-	p:setSpeed(300, 400)
-	p:setSizes(0.5, 0.5,0.1,0.5,0.01)
-	p:setColors(255, 255, 0, 128, 255, 125, 32, 255,192,92,32,255,240,64,32,255)
-	p:setPosition(pos.X+avatar:getWidth()/2,pos.Y+avatar:getHeight()/1.5)
-	p:setLifetime(-1)
-	p:setParticleLife(0.5,2)
-	p:setDirection(270)
-	p:setSpread(360)
-	p:setTangentialAcceleration(0,0)
-	p:setRadialAcceleration(0,0)
-	p:stop()
+	if not mobile then
+		p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 1000 )
+		p:setEmissionRate(400)
+		p:setSpeed(300, 400)
+		p:setSizes(0.5, 0.5,0.1,0.5,0.01)
+		p:setColors(255, 255, 0, 128, 255, 125, 32, 255,192,92,32,255,240,64,32,255)
+		p:setPosition(pos.X+avatar:getWidth()/2,pos.Y+avatar:getHeight()/1.5)
+		p:setLifetime(-1)
+		p:setParticleLife(0.5,2)
+		p:setDirection(270)
+		p:setSpread(360)
+		p:setTangentialAcceleration(0,0)
+		p:setRadialAcceleration(0,0)
+		p:stop()
+	end
 	
 	Timer.tween(5, pos, {X=love.graphics.getWidth()/2-avatar:getWidth()/2}, 'out-back')
 	Timer.tween(5, pos, {Y=love.graphics.getHeight()/2-avatar:getHeight()/2}, 'bounce')
@@ -73,8 +75,10 @@ function start_screen:draw()
 	cam:lookAt(1280/2,720/2)
 	cam:attach()
 	love.graphics.draw( start, 0, 0)
-	p:setPosition(pos.X+avatar:getWidth()/2,pos.Y+avatar:getHeight()/2)
-	love.graphics.draw(p, 0, 0)
+	if not mobile then
+		p:setPosition(pos.X+avatar:getWidth()/2,pos.Y+avatar:getHeight()/2)
+		love.graphics.draw(p, 0, 0)
+	end
 	love.graphics.draw( avatar, pos.X , pos.Y  )
 	p:start()
 	--p:setPosition(steve.posX, steve.posY)
@@ -255,42 +259,35 @@ function game:init()
 	--love.audio.play(music)
 
 	cam:zoomTo(1)
-	p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
-	p:setEmissionRate(1000)
-	p:setSpeed(300, 400)
-	p:setSizes(2, 1)
-	p:setColors(220, 105, 20, 255, 194, 30, 18, 0)
-	p:setPosition(400, 300)
-	p:setLifetime(0.1)
-	p:setParticleLife(0.2)
-	p:setDirection(0)
-	p:setSpread(360)
-	p:setTangentialAcceleration(1000)
-	p:setRadialAcceleration(-2000)
-	p:stop()
-	
+	if not mobile then
+		p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
+		p:setEmissionRate(1000)
+		p:setSpeed(300, 400)
+		p:setSizes(2, 1)
+		p:setColors(220, 105, 20, 255, 194, 30, 18, 0)
+		p:setPosition(400, 300)
+		p:setLifetime(0.1)
+		p:setParticleLife(0.2)
+		p:setDirection(0)
+		p:setSpread(360)
+		p:setTangentialAcceleration(1000)
+		p:setRadialAcceleration(-2000)
+		p:stop()
+	end
 	
     import_data("/data/data.json")
-	
     require "/fonction/perso"
     require "/fonction/dispinfo"  
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
 	require "/fonction/mob"
 	
-
-	
-	--test()
-	
-	
 	loadmaps()
-    --love.graphics.setMode( 16*resolution, 9*resolution)
+
     info=true
-    --up,down,left,right=0,0,0,0
-    --move=false
+	
     cursor_x=0
     cursor_y=0
-    
     
     steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
 	monster = new_mob()
@@ -305,6 +302,8 @@ function game:init()
     -- mouse_x=0
     -- mouse_y=0
     -- click=0
+   
+   test()
    
 end
 
@@ -329,7 +328,39 @@ function game:draw()
     steve:draw() 				-- afficher perso
 	monster:draw()
 	steve:getmap():drawdeco(0,0)-- afficher map deco
-	love.graphics.draw(p, 0, 0)	-- afficher particule
+	
+
+	if path then
+		oldX = false
+		for node, count in path:nodes() do
+			if oldX then
+				love.graphics.setColor( 255, 255, 2555 )
+				love.graphics.line( oldX, oldY, node:getX()*64+32, node:getY()*64+32)
+				love.graphics.setColor( 255, 0, 0 )
+				love.graphics.point( oldX, oldY )
+				 love.graphics.setColor(255, 255, 255)
+			end
+			oldX = node:getX()*64+32
+			oldY = node:getY()*64+32
+		end
+	end
+	
+	
+	if not mobile then
+		love.graphics.draw(p, 0, 0)	-- afficher particule
+	end
+	
+		for x=1,grid:getWidth() do
+		for y=1,grid:getHeight() do
+			--print(self.map_col[x][y])
+			if grid:isWalkableAt(x, y) then
+				love.graphics.print("true",(x)*64+32,(y)*64+32)
+			else
+				love.graphics.print("false",(x)*64+32,(y)*64+32)
+			end
+			--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
+		end
+	end
 	
 	cam:detach()				-- fin du mode camera
 	
@@ -343,13 +374,18 @@ function game:draw()
         keypad:draw()
     end
 	
+
+	
+	
 end
 
 function game:update(dt)
 
     steve:update(dt)  -- update steve
 	monster:update(dt)
-	p:update(dt) --update particule
+	if not mobile then
+		p:update(dt) --update particule
+	end
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
@@ -386,7 +422,6 @@ function game:update(dt)
             steve:use()
         end
     end
-	
 end
 
 function game:mousepressed(x, y, button)
@@ -426,51 +461,45 @@ function game:keypressed(key)
 	end
 	
 	if key=="o" then
-		--test()
+		love.graphics.setPointSize( 5 )
+		path = myFinder:getPath(10, 10,math.floor(steve:getX()/64), math.floor(steve:getY()/64))
+		if path then
+			print(('Path found! Length: %.2f'):format(path:getLength()))
+			for node, count in path:nodes() do
+				print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
+			end
+		end
+		
+	for y=1,grid:getHeight() do
+		str = " "
+		for x=1,grid:getWidth() do
+			--print(self.map_col[x][y])
+			if grid:isWalkableAt(x, y) then
+				str = str.."0"
+			else
+				str = str .. "1"
+			end
+		end
+		print(str)
 	end
-
+		
+	end
 
 end
 
 ---------------------------------------------------------------------
 
--- -- function test()
-
-	-- -- Grid = require("lib.jumper.grid") -- The grid class
-	-- -- Pathfinder = require ("lib.jumper.pathfinder") -- The pathfinder lass
-
-	-- Value for walkable tiles
-	-- -- local walkable = 0
-
-	-- Library setup
-
-
-	-- Creates a grid object
-	-- -- grid = Grid({
-		-- -- {0,1,0,1,0 },
-		-- -- {0,1,0,1,0 },
-		-- -- {0,1,1,1,0 },
-		-- -- {0,0,0,0,0 },
-	-- -- })
+function test()
+	Grid = require ("lib.jumper.grid")
+	Pathfinder = require ("lib.jumper.pathfinder")
 	
-	-- -- for k,v in pairs(grid) do
-	-- -- print(k,v)
-	-- -- end
-	-- Creates a pathfinder object using Jump Point Search
-	-- -- local myFinder = Pathfinder:new(grid, 'ASTAR', 0)
+	
+	grid = Grid(steve:getmap().map_sol)
+	
+	
+	
+	myFinder = Pathfinder(grid, 'ASTAR',0)
+	myFinder:getMode('ORTHOGONAL')
+	myFinder:setHeuristic('CARDINTCARD')
 
-	-- Define start and goal locations coordinates
-	-- -- local startx, starty = 1,1
-	-- -- local endx, endy = 5,1
-
-	-- Calculates the path, and its length
-	-- -- local path, length = myFinder:getPath(startx, starty, endx, endy)
-	-- -- print(length)
--- -- if path then
-  -- -- print(('Path found! Length: %.2f'):format(length))
-    -- -- for node, count in path:iter() do
-      -- -- print(('Step: %d - x: %d - y: %d'):format(count, node.x, node.y))
-    -- -- end
--- -- end
-
--- -- end
+end
