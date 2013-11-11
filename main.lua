@@ -303,7 +303,27 @@ function game:init()
     -- mouse_y=0
     -- click=0
    
-   test()
+   	Grid = require ("lib.jumper.grid")
+	Pathfinder = require ("lib.jumper.pathfinder")
+	
+	testmap = steve:getmap().map_col
+	
+	grid = Grid(testmap)
+
+		
+	for y=0,steve:getmap().LY-1 do
+		test = ""
+		for x=0,steve:getmap().LX-1 do
+			test = test..(testmap[x+1][y+1])
+		end
+		print(test)
+	end
+	
+	
+	walkable = 0
+	myFinder = Pathfinder(grid, 'ASTAR',walkable)
+	--myFinder:getMode('ORTHOGONAL')
+	--myFinder:setHeuristic('CARDINTCARD')
    
 end
 
@@ -354,9 +374,9 @@ function game:draw()
 			for y=1,grid:getHeight() do
 				--print(self.map_col[x][y])
 				if grid:isWalkableAt(x, y) then
-					love.graphics.print("true",(x-1)*64+32,(y-1)*64+20)
+					love.graphics.print("O",(x-1)*64+32,(y-1)*64+20)
 				else
-					love.graphics.print("false",(x-1)*64+32,(y-1)*64+20)
+					love.graphics.print("X",(x-1)*64+32,(y-1)*64+20)
 				end
 				--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 			end
@@ -461,42 +481,22 @@ function game:keypressed(key)
 	end
 	
 	if key=="o" then
+		print("O")
 		love.graphics.setPointSize( 5 )
 		path = myFinder:getPath(10, 10,math.floor(steve:getX()/64), math.floor(steve:getY()/64))
 		if path then
 			print(('Path found! Length: %.2f'):format(path:getLength()))
 			for node, count in path:nodes() do
 				print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
-			end
-		end
-		for y=1,grid:getHeight() do
-			str = " "
-			for x=1,grid:getWidth() do
-				--print(self.map_col[x][y])
-				if grid:isWalkableAt(x, y) then
-					str = str.."0"
+				if (steve:getmap().map_col[node:getX()+1][node:getY()+1]==0) then
+					print("true")
 				else
-					str = str .. "1"
+					print("false")
 				end
 			end
-			print(str)
 		end
-		
 	end
 
 end
 
 ---------------------------------------------------------------------
-
-function test()
-	Grid = require ("lib.jumper.grid")
-	Pathfinder = require ("lib.jumper.pathfinder")
-	
-	
-	grid = Grid(steve:getmap().map_sol)
-
-	myFinder = Pathfinder(grid, 'ASTAR',0)
-	myFinder:getMode('ORTHOGONAL')
-	myFinder:setHeuristic('CARDINTCARD')
-
-end
