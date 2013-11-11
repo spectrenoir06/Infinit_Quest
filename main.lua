@@ -14,7 +14,11 @@
 	require "/fonction/option"
     ----------------------------------
 	
-	require "/fonction/data"  
+	require "/fonction/data" 
+	
+	Grid = require "lib.jumper.grid"
+	Pathfinder = require "lib.jumper.pathfinder"
+	
    -- require "/fonction/dataobj"
 	
 	--G_port = "4321"
@@ -302,28 +306,35 @@ function game:init()
     -- mouse_x=0
     -- mouse_y=0
     -- click=0
-   
-   	Grid = require ("lib.jumper.grid")
-	Pathfinder = require ("lib.jumper.pathfinder")
 	
 	testmap = steve:getmap().map_col
-	
 	grid = Grid(testmap)
-
-		
+	
+	local function walkable(value)
+        return value == 0
+    end
+	
 	for y=0,steve:getmap().LY-1 do
 		test = ""
 		for x=0,steve:getmap().LX-1 do
-			test = test..(testmap[x+1][y+1])
+			test = test..(grid._map[y+1][x+1])
 		end
 		print(test)
 	end
 	
-	
-	walkable = 0
 	myFinder = Pathfinder(grid, 'ASTAR',walkable)
-	--myFinder:getMode('ORTHOGONAL')
+	myFinder:setMode('ORTHOGONAL')
 	--myFinder:setHeuristic('CARDINTCARD')
+	
+	path = myFinder:getPath(10, 10, 28, 14)
+	
+	if path then
+		print(('Path found! Length: %.2f'):format(path:getLength()))
+		for node, count in path:nodes() do
+			print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
+		end
+end
+
    
 end
 
@@ -351,17 +362,10 @@ function game:draw()
 	
 
 	if path then
-		oldX = false
 		for node, count in path:nodes() do
-			if oldX then
-				love.graphics.setColor( 255, 255, 2555 )
-				love.graphics.line( oldX, oldY, node:getX()*64+32, node:getY()*64+32)
-				love.graphics.setColor( 255, 0, 0 )
-				love.graphics.point( oldX, oldY )
-				 love.graphics.setColor(255, 255, 255)
-			end
-			oldX = node:getX()*64+32
-			oldY = node:getY()*64+32
+				love.graphics.setColor( 255, 0, 0)
+				love.graphics.point( node:getX(), node:getY() )
+				love.graphics.setColor(255, 255, 255)
 		end
 	end
 	
@@ -373,11 +377,7 @@ function game:draw()
 		for x=1,grid:getWidth() do
 			for y=1,grid:getHeight() do
 				--print(self.map_col[x][y])
-				if grid:isWalkableAt(x, y) then
-					love.graphics.print("O",(x-1)*64+32,(y-1)*64+20)
-				else
-					love.graphics.print("X",(x-1)*64+32,(y-1)*64+20)
-				end
+				love.graphics.print(grid._map[y][x],(x-1)*64+32,(y-1)*64+20)
 				--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 			end
 		end
@@ -483,16 +483,11 @@ function game:keypressed(key)
 	if key=="o" then
 		print("O")
 		love.graphics.setPointSize( 5 )
-		path = myFinder:getPath(10, 10,math.floor(steve:getX()/64), math.floor(steve:getY()/64))
+		path = myFinder:getPath(10, 10,math.floor(steve:getX()/64)+1, math.floor(steve:getY()/64)+1)
 		if path then
 			print(('Path found! Length: %.2f'):format(path:getLength()))
 			for node, count in path:nodes() do
 				print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
-				if (steve:getmap().map_col[node:getX()+1][node:getY()+1]==0) then
-					print("true")
-				else
-					print("false")
-				end
 			end
 		end
 	end

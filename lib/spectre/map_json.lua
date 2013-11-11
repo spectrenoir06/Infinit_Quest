@@ -150,13 +150,13 @@ function map:draw(x,y)
         v.sprite:drawframe((v.x*resolution),(v.y*resolution),1)
     end
 	
-	for x=1,self.LX do
-		for y=1,self.LY do
-			--print(self.map_col[x][y])
-			love.graphics.print(self.map_col[x][y],(x-1)*64+32,(y-1)*64+32)
-			--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
-		end
-	end
+	-- for x=1,self.LX do
+		-- for y=1,self.LY do
+			-- --print(self.map_col[x][y])
+			-- love.graphics.print(self.map_col[y][x],(x-1)*64+32,(y-1)*64+32)
+			-- --love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
+		-- end
+	-- end
 	
 end
 
@@ -274,13 +274,13 @@ end
 function map:createMapCol()
 
 	self.map_col = {}
-	for x=0,self.LX-1 do
-	self.map_col[x+1] = {}
-		for y=0,self.LY-1 do
+	for y=0,self.LY-1 do
+		self.map_col[y+1] = {}
+		for x=0,self.LX-1 do
 			if self:scancol(x,y) then
-				self.map_col[x+1][y+1] = 1 
+				self.map_col[y+1][x+1] = 1 
 			else
-				self.map_col[x+1][y+1] = 0
+				self.map_col[y+1][x+1] = 0
 			end
 		end
 	end
