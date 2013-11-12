@@ -285,6 +285,11 @@ function map:createMapCol()
 		end
 	end
 	
+	self.grid = Grid(self.map_col)
+	self.pathfinder = Pathfinder(self.grid, 'ASTAR',0)
+	self.pathfinder:setMode('ORTHOGONAL')
+	self.pathfinder:setHeuristic('CARDINTCARD')
+	
 end
 
 

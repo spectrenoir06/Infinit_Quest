@@ -36,8 +36,8 @@ function love.load(arg)
 	load_option()
 	gamestate.registerEvents()
 	cam = camera()
-	gamestate.switch(start_screen)
-	--gamestate.switch(game)
+	--gamestate.switch(start_screen)
+	gamestate.switch(game)
 end
 -----------------------------start_screen---------------------------
 
@@ -312,33 +312,14 @@ function game:init()
     -- mouse_y=0
     -- click=0
 	
-	testmap = steve:getmap().map_col
-	grid = Grid(testmap)
-	
-	local function walkable(value)
-        return value == 0
-    end
-	
-	for y=0,steve:getmap().LY-1 do
-		test = ""
-		for x=0,steve:getmap().LX-1 do
-			test = test..(grid._map[y][x])
-		end
-		print(test)
-	end
-	
-	myFinder = Pathfinder(grid, 'ASTAR',walkable)
-	myFinder:setMode('ORTHOGONAL')
-	myFinder:setHeuristic('CARDINTCARD')
-	
-	path = myFinder:getPath(10, 10, 28, 14)
-	
-	if path then
-		print(('Path found! Length: %.2f'):format(path:getLength()))
-		for node, count in path:nodes() do
-			print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
-		end
-end
+	-- for y=0,steve:getmap().LY-1 do
+		-- test = ""
+		-- for x=0,steve:getmap().LX-1 do
+			-- test = test..(grid._map[y][x])
+		-- end
+		-- print(test)
+	-- end
+	--end
 
    
 end
@@ -375,18 +356,9 @@ function game:draw()
 		end
 	end
 	
-	
 	if not mobile then
 		love.graphics.draw(p, 0, 0)	-- afficher particule
 	end
-	
-		for x=1,grid:getWidth() do
-			for y=1,grid:getHeight() do
-				--print(self.map_col[x][y])
-				--love.graphics.print(grid._map[y-1][x-1],(x-1)*64+32,(y-1)*64+20)
-				--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
-			end
-		end
 	
 	cam:detach()				-- fin du mode camera
 	
