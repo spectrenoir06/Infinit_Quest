@@ -85,14 +85,18 @@ function start_screen:draw()
 		love.graphics.draw(p, 0, 0)
 	end
 	love.graphics.draw( avatar, pos.X , pos.Y  )
-	p:start()
+	if not mobile then
+		p:start()
+	end
 	--p:setPosition(steve.posX, steve.posY)
 	cam:detach()
 end
 
 function start_screen:update(dt)
 	Timer.update(dt)
-	p:update(dt)
+	if not mobile then
+		p:update(dt)
+	end
 end
 
 
@@ -379,7 +383,7 @@ function game:draw()
 		for x=1,grid:getWidth() do
 			for y=1,grid:getHeight() do
 				--print(self.map_col[x][y])
-				love.graphics.print(grid._map[y-1][x-1],(x-1)*64+32,(y-1)*64+20)
+				--love.graphics.print(grid._map[y-1][x-1],(x-1)*64+32,(y-1)*64+20)
 				--love.graphics.rectangle( "line", (x)*64, (y)*64, 64, 64 )
 			end
 		end
@@ -474,8 +478,10 @@ function game:keypressed(key)
     end
 	
 	if key=="e" then
-		p:start()
-		p:setPosition(steve.posX, steve.posY)
+		if not mobile then
+			p:start()
+			p:setPosition(steve.posX, steve.posY)
+		end
 	end
 	
 	if key=="escape" then
