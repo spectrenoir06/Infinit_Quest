@@ -425,6 +425,11 @@ function game:update(dt)
         if love.keyboard.isDown( " " ) then
             steve:use()
         end
+		if love.keyboard.isDown("f") then
+			finde = true
+		else
+			finde = false
+		end
     end
 end
 
@@ -467,15 +472,7 @@ function game:keypressed(key)
 	end
 	
 	if key=="o" then
-		print("O")
-		
-		path = myFinder:getPath(8, 12,math.floor(steve:getX()/64), math.floor(steve:getY()/64))
-		if path then
-			print(('Path found! Length: %.2f'):format(path:getLength()))
-			for node, count in path:nodes() do
-				print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
-			end
-		end
+
 	end
 
 end

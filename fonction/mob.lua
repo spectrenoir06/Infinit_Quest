@@ -42,16 +42,40 @@ end
 function mob:update(dt)
 	self.sprite:update(dt)
 	--print(dist(steve.posX,steve.posY,monster.X,monster.Y)/64)
-	if dist(steve.posX,steve.posY,self.X,self.Y)/64 < 10 then
-		--print("ennemi en vu")
-		if dist(steve.posX,steve.posY,self.X,self.Y)/64 <=1 then
-			
-		else
-			self.path = nil
-			self.path = steve:getmap().pathfinder:getPath(math.floor(self.X/64), math.floor(self.Y/64), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
-			self.nodes = {}
-			for node, count in self.path:nodes() do
-				self.nodes[count]=node
+	if (dist(steve.posX,steve.posY,self.X,self.Y)/64 < 20) and (dist(steve.posX,steve.posY,self.X,self.Y)/64 >1) then
+		self.path = nil
+		self.path = steve:getmap().pathfinder:getPath(math.floor(self.X/64), math.floor(self.Y/64), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
+		self.nodes = {}
+		for node, count in self.path:nodes() do
+			self.nodes[count]=node
+		end
+		--print(self.nodes[2]:getX())
+		if self.nodes[2] and finde then
+			if self.X1 < self.nodes[2]:getX()*64 then
+				if self.X1+dt*self.speed > self.nodes[2]:getX()*64 then
+					self:setX1( math.floor((self.X1 +(dt*self.speed) )/64)*64  )
+				else
+					self:setX1( self.X1 +(dt*self.speed) )
+				end
+			elseif self.X1 > self.nodes[2]:getX()*64 then
+				if self.X1-dt*self.speed < self.nodes[2]:getX()*64 then
+					self:setX1( math.floor((self.X1/64)*64  ))
+				else
+					self:setX1( self.X1 -(dt*self.speed) )
+				end
+			end
+			if self.Y1 < self.nodes[2]:getY()*64 then
+				if self.Y1+dt*self.speed > self.nodes[2]:getY()*64 then
+					self:setY1( math.floor((self.Y1+dt*self.speed)/64)*64  )
+				else
+					self:setY1( self.Y1 +(dt*self.speed) )
+				end
+			elseif self.Y1 > self.nodes[2]:getY()*64 then
+				if self.Y1-dt*self.speed < self.nodes[2]:getY()*64 then
+					self:setY1( math.floor(self.Y1/64)*64  )
+				else
+					self:setY1( self.Y1 -(dt*self.speed) )
+				end
 			end
 		end
 	end
@@ -60,19 +84,13 @@ function mob:update(dt)
 	
 	if self.dx~=0 or self.dy ~=0 then -- si mouvement
 		self.sprite:play()
-			self:setX1( self.X1 +(dt*self.dx*self.speed) ) -- mouvement sur X
-			self:setY1( self.Y1 +(dt*self.dy*self.speed) ) -- mouvement sur Y
-			--self.sprite:play()
+		self:setX1( self.X1 +(dt*self.dx*self.speed) ) -- mouvement sur X
+		self:setY1( self.Y1 +(dt*self.dy*self.speed) ) -- mouvement sur Y
+		--self.sprite:play()
 	else
 		self.sprite:stop()
     end
-	
-	----
 
-	
-	
-	----
-	
 	self:updatePos()
 	self.dy = 0
 	self.dx = 0
