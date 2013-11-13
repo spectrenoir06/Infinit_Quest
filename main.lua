@@ -347,17 +347,18 @@ function game:draw()
 	steve:getmap():drawdeco(0,0)-- afficher map deco
 	
 
-	if path then
-		for node, count in path:nodes() do
+	if monster.nodes then
+		for count, node in pairs(monster.nodes) do
+			love.graphics.setPointSize( 20 )
+			love.graphics.setColor( 0, 0, 255)
+			if count>1 then
+				love.graphics.line( node:getX()*64+32, node:getY()*64+32, monster.nodes[count-1]:getX()*64+32, monster.nodes[count-1]:getY()*64+32)
+			end
+			if count == 2 then
 				love.graphics.setColor( 255, 0, 0)
-				love.graphics.setPointSize( 20 )
-				if count == 2 then
-					love.graphics.setColor( 255, 0, 0)
-				else
-					love.graphics.setColor( 0, 0, 255)
-				end
-				love.graphics.point( node:getX()*64+32, node:getY()*64+32 )
-				love.graphics.setColor(255, 255, 255)
+			end
+			love.graphics.point( node:getX()*64+32, node:getY()*64+32 )
+			love.graphics.setColor(255, 255, 255)
 		end
 	end
 	

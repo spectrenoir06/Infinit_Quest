@@ -47,13 +47,11 @@ function mob:update(dt)
 		if dist(steve.posX,steve.posY,self.X,self.Y)/64 <=1 then
 			
 		else
-			path = steve:getmap().pathfinder:getPath(math.floor(self.X/64), math.floor(self.Y/64), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
-			for node, count in path:nodes() do
-				print(('Step: %d - x: %d - y: %d'):format(count, node:getX(), node:getY()))
-				print(path:nodes())
-				if count == 2 then
-					self:Goto(node:getX(),node:getY())
-				end
+			self.path = nil
+			self.path = steve:getmap().pathfinder:getPath(math.floor(self.X/64), math.floor(self.Y/64), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
+			self.nodes = {}
+			for node, count in self.path:nodes() do
+				self.nodes[count]=node
 			end
 		end
 	end
