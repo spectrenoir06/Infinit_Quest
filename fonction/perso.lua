@@ -77,8 +77,7 @@ function perso:update(dt)
 	-- end
 	
 	local grid = resolution/2
-	
-	
+
 	-- if old ~= (self.X1 % grid /grid) then
 		--print(self.X1 % grid /grid)
 	-- end

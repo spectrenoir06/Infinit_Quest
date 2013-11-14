@@ -28,11 +28,15 @@ function new_mob()
 
     a.direction = 2
 	a.sprite:stop()
-	a.sprite:setAnim(2,2)
+	--a.sprite:setAnim(2,2)
 	
     a.dx = 0
     a.dy =0
+	a.path = steve:getmap().pathfinder:getPath(math.floor(a.X/64), math.floor(a.Y/64), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
 	a.nodes = {}
+	for node, count in a.path:nodes() do
+		a.nodes[count]=node
+	end
 	--a.path
 
     return setmetatable(a, mob)
@@ -42,54 +46,59 @@ end
 function mob:update(dt)
 	self.sprite:update(dt)
 	--print(dist(steve.posX,steve.posY,monster.X,monster.Y)/64)
-	if (dist(steve.posX,steve.posY,self.X,self.Y)/64 < 20) and (dist(steve.posX,steve.posY,self.X,self.Y)/64 >1) then
-		self.path = nil
-		self.path = steve:getmap().pathfinder:getPath(math.floor(self.X/64), math.floor(self.Y/64), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
-		self.nodes = {}
-		for node, count in self.path:nodes() do
-			self.nodes[count]=node
-		end
+	if (dist(steve.posX,steve.posY,self.X,self.Y)/64 < 20) and (dist(steve.posX,steve.posY,self.X,self.Y)/64 >0) then --and finde	then
+
 		--print(self.nodes[2]:getX())
-		if self.nodes[2] and finde then
-			if self.X1 < self.nodes[2]:getX()*64 then
-				if self.X1+dt*self.speed > self.nodes[2]:getX()*64 then
-					self:setX1( math.floor((self.X1 +(dt*self.speed) )/64)*64  )
+		if ((self.X1 ~= self.nodes[1]:getX()*64) or (self.Y1 ~= self.nodes[1]:getY()*64))  then
+			self.sprite:play()
+			if self.X1 < self.nodes[1]:getX()*64 then
+				if self.X1+dt*self.speed > self.nodes[1]:getX()*64 then
+					self:setX1(  self.nodes[1]:getX()*64)
+					
 				else
+					self:setdirection(4)
 					self:setX1( self.X1 +(dt*self.speed) )
 				end
-			elseif self.X1 > self.nodes[2]:getX()*64 then
-				if self.X1-dt*self.speed < self.nodes[2]:getX()*64 then
-					self:setX1( math.floor((self.X1/64)*64  ))
+			elseif self.X1 > self.nodes[1]:getX()*64 then
+				if self.X1-dt*self.speed < self.nodes[1]:getX()*64 then
+					self:setX1(  self.nodes[1]:getX()*64)
 				else
+					self:setdirection(3)
 					self:setX1( self.X1 -(dt*self.speed) )
 				end
-			end
-			if self.Y1 < self.nodes[2]:getY()*64 then
-				if self.Y1+dt*self.speed > self.nodes[2]:getY()*64 then
-					self:setY1( math.floor((self.Y1+dt*self.speed)/64)*64  )
+			elseif self.Y1 < self.nodes[1]:getY()*64 then
+				if self.Y1+dt*self.speed > self.nodes[1]:getY()*64 then
+					self:setY1(  self.nodes[1]:getY()*64 )
 				else
+					self:setdirection(2)
 					self:setY1( self.Y1 +(dt*self.speed) )
 				end
-			elseif self.Y1 > self.nodes[2]:getY()*64 then
-				if self.Y1-dt*self.speed < self.nodes[2]:getY()*64 then
-					self:setY1( math.floor(self.Y1/64)*64  )
+			elseif self.Y1 > self.nodes[1]:getY()*64 then
+				if self.Y1-dt*self.speed < self.nodes[1]:getY()*64 then
+					self:setY1(  self.nodes[1]:getY()*64  )
 				else
+					self:setdirection(1)
 					self:setY1( self.Y1 -(dt*self.speed) )
+				end
+			end
+		else -- si mob sur la premier case du path
+			--print("node 1")
+			self.path = nil
+			self.path = steve:getmap().pathfinder:getPath(self.nodes[1]:getX(), self.nodes[1]:getY(), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
+			self.nodes = {}
+			for node, count in self.path:nodes() do
+				self.nodes[count]=node
+			end
+			if self.path:getLength() >= 1 then
+				self.path = nil
+				self.path = steve:getmap().pathfinder:getPath(self.nodes[2]:getX(), self.nodes[2]:getY(), math.floor(steve:getX()/64), math.floor(steve:getY()/64))
+				self.nodes = {}
+				for node, count in self.path:nodes() do
+					self.nodes[count]=node
 				end
 			end
 		end
 	end
-	
-	local grid = resolution/2
-	
-	if self.dx~=0 or self.dy ~=0 then -- si mouvement
-		self.sprite:play()
-		self:setX1( self.X1 +(dt*self.dx*self.speed) ) -- mouvement sur X
-		self:setY1( self.Y1 +(dt*self.dy*self.speed) ) -- mouvement sur Y
-		--self.sprite:play()
-	else
-		self.sprite:stop()
-    end
 
 	self:updatePos()
 	self.dy = 0
