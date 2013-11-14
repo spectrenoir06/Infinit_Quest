@@ -1,12 +1,12 @@
 mob = {}
 mob.__index = mob
 
-function new_mob()
+function new_mob(x,y)
 
     local a={}
 	
-	a.X = 10*64
-	a.Y = 10*64
+	a.X = x*64
+	a.Y = y*64
 	
 	a.LX = 64
     a.LY = 64

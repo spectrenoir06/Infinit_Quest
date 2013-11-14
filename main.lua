@@ -299,7 +299,10 @@ function game:init()
     cursor_y=0
     
     steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
-	monster = new_mob()
+	monster = new_mob(10,10)
+	monster1 = new_mob(20,20)
+	monster2 = new_mob(25,10)
+	monster3 = new_mob(10,25)
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
@@ -344,6 +347,9 @@ function game:draw()
 	steve:getmap():draw(0,0)  	-- afficher map
     steve:draw() 				-- afficher perso
 	monster:draw()
+	monster1:draw()
+	monster2:draw()
+	monster3:draw()
 	steve:getmap():drawdeco(0,0)-- afficher map deco
 	
 
@@ -387,6 +393,9 @@ function game:update(dt)
 
     steve:update(dt)  -- update steve
 	monster:update(dt)
+	monster1:update(dt)
+	monster2:update(dt)
+	monster3:update(dt)
 	if not mobile then
 		p:update(dt) --update particule
 	end
