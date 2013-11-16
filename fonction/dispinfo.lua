@@ -5,7 +5,7 @@ function dispinfo(x,y)
     if y == nil then
       y=0
     end
-    love.graphics.draw(cache, x+0, 0)
+    --love.graphics.draw(cache, x+0, 0)
     love.graphics.print("Fps = "..love.timer.getFPS(), x+10, y+10)
     love.graphics.print("map = "..steve:getmap().fichier, x+300, y+10)
     love.graphics.print("Perso X1 = "..steve.X1,x+10,y+30)
@@ -28,7 +28,7 @@ function dispinfo(x,y)
 	love.graphics.print("rot = "..cam.rot.." rad",x+10,y+150)
 	love.graphics.print("rot = "..(cam.rot/math.pi) * 180  .." °",x+10,y+165)
 	
-	love.graphics.print("dist = "..dist(steve.posX,steve.posY,monster.X,monster.Y)/resolution,x+10,y+180)
+	--love.graphics.print("dist = "..dist(steve.posX,steve.posY,monster.X,monster.Y)/resolution,x+10,y+180)
 	
     -- love.graphics.print("up = "..up,x+10,y+140)
     -- love.graphics.print("down = "..down,x+10,y+155)

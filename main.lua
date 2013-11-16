@@ -263,26 +263,7 @@ end
 
 function game:init()
 
-	--love.audio.stop(intro_music)
-	--music = love.audio.newSource("/music/main.mp3")
-	--love.audio.play(music)
-
 	cam:zoomTo(1)
-	if not mobile then
-		p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
-		p:setEmissionRate(1000)
-		p:setSpeed(300, 400)
-		p:setSizes(2, 1)
-		p:setColors(220, 105, 20, 255, 194, 30, 18, 0)
-		p:setPosition(400, 300)
-		p:setLifetime(0.1)
-		p:setParticleLife(0.2)
-		p:setDirection(0)
-		p:setSpread(360)
-		p:setTangentialAcceleration(1000)
-		p:setRadialAcceleration(-2000)
-		p:stop()
-	end
 	
     import_data("/data/data.json")
     require "/fonction/perso"
@@ -290,6 +271,11 @@ function game:init()
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
 	require "/fonction/mob"
+	socket = require "socket"
+	
+	udp = socket.udp()
+	udp:settimeout(0)
+    udp:setsockname('*', 12345)
 	
 	loadmaps()
 
@@ -298,33 +284,10 @@ function game:init()
     cursor_x=0
     cursor_y=0
     
-    steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
-	monster = new_mob(10,10)
-	monster1 = new_mob(20,20)
-	monster2 = new_mob(25,10)
-	monster3 = new_mob(10,25)
-    
-    inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
-    cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
-    invent = inv_new(5.375*resolution,10*resolution,"/textures/"..resolution.."/inv.png")
-    A_key = button_new(16*resolution,9*resolution,"/textures/"..resolution.."/A.png")
-    keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
+	tab_perso = {}
+	steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
+	table.insert(tab_perso,steve )
 	
-    -- touche=0
-    -- mouse_x=0
-    -- mouse_y=0
-    -- click=0
-	
-	-- for y=0,steve:getmap().LY-1 do
-		-- test = ""
-		-- for x=0,steve:getmap().LX-1 do
-			-- test = test..(grid._map[y][x])
-		-- end
-		-- print(test)
-	-- end
-	--end
-
-   
 end
 
 function game:draw()
@@ -345,45 +308,18 @@ function game:draw()
 	cam:attach()	 			-- mode camera
     
 	steve:getmap():draw(0,0)  	-- afficher map
-    steve:draw() 				-- afficher perso
-	monster:draw()
-	monster1:draw()
-	monster2:draw()
-	monster3:draw()
+    
+	for k,v in pairs(tab_perso) do
+		v:draw() 				-- afficher perso
+	end
 	steve:getmap():drawdeco(0,0)-- afficher map deco
 	
-
-	-- if monster.nodes then
-		-- for count, node in pairs(monster.nodes) do
-			-- love.graphics.setPointSize( 20 )
-			-- love.graphics.setColor( 0, 0, 255)
-			-- if count>1 then
-				-- love.graphics.line( node:getX()*64+32, node:getY()*64+32, monster.nodes[count-1]:getX()*64+32, monster.nodes[count-1]:getY()*64+32)
-			-- end
-			-- if count == 2 then
-				-- love.graphics.setColor( 255, 0, 0)
-			-- end
-			-- love.graphics.point( node:getX()*64+32, node:getY()*64+32 )
-			-- love.graphics.setColor(255, 255, 255)
-		-- end
-	-- end
-	
-	if not mobile then
-		love.graphics.draw(p, 0, 0)	-- afficher particule
-	end
 	
 	cam:detach()				-- fin du mode camera
 	
     if info then
         dispinfo(love.graphics.getWidth()-448,0)	-- cadre info
     end
-    --invent:draw(steve)
-    --touchemobil:draw()
-    if mobile then -- aff touche mobil
-        A_key:draw()
-        keypad:draw()
-    end
-	
 
 	
 	
@@ -391,38 +327,22 @@ end
 
 function game:update(dt)
 
-    steve:update(dt)  -- update steve
-	monster:update(dt)
-	monster1:update(dt)
-	monster2:update(dt)
-	monster3:update(dt)
-	if not mobile then
-		p:update(dt) --update particule
+	udp_data, msg_or_ip, port_or_nil = udp:receivefrom()
+	if udp_data then
+		print(udp_data, msg_or_ip, port_or_nil)
+		if udp_data == "New_game" then
+		
+			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution) )
+			udp:sendto("New_game")
+		end
 	end
 	
-    local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
- 
-    if invent:get(love.mouse.getX( ),love.mouse.getY( ),click) then
-        steve:setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
-    end   
 	
-    if mobile then -- mode tactile mobil
-        local touche = keypad:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click)
-        if touche==1 then
-            steve:GoUp()
-        elseif touche == 2 then
-            steve:GoDown()
-        elseif touche==3 then 
-            steve:GoLeft()
-        elseif touche==4 then
-            steve:GoRight()
-		end
-		
-        if A_key:isPress(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then
-            steve:use()
-        end
-    else -- mode clavier
-        if love.keyboard.isDown( "up" ) then
+	for k,v in pairs(tab_perso) do
+		v:update(dt)  -- update steve
+	end
+ 
+		if love.keyboard.isDown( "up" ) then
             steve:GoUp()
         elseif love.keyboard.isDown( "down" ) then
             steve:GoDown()
@@ -439,7 +359,6 @@ function game:update(dt)
 		else
 			finde = false
 		end
-    end
 end
 
 function game:mousepressed(x, y, button)
