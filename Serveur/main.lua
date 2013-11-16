@@ -330,10 +330,9 @@ function game:update(dt)
 	udp_data, msg_or_ip, port_or_nil = udp:receivefrom()
 	if udp_data then
 		print(udp_data, msg_or_ip, port_or_nil)
-		if udp_data == "New_game" then
-		
+		if udp_data == "new_game" then
 			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution) )
-			udp:sendto("New_game")
+			udp:sendto("new_game", msg_or_ip,  port_or_nil)
 		end
 	end
 	

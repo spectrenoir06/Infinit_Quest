@@ -291,6 +291,20 @@ function game:init()
     require "/fonction/pnj"
 	require "/fonction/mob"
 	
+	socket = require "socket"
+	address, port = "localhost", 12345
+	udp = socket.udp()
+	udp:settimeout(0)
+    udp:setpeername(address, port)
+	udp:send("new_game")
+	while 1 do
+		rep_data, rep_msg = udp:receive()
+		if rep_data then
+			print(rep_data,rep_msg)
+			break
+		end
+	end
+	
 	loadmaps()
 
     info=true
@@ -299,10 +313,6 @@ function game:init()
     cursor_y=0
     
     steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
-	monster = new_mob(10,10)
-	monster1 = new_mob(20,20)
-	monster2 = new_mob(25,10)
-	monster3 = new_mob(10,25)
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
@@ -310,26 +320,16 @@ function game:init()
     A_key = button_new(16*resolution,9*resolution,"/textures/"..resolution.."/A.png")
     keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
 	
-    -- touche=0
-    -- mouse_x=0
-    -- mouse_y=0
-    -- click=0
+    tab_perso = {}
+	table.insert(tab_perso,steve )
 	
-	-- for y=0,steve:getmap().LY-1 do
-		-- test = ""
-		-- for x=0,steve:getmap().LX-1 do
-			-- test = test..(grid._map[y][x])
-		-- end
-		-- print(test)
-	-- end
-	--end
 
    
 end
 
 function game:draw()
 	--love.graphics.setIcon(icone)
-	cam:lookAt(math.floor(steve.X1), math.floor(steve.Y1))
+	cam:lookAt(math.floor(tab_perso[1].X1), math.floor(tab_perso[1].Y1))
 	
     if cam.x<love.graphics.getWidth()/2 then
          cam.x = love.graphics.getWidth()/2
@@ -345,11 +345,9 @@ function game:draw()
 	cam:attach()	 			-- mode camera
     
 	steve:getmap():draw(0,0)  	-- afficher map
-    steve:draw() 				-- afficher perso
-	monster:draw()
-	monster1:draw()
-	monster2:draw()
-	monster3:draw()
+    for k,v in pairs(tab_perso) do
+		v:draw() 				-- afficher perso
+	end
 	steve:getmap():drawdeco(0,0)-- afficher map deco
 	
 
@@ -367,10 +365,6 @@ function game:draw()
 			-- love.graphics.setColor(255, 255, 255)
 		-- end
 	-- end
-	
-	if not mobile then
-		love.graphics.draw(p, 0, 0)	-- afficher particule
-	end
 	
 	cam:detach()				-- fin du mode camera
 	
@@ -391,13 +385,8 @@ end
 
 function game:update(dt)
 
-    steve:update(dt)  -- update steve
-	monster:update(dt)
-	monster1:update(dt)
-	monster2:update(dt)
-	monster3:update(dt)
-	if not mobile then
-		p:update(dt) --update particule
+    for k,v in pairs(tab_perso) do
+		v:update(dt)				-- afficher perso
 	end
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
@@ -423,16 +412,16 @@ function game:update(dt)
         end
     else -- mode clavier
         if love.keyboard.isDown( "up" ) then
-            steve:GoUp()
+            tab_perso[1]:GoUp()
         elseif love.keyboard.isDown( "down" ) then
-            steve:GoDown()
+            tab_perso[1]:GoDown()
         elseif love.keyboard.isDown( "left" ) then
-            steve:GoLeft()
+            tab_perso[1]:GoLeft()
         elseif love.keyboard.isDown( "right" ) then
-           steve:GoRight()
+           tab_perso[1]:GoRight()
         end
         if love.keyboard.isDown( " " ) then
-            steve:use()
+            tab_perso[1]:use()
         end
 		if love.keyboard.isDown("f") then
 			finde = true
