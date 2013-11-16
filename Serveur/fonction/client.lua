@@ -10,6 +10,9 @@ function clients_new()
 end
 
 function clients:add(psedo,ip,port)
+		for k,v in ipairs(self.list) do
+		udp:sendto("new_player", v.ip,  v.port)
+	end
 	table.insert(self.list,{psedo = psedo , ip = ip , port = port })
 end
 

@@ -330,13 +330,19 @@ end
 
 function game:update(dt)
 
+		clients:update()
+
 	udp_data, msg_or_ip, port_or_nil = udp:receivefrom()
 	if udp_data then
-		print(udp_data, msg_or_ip, port_or_nil)
 		if udp_data == "new_game" then
+			print(udp_data, msg_or_ip, port_or_nil)
 			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution) )
 			clients:add(#tab_perso,msg_or_ip,port_or_nil)
 			udp:sendto(#tab_perso, msg_or_ip,  port_or_nil)
+		elseif udp_data then
+			json_data = json.decode(udp_data)
+			tab_perso[json_data.id]:setX1(json_data.x1)
+			tab_perso[json_data.id]:setY1(json_data.y1)
 		end
 	end
 	
@@ -344,8 +350,7 @@ function game:update(dt)
 	for k,v in pairs(tab_perso) do
 		v:update(dt)  -- update steve
 	end
-	
-	clients:update()
+
  
 		if love.keyboard.isDown( "up" ) then
             steve:GoUp()

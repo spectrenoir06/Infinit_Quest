@@ -392,11 +392,15 @@ end
 function game:update(dt)
 
 	rep_data, rep_msg = udp:receive()
-	if rep_data then
+	if rep_data=="new_player" then
+		table.insert(tab_perso,perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution))
+	elseif rep_data then
 		json_data = json.decode(rep_data)
 		for k,v in ipairs(json_data) do
-			tab_perso[k]:setX1(v.x1)
-			tab_perso[k]:setY1(v.y1)
+			if k~= id then
+				tab_perso[k]:setX1(v.x1)
+				tab_perso[k]:setY1(v.y1)
+			end
 		end
 	end
 
@@ -429,6 +433,7 @@ function game:update(dt)
     else -- mode clavier
         if love.keyboard.isDown( "up" ) then
             tab_perso[id]:GoUp()
+			
         elseif love.keyboard.isDown( "down" ) then
             tab_perso[id]:GoDown()
         elseif love.keyboard.isDown( "left" ) then
@@ -444,6 +449,9 @@ function game:update(dt)
 		else
 			finde = false
 		end
+		
+		udp:send(json.encode( { id = id , x1=tab_perso[id].X1 , y1=tab_perso[id].Y1 } ))
+		
     end
 end
 
