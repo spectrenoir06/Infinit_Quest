@@ -7,5 +7,4 @@ function load_option()
 	if love.keyboard.isDown( "up" ) and love.keyboard.isDown( "down" ) then
         mobile=true
 	end
-	
 end

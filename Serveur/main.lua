@@ -286,89 +286,73 @@ function game:init()
     cursor_y=0
     
 	tab_perso = {}
-	steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
-	table.insert(tab_perso,steve )
 	
 	clients = clients_new()
+	
+	sync = 0
+	sync_dt = 0.05
 	
 end
 
 function game:draw()
-	--love.graphics.setIcon(icone)
-	cam:lookAt(math.floor(steve.X1), math.floor(steve.Y1))
-	
-    if cam.x<love.graphics.getWidth()/2 then
-         cam.x = love.graphics.getWidth()/2
-    elseif cam.x>steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
-         cam.x = steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
-    end
-    if cam.y<love.graphics.getHeight()/2 then
-        cam.y = love.graphics.getHeight()/2
-    elseif cam.y>steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
-         cam.y = steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
-    end
-	
-	cam:attach()	 			-- mode camera
-    
-	steve:getmap():draw(0,0)  	-- afficher map
-    
-	for k,v in pairs(tab_perso) do
-		v:draw() 				-- afficher perso
+	for k,v in ipairs(tab_perso) do
+		love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY, 10,15*k+10)
 	end
-	steve:getmap():drawdeco(0,0)-- afficher map deco
-	
-	
-	cam:detach()				-- fin du mode camera
-	
-    if info then
-        dispinfo(love.graphics.getWidth()-448,0)	-- cadre info
-    end
 
 	
 	
 end
 
 function game:update(dt)
-
-		clients:update()
-
+	sync = sync + dt
+	
 	udp_data, msg_or_ip, port_or_nil = udp:receivefrom()
-	if udp_data then
-		if udp_data == "new_game" then
-			print(udp_data, msg_or_ip, port_or_nil)
-			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution) )
-			clients:add(#tab_perso,msg_or_ip,port_or_nil)
-			udp:sendto(#tab_perso, msg_or_ip,  port_or_nil)
-		elseif udp_data then
-			json_data = json.decode(udp_data)
-			tab_perso[json_data.id]:setX1(json_data.x1)
-			tab_perso[json_data.id]:setY1(json_data.y1)
+		if udp_data then
+			if udp_data == "new_game" then
+				print(udp_data, msg_or_ip, port_or_nil)
+				table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution) )
+				clients:add(#tab_perso,msg_or_ip,port_or_nil)
+				udp:sendto(#tab_perso, msg_or_ip,  port_or_nil)
+			elseif udp_data then
+				json_data = json.decode(udp_data)
+				tab_perso[json_data.id]:setX1(json_data.x1)
+				tab_perso[json_data.id]:setY1(json_data.y1)
+				tab_perso[json_data.id]:setdirection(json_data.dir)
+			end
 		end
-	end
 	
 	
-	for k,v in pairs(tab_perso) do
-		v:update(dt)  -- update steve
+	if sync > sync_dt then
+		clients:update()
+		sync = sync-sync_dt
 	end
+		
+
+	
+	
+	
+	-- for k,v in pairs(tab_perso) do
+		-- v:update(dt)  -- update steve
+	-- end
 
  
-		if love.keyboard.isDown( "up" ) then
-            steve:GoUp()
-        elseif love.keyboard.isDown( "down" ) then
-            steve:GoDown()
-        elseif love.keyboard.isDown( "left" ) then
-            steve:GoLeft()
-        elseif love.keyboard.isDown( "right" ) then
-           steve:GoRight()
-        end
-        if love.keyboard.isDown( " " ) then
-            steve:use()
-        end
-		if love.keyboard.isDown("f") then
-			finde = true
-		else
-			finde = false
-		end
+		-- if love.keyboard.isDown( "up" ) then
+            -- steve:GoUp()
+        -- elseif love.keyboard.isDown( "down" ) then
+            -- steve:GoDown()
+        -- elseif love.keyboard.isDown( "left" ) then
+            -- steve:GoLeft()
+        -- elseif love.keyboard.isDown( "right" ) then
+           -- steve:GoRight()
+        -- end
+        -- if love.keyboard.isDown( " " ) then
+            -- steve:use()
+        -- end
+		-- if love.keyboard.isDown("f") then
+			-- finde = true
+		-- else
+			-- finde = false
+		-- end
 end
 
 function game:mousepressed(x, y, button)

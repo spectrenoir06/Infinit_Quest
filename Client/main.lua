@@ -292,7 +292,7 @@ function game:init()
 	require "/fonction/mob"
 		loadmaps()
 	socket = require "socket"
-	address, port = "localhost", 12345
+	address, port = "192.168.10.2", 12345
 	udp = socket.udp()
 	udp:settimeout(0)
     udp:setpeername(address, port)
@@ -308,7 +308,7 @@ function game:init()
 	tab_perso = {}
 	
 	for i=0,tonumber(rep_data)-1 do
-		table.insert(tab_perso,perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution))
+		table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..i..".png",resolution,resolution))
 	end
 	
 
@@ -327,8 +327,8 @@ function game:init()
     keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
 	
 
-	  
-	
+	 sync = 0
+	sync_dt = 0.05
 
    
 end
@@ -390,20 +390,29 @@ function game:draw()
 end
 
 function game:update(dt)
+	
+	sync = sync + dt
 
+	
 	rep_data, rep_msg = udp:receive()
 	if rep_data=="new_player" then
-		table.insert(tab_perso,perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution))
+		table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution))
 	elseif rep_data then
 		json_data = json.decode(rep_data)
 		for k,v in ipairs(json_data) do
 			if k~= id then
 				tab_perso[k]:setX1(v.x1)
 				tab_perso[k]:setY1(v.y1)
+				tab_perso[k]:setdirection(v.dir)
 			end
 		end
 	end
+	
+	if sync > sync_dt then
 
+		udp:send(json.encode( { id = id , x1=tab_perso[id].X1 , y1=tab_perso[id].Y1 ,dir=tab_perso[id].direction } ))
+		sync = sync-sync_dt
+	end
 
     for k,v in pairs(tab_perso) do
 		v:update(dt)				-- afficher perso
@@ -411,23 +420,24 @@ function game:update(dt)
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
-    if invent:get(love.mouse.getX( ),love.mouse.getY( ),click) then
+    if invent:get(love.mouse.getX(),love.mouse.getY(),click) then
         steve:setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
     end   
 	
     if mobile then -- mode tactile mobil
-        local touche = keypad:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click)
+        local touche = keypad:get(love.mouse.getX(),love.mouse.getY(),click)
+		print(touche)
         if touche==1 then
-            steve:GoUp()
+             tab_perso[id]:GoUp()
         elseif touche == 2 then
-            steve:GoDown()
+             tab_perso[id]:GoDown()
         elseif touche==3 then 
-            steve:GoLeft()
+             tab_perso[id]:GoLeft()
         elseif touche==4 then
-            steve:GoRight()
+             tab_perso[id]:GoRight()
 		end
 		
-        if A_key:isPress(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then
+        if A_key:isPress(love.mouse.getX(),love.mouse.getY(),click) then
             steve:use()
         end
     else -- mode clavier
@@ -449,8 +459,6 @@ function game:update(dt)
 		else
 			finde = false
 		end
-		
-		udp:send(json.encode( { id = id , x1=tab_perso[id].X1 , y1=tab_perso[id].Y1 } ))
 		
     end
 end
