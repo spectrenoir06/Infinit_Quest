@@ -290,7 +290,7 @@ function game:init()
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
 	require "/fonction/mob"
-	
+		loadmaps()
 	socket = require "socket"
 	address, port = "localhost", 12345
 	udp = socket.udp()
@@ -300,19 +300,25 @@ function game:init()
 	while 1 do
 		rep_data, rep_msg = udp:receive()
 		if rep_data then
-			print(rep_data,rep_msg)
+			print(rep_data)
 			break
 		end
 	end
 	
-	loadmaps()
+	tab_perso = {}
+	
+	for i=0,tonumber(rep_data)-1 do
+		table.insert(tab_perso,perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution))
+	end
+	
+
 
     info=true
 	
     cursor_x=0
     cursor_y=0
     
-    steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
+    id = #tab_perso
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
@@ -320,8 +326,8 @@ function game:init()
     A_key = button_new(16*resolution,9*resolution,"/textures/"..resolution.."/A.png")
     keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
 	
-    tab_perso = {}
-	table.insert(tab_perso,steve )
+
+	  
 	
 
    
@@ -329,26 +335,26 @@ end
 
 function game:draw()
 	--love.graphics.setIcon(icone)
-	cam:lookAt(math.floor(tab_perso[1].X1), math.floor(tab_perso[1].Y1))
+	cam:lookAt(math.floor(tab_perso[id].X1), math.floor(tab_perso[id].Y1))
 	
     if cam.x<love.graphics.getWidth()/2 then
          cam.x = love.graphics.getWidth()/2
-    elseif cam.x>steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
-         cam.x = steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
+    elseif cam.x>tab_perso[id]:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
+         cam.x = tab_perso[id]:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
     end
     if cam.y<love.graphics.getHeight()/2 then
         cam.y = love.graphics.getHeight()/2
-    elseif cam.y>steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
-         cam.y = steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
+    elseif cam.y>tab_perso[id]:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
+         cam.y = tab_perso[id]:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
     end
 	
 	cam:attach()	 			-- mode camera
     
-	steve:getmap():draw(0,0)  	-- afficher map
+	tab_perso[id]:getmap():draw(0,0)  	-- afficher map
     for k,v in pairs(tab_perso) do
 		v:draw() 				-- afficher perso
 	end
-	steve:getmap():drawdeco(0,0)-- afficher map deco
+	tab_perso[id]:getmap():drawdeco(0,0)-- afficher map deco
 	
 
 	-- if monster.nodes then
@@ -385,6 +391,16 @@ end
 
 function game:update(dt)
 
+	rep_data, rep_msg = udp:receive()
+	if rep_data then
+		json_data = json.decode(rep_data)
+		for k,v in ipairs(json_data) do
+			tab_perso[k]:setX1(v.x1)
+			tab_perso[k]:setY1(v.y1)
+		end
+	end
+
+
     for k,v in pairs(tab_perso) do
 		v:update(dt)				-- afficher perso
 	end
@@ -412,13 +428,13 @@ function game:update(dt)
         end
     else -- mode clavier
         if love.keyboard.isDown( "up" ) then
-            tab_perso[1]:GoUp()
+            tab_perso[id]:GoUp()
         elseif love.keyboard.isDown( "down" ) then
-            tab_perso[1]:GoDown()
+            tab_perso[id]:GoDown()
         elseif love.keyboard.isDown( "left" ) then
-            tab_perso[1]:GoLeft()
+            tab_perso[id]:GoLeft()
         elseif love.keyboard.isDown( "right" ) then
-           tab_perso[1]:GoRight()
+           tab_perso[id]:GoRight()
         end
         if love.keyboard.isDown( " " ) then
             tab_perso[1]:use()

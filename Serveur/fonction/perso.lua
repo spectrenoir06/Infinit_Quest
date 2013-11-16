@@ -508,3 +508,8 @@ function perso:GoRight()
     self.dy = 0
     self.dx = 1
 end
+
+function perso:info()
+	self.posX , self.posY , self.X1 ,  self.Y1 , self.X2 , self.Y2 = self:getPos()
+	return self.posX , self.posY
+end

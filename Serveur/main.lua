@@ -271,6 +271,7 @@ function game:init()
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
 	require "/fonction/mob"
+	require "/fonction/client"
 	socket = require "socket"
 	
 	udp = socket.udp()
@@ -287,6 +288,8 @@ function game:init()
 	tab_perso = {}
 	steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
 	table.insert(tab_perso,steve )
+	
+	clients = clients_new()
 	
 end
 
@@ -332,7 +335,8 @@ function game:update(dt)
 		print(udp_data, msg_or_ip, port_or_nil)
 		if udp_data == "new_game" then
 			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution) )
-			udp:sendto("new_game", msg_or_ip,  port_or_nil)
+			clients:add(#tab_perso,msg_or_ip,port_or_nil)
+			udp:sendto(#tab_perso, msg_or_ip,  port_or_nil)
 		end
 	end
 	
@@ -340,6 +344,8 @@ function game:update(dt)
 	for k,v in pairs(tab_perso) do
 		v:update(dt)  -- update steve
 	end
+	
+	clients:update()
  
 		if love.keyboard.isDown( "up" ) then
             steve:GoUp()
