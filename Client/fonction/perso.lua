@@ -17,6 +17,7 @@ function perso_new(fichier,LX,LY,map)
 				a.map = data.map[k]
 				a.posX = a.globalPosX - v.X * resolution
 				a.posY = a.globalPosY - v.Y * resolution
+				a.mapnb = k
 				break
 			end
 		end
@@ -58,11 +59,12 @@ function perso:getmap()
 end
 
 function perso:getmapnb()
-    return self.map.map.nb
+    return self.mapnb
 end
 
 function perso:setmap(map)
     self.map = data.map[map]
+	self.mapnb = map
 end
 
 
@@ -162,8 +164,8 @@ function perso:update(dt)
 					self.map = data.map[k]
 					self:setPosX(self.globalPosX - v.X * resolution)
 					self:setPosY(self.globalPosY - v.Y * resolution)
-					
-					
+					self.mapnb = k
+					udp:send(json.encode( { cmd = "map_update" ,id = id , x1=self.X1 , y1=self.Y1 ,dir=self.direction , map = k } ))
 					break
 				end
 			end

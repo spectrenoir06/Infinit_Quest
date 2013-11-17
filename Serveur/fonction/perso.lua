@@ -15,6 +15,7 @@ function perso_new(fichier,LX,LY,map)
 		if (v.X<(a.globalPosX/resolution)) and (v.Y<(a.globalPosX/resolution)) then -- 
 			if ((a.globalPosX-v.X*resolution) < v.map.LX*resolution) and ((a.globalPosY-v.Y*resolution) < v.map.LY*resolution) then
 				a.map = data.map[k]
+				a.mapnb = k
 				a.posX = a.globalPosX - v.X * resolution
 				a.posY = a.globalPosY - v.Y * resolution
 				break
@@ -58,11 +59,12 @@ function perso:getmap()
 end
 
 function perso:getmapnb()
-    return self.map.map.nb
+    return self.mapnb
 end
 
 function perso:setmap(map)
     self.map = data.map[map]
+	self.mapnb = map
 end
 
 

@@ -296,7 +296,7 @@ end
 
 function game:draw()
 	for k,v in ipairs(tab_perso) do
-		love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY, 10,15*k+10)
+		love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY.." ; map="..v.mapnb, 10,15*k+10)
 	end
 
 	
@@ -306,15 +306,17 @@ end
 function game:update(dt)
 	sync = sync + dt
 	
-	udp_data, msg_or_ip, port_or_nil = udp:receivefrom()
+	local udp_data, msg_or_ip, port_or_nil = udp:receivefrom()
 		if udp_data then
-			if udp_data == "new_game" then
-				print(udp_data, msg_or_ip, port_or_nil)
+			local json_data = json.decode(udp_data)
+			if json_data.cmd == "new_game" then
+				print(json_data.cmd, msg_or_ip, port_or_nil)
 				table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution) )
 				clients:add(#tab_perso,msg_or_ip,port_or_nil)
 				udp:sendto(#tab_perso, msg_or_ip,  port_or_nil)
-			elseif udp_data then
-				json_data = json.decode(udp_data)
+			elseif json_data.cmd == "pos_update" then
+				--print(json_data.cmd, msg_or_ip, port_or_nil)
+				tab_perso[json_data.id]:setmap(json_data.map)
 				tab_perso[json_data.id]:setX1(json_data.x1)
 				tab_perso[json_data.id]:setY1(json_data.y1)
 				tab_perso[json_data.id]:setdirection(json_data.dir)

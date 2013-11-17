@@ -296,7 +296,7 @@ function game:init()
 	udp = socket.udp()
 	udp:settimeout(0)
     udp:setpeername(address, port)
-	udp:send("new_game")
+	udp:send(json.encode( { cmd = "new_game"} ))
 	while 1 do
 		rep_data, rep_msg = udp:receive()
 		if rep_data then
@@ -371,7 +371,9 @@ function game:draw()
 			-- love.graphics.setColor(255, 255, 255)
 		-- end
 	-- end
-	
+	for k,v in ipairs(tab_perso) do
+		love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY.." ; map="..v.mapnb, 10,15*k+10)
+	end
 	cam:detach()				-- fin du mode camera
 	
     if info then
@@ -394,23 +396,25 @@ function game:update(dt)
 	sync = sync + dt
 
 	
-	rep_data, rep_msg = udp:receive()
-	if rep_data=="new_player" then
-		table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution))
-	elseif rep_data then
-		json_data = json.decode(rep_data)
-		for k,v in ipairs(json_data) do
-			if k~= id then
-				tab_perso[k]:setX1(v.x1)
-				tab_perso[k]:setY1(v.y1)
-				tab_perso[k]:setdirection(v.dir)
+	local udp_data, rep_msg = udp:receive()
+	if udp_data then
+		print(udp_data)
+		local json_data = json.decode(udp_data)
+		if json_data.cmd == "new_game" then 
+			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution))
+		elseif json_data then
+			for k,v in pairs(json_data) do
+				if k~= id then
+					tab_perso[k]:setX1(v.x1)
+					tab_perso[k]:setY1(v.y1)
+					tab_perso[k]:setdirection(v.dir)
+				end
 			end
 		end
 	end
 	
 	if sync > sync_dt then
-
-		udp:send(json.encode( { id = id , x1=tab_perso[id].X1 , y1=tab_perso[id].Y1 ,dir=tab_perso[id].direction } ))
+		udp:send(json.encode( { cmd = "pos_update" , id = id , x1=tab_perso[id].X1 , y1=tab_perso[id].Y1 ,map=tab_perso[id]:getmapnb(),dir=tab_perso[id].direction } ))
 		sync = sync-sync_dt
 	end
 
@@ -452,7 +456,7 @@ function game:update(dt)
            tab_perso[id]:GoRight()
         end
         if love.keyboard.isDown( " " ) then
-            tab_perso[1]:use()
+            tab_perso[id]:use()
         end
 		if love.keyboard.isDown("f") then
 			finde = true

@@ -11,7 +11,7 @@ end
 
 function clients:add(psedo,ip,port)
 	for k,v in ipairs(self.list) do
-		udp:sendto("new_player", v.ip,  v.port)
+		udp:sendto(json.encode({cmd = "new_player"}), v.ip,  v.port)
 	end
 	table.insert(self.list,{psedo = psedo , ip = ip , port = port })
 end
@@ -26,8 +26,9 @@ end
 
 function clients:update()
 	self.data = {}
+	--self.data.cmd ="pos_update"
 	for k,v in ipairs(tab_perso) do
-		self.data[k]={x1=v.X1,y1=v.Y1,dir = v:getdirection()}
+		self.data[k]={ x1=v.X1,y1=v.Y1,dir = v:getdirection() , map=v.mapnb}
 	end
 	for k,v in ipairs(self.list) do
 		udp:sendto(json.encode(self.data), v.ip,  v.port)
