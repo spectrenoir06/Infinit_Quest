@@ -292,24 +292,28 @@ function game:init()
 	require "/fonction/mob"
 		loadmaps()
 	socket = require "socket"
-	address, port = "192.168.10.2", 12345
+	address, port = "localhost", 12345
 	udp = socket.udp()
 	udp:settimeout(0)
     udp:setpeername(address, port)
-	udp:send(json.encode( { cmd = "new_game"} ))
+	psedo = "antoine"
+	
+	udp:send(json.encode( { cmd = "connect" , data = {psedo = psedo}} ))
+	tab_perso = {}
+		
 	while 1 do
 		rep_data, rep_msg = udp:receive()
 		if rep_data then
 			print(rep_data)
-			break
+			local tab = json.decode(rep_data)
+			if tab.cmd == "new_player" then
+				print(table.getn(tab.data))
+				table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..tab.data[1].perso.skin..".png",resolution,resolution))
+				break
+			end
 		end
 	end
-	
-	tab_perso = {}
-	
-	for i=0,tonumber(rep_data)-1 do
-		table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..i..".png",resolution,resolution))
-	end
+
 	
 
 
@@ -401,20 +405,21 @@ function game:update(dt)
 		print(udp_data)
 		local json_data = json.decode(udp_data)
 		if json_data.cmd == "new_game" then 
-			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..#tab_perso..".png",resolution,resolution))
-		elseif json_data then
-			for k,v in pairs(json_data) do
-				if k~= id then
-					tab_perso[k]:setX1(v.x1)
-					tab_perso[k]:setY1(v.y1)
-					tab_perso[k]:setdirection(v.dir)
-				end
-			end
+			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin".. json_data.data.skin ..".png",resolution,resolution))
+		elseif json_data.cmd == "update" then
+			-- for k,v in pairs(json_data.data) do
+				-- if k~= id then
+					-- tab_perso[k]:setX1(v.x1)
+					-- tab_perso[k]:setY1(v.y1)
+					-- tab_perso[k]:setdirection(v.dir)
+				-- end
+			-- end
 		end
 	end
 	
 	if sync > sync_dt then
-		udp:send(json.encode( { cmd = "pos_update" , id = id , x1=tab_perso[id].X1 , y1=tab_perso[id].Y1 ,map=tab_perso[id]:getmapnb(),dir=tab_perso[id].direction } ))
+		udp:send(json.encode( { cmd = "pos_update" ,map = tab_perso[id].map, data = {id = id , posX=tab_perso[id].posX , posY=tab_perso[id].posY ,map=tab_perso[id]:getmapnb(),dir=tab_perso[id].direction }}))
+		
 		sync = sync-sync_dt
 	end
 
