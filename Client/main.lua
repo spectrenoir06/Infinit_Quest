@@ -290,6 +290,8 @@ function game:init()
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
 	require "/fonction/mob"
+	require "/fonction/clients"
+	
 		loadmaps()
 	socket = require "socket"
 	address, port = "localhost", 12345
@@ -299,7 +301,8 @@ function game:init()
 	psedo = "antoine"
 	
 	udp:send(json.encode( { cmd = "connect" , data = {psedo = psedo}} ))
-	tab_perso = {}
+		
+	local_clients = clients_new()
 		
 	while 1 do
 		rep_data, rep_msg = udp:receive()
@@ -307,8 +310,11 @@ function game:init()
 			print(rep_data)
 			local tab = json.decode(rep_data)
 			if tab.cmd == "new_player" then
-				print(table.getn(tab.data))
-				table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin"..tab.data[1].perso.skin..".png",resolution,resolution))
+				local id = table.getn(tab.data)
+				clients:set_main_client(id)
+				for i=1,id do
+					local_clients:add(tab.data)
+				end
 				break
 			end
 		end
@@ -322,8 +328,6 @@ function game:init()
     cursor_x=0
     cursor_y=0
     
-    id = #tab_perso
-    
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
     invent = inv_new(5.375*resolution,10*resolution,"/textures/"..resolution.."/inv.png")
@@ -331,34 +335,32 @@ function game:init()
     keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
 	
 
-	 sync = 0
-	sync_dt = 0.05
+	sync = 0
+	sync_dt = 0.5
 
    
 end
 
 function game:draw()
 	--love.graphics.setIcon(icone)
-	cam:lookAt(math.floor(tab_perso[id].X1), math.floor(tab_perso[id].Y1))
+	cam:lookAt(math.floor(local_clients:main().X1), math.floor(local_clients:main().Y1))
 	
     if cam.x<love.graphics.getWidth()/2 then
          cam.x = love.graphics.getWidth()/2
-    elseif cam.x>tab_perso[id]:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
-         cam.x = tab_perso[id]:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
+    elseif cam.x>local_clients:main():getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
+         cam.x = local_clients:main():getmap():getLX()*resolution-(love.graphics.getWidth()/2)
     end
     if cam.y<love.graphics.getHeight()/2 then
         cam.y = love.graphics.getHeight()/2
-    elseif cam.y>tab_perso[id]:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
-         cam.y = tab_perso[id]:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
+    elseif cam.y>local_clients:main():getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
+         cam.y = local_clients:main():getmap():getLY()*resolution-(love.graphics.getHeight()/2)
     end
 	
 	cam:attach()	 			-- mode camera
     
-	tab_perso[id]:getmap():draw(0,0)  	-- afficher map
-    for k,v in pairs(tab_perso) do
-		v:draw() 				-- afficher perso
-	end
-	tab_perso[id]:getmap():drawdeco(0,0)-- afficher map deco
+	local_clients:main():getmap():draw(0,0)  	-- afficher map
+	local_clients:draw()
+	local_clients:main():getmap():drawdeco(0,0)-- afficher map deco
 	
 
 	-- if monster.nodes then
@@ -375,9 +377,9 @@ function game:draw()
 			-- love.graphics.setColor(255, 255, 255)
 		-- end
 	-- end
-	for k,v in ipairs(tab_perso) do
-		love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY.." ; map="..v.mapnb, 10,15*k+10)
-	end
+	-- for k,v in ipairs(tab_perso) do
+		-- love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY.." ; map="..v.mapnb, 10,15*k+10)
+	-- end
 	cam:detach()				-- fin du mode camera
 	
     if info then
@@ -396,36 +398,13 @@ function game:draw()
 end
 
 function game:update(dt)
-	
-	sync = sync + dt
 
-	
 	local udp_data, rep_msg = udp:receive()
 	if udp_data then
-		print(udp_data)
-		local json_data = json.decode(udp_data)
-		if json_data.cmd == "new_game" then 
-			table.insert(tab_perso,perso_new("/textures/"..resolution.."/skin".. json_data.data.skin ..".png",resolution,resolution))
-		elseif json_data.cmd == "update" then
-			-- for k,v in pairs(json_data.data) do
-				-- if k~= id then
-					-- tab_perso[k]:setX1(v.x1)
-					-- tab_perso[k]:setY1(v.y1)
-					-- tab_perso[k]:setdirection(v.dir)
-				-- end
-			-- end
-		end
+		local_clients:receive(udp_data,rep_msg)
 	end
 	
-	if sync > sync_dt then
-		udp:send(json.encode( { cmd = "pos_update" ,map = tab_perso[id].map, data = {id = id , posX=tab_perso[id].posX , posY=tab_perso[id].posY ,map=tab_perso[id]:getmapnb(),dir=tab_perso[id].direction }}))
-		
-		sync = sync-sync_dt
-	end
-
-    for k,v in pairs(tab_perso) do
-		v:update(dt)				-- afficher perso
-	end
+    local_clients:update(dt)
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
@@ -437,13 +416,13 @@ function game:update(dt)
         local touche = keypad:get(love.mouse.getX(),love.mouse.getY(),click)
 		print(touche)
         if touche==1 then
-             tab_perso[id]:GoUp()
+             local_clients:main():GoUp()
         elseif touche == 2 then
-             tab_perso[id]:GoDown()
+             local_clients:main():GoDown()
         elseif touche==3 then 
-             tab_perso[id]:GoLeft()
+             local_clients:main():GoLeft()
         elseif touche==4 then
-             tab_perso[id]:GoRight()
+             local_clients:main():GoRight()
 		end
 		
         if A_key:isPress(love.mouse.getX(),love.mouse.getY(),click) then
@@ -451,17 +430,16 @@ function game:update(dt)
         end
     else -- mode clavier
         if love.keyboard.isDown( "up" ) then
-            tab_perso[id]:GoUp()
-			
+            local_clients:main():GoUp()
         elseif love.keyboard.isDown( "down" ) then
-            tab_perso[id]:GoDown()
+            local_clients:main():GoDown()
         elseif love.keyboard.isDown( "left" ) then
-            tab_perso[id]:GoLeft()
+            local_clients:main():GoLeft()
         elseif love.keyboard.isDown( "right" ) then
-           tab_perso[id]:GoRight()
+           local_clients:main():GoRight()
         end
         if love.keyboard.isDown( " " ) then
-            tab_perso[id]:use()
+            local_clients:main():use()
         end
 		if love.keyboard.isDown("f") then
 			finde = true

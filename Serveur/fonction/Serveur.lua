@@ -13,7 +13,7 @@ end
 function serveur:add_client(psedo,ip,port)
 	local client = {perso = player_new(psedo,self.id) , ip = ip , port = port}
 	table.insert(self.player_map[1],client)
-	self:broadcast("new_player",self.player_map[1],nil)
+	self:broadcast("new_player",self:getperso(1),nil)
 	self:update(1)
 	self.id = self.id +1
 end
@@ -27,13 +27,13 @@ function serveur:broadcast(cmd,data,map)
 	if map then
 		for nb,client in ipairs(self.player_map[map]) do
 			udp:sendto(json.encode(send), client.ip,  client.port)
-			print("send : cmd="..cmd.." ; port="..client.port)
+			--print("send : cmd="..cmd.." ; port="..client.port)
 		end
 	else
 		for k,v in ipairs(self.player_map) do
 			for nb,client in ipairs(v) do
 				udp:sendto(json.encode(send), client.ip,  client.port)
-				print("send : cmd="..cmd.." ; port="..client.port)
+				--print("send : cmd="..cmd.." ; port="..client.port)
 			end
 		end
 	end
@@ -45,10 +45,12 @@ function serveur:receive(data, ip, port)
 	if tab.cmd == "connect" then
 		self:add_client(tab.data.psedo,ip,port)
 	elseif tab.cmd == "pos_update" then
-		local perso = self.player_map[tab.data.map]
-		for k,v in perso do
-			if v.id == tab.data.id then
+		local list = self.player_map[tab.map]
+		for nb,client in ipairs(list) do
+			if client.perso.id == tab.data.id then
+				--print(json.encode(tab.data))
 				v:setinfo(tab.data)
+				break
 			end
 		end
 	end
@@ -62,26 +64,38 @@ end
 function serveur:update(map)
 	if map then
 		for nb,client in ipairs(self.player_map[map]) do
-			self:broadcast("update",client.perso,k)
+			self:broadcast("update",self:getperso(map),k)
 		end
 	else
 		for k,zone in ipairs(self.player_map) do
 			for nb,client in ipairs(zone) do
-				self:broadcast("update",client.perso,k)
+				self:broadcast("update",self:getperso(k),k)
 			end
 		end
 	end
 end
 
--- function serveur:getlist()
-	-- local tab = {}
-	-- for k,v in ipairs(self.player_map) do
-		-- for l,b in ipairs(v) do
-			-- table.insert(tab,{psedo = b.psedo, ip = b.ip, port = b.port , map = k})
-		-- end
-	-- end
-	-- return tab
--- end
+function serveur:getlist()
+	local tab = {}
+	for k,zone in ipairs(self.player_map) do
+		for nb,client in ipairs(zone) do
+			table.insert(tab,{psedo = client.perso.name, ip = client.ip, port = client.port , map = k ,id = client.perso.id , posX=client.perso.posX , posY=client.perso.posY})
+		end
+	end
+	return tab
+end
+
+function serveur:getperso(map)
+	local tab = {}
+	if map then
+		for nb,client in ipairs(self.player_map[map]) do
+			table.insert(tab,client.perso:getinfo())
+		end
+	else
+		error("no map")
+	end
+	return tab
+end
 
 
 -----

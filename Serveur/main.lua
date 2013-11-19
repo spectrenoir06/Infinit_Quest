@@ -34,14 +34,14 @@ function game:init()
 	server = serveur_new()
 	
 	sync = 0
-	sync_dt = 0.05
+	sync_dt = 0.5
 	
 end
 
 function game:draw()
-	-- for k,v in ipairs(serveur:getlist()) do
-		-- love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY.." ; map="..v.map, 10,15*k+10)
-	-- end
+	for k,v in ipairs(server:getlist()) do
+		love.graphics.print(k.." : id="..v.id.." ; psedo="..v.psedo.."  ;  ip="..v.ip..":"..v.port.." ; map="..v.map.." ; X="..v.posX, 10,15*k+10)
+	end
 end
 
 function game:update(dt)
