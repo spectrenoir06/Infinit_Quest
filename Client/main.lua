@@ -312,7 +312,7 @@ function game:init()
 				local id = table.getn(tab.data)
 				clients:set_main_client(id)
 				for i=1,id do
-					local_clients:add(tab.data)
+					local_clients:add(tab.data[i])
 				end
 				break
 			end

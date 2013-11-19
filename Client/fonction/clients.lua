@@ -13,9 +13,9 @@ end
 
 function clients:add(data)
 	local nb = table.getn(data)
-	print(nb)
-	--print(json.encode(data))
-	table.insert(self.tab_perso,perso_new("/textures/"..resolution.."/skin"..data[nb].skin ..".png",resolution,resolution))
+	print(json.encode(data))
+	print(data.skin)
+	table.insert(self.tab_perso,perso_new("/textures/"..resolution.."/skin"..data.skin..".png",resolution,resolution))
 end
 
 function clients:set_main_client(id)
@@ -23,12 +23,12 @@ function clients:set_main_client(id)
 end
 
 function clients:receive(data,msg)
-	--print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
+	print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
 	local tab = json.decode(data)
 	if tab.cmd == "new_player" then
 		self:add(tab.data)
 	elseif tab.cmd == "update" then
-		
+		self:perso_set_info(tab.data)
 	end
 
 end
@@ -59,4 +59,14 @@ end
 
 function clients:main()
 	return self.tab_perso[self.id]
+end
+
+function clients:perso_set_info(data)
+	for k,v in ipairs(data) do
+		if k~=self.id then
+			self.tab_perso[k]:setPosX(v.posX)
+			self.tab_perso[k]:setPosX(v.posY)
+			self.tab_perso[k]:setdirection(v.dir)
+		end
+	end
 end
