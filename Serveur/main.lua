@@ -40,7 +40,8 @@ end
 
 function game:draw()
 	for k,v in ipairs(server:getlist()) do
-		love.graphics.print(k.." : id="..v.id.." ; psedo="..v.psedo.."  ;  ip="..v.ip..":"..v.port.." ; map="..v.map.." ; X="..v.posX, 10,15*k+10)
+		--print(json.encode(v))
+		love.graphics.print(k.." : id="..v.id.." ; psedo="..v.name.."  ;  ip="..v.ip..":"..v.port.." ; map="..v.map.." ; X="..v.posX, 10,15*k+10)
 	end
 end
 

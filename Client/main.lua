@@ -298,9 +298,8 @@ function game:init()
 	udp = socket.udp()
 	udp:settimeout(0)
     udp:setpeername(address, port)
-	psedo = "antoine"
 	
-	udp:send(json.encode( { cmd = "connect" , data = {psedo = psedo}} ))
+	udp:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
 		
 	local_clients = clients_new()
 		

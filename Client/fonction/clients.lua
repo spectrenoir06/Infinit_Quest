@@ -5,7 +5,7 @@ function clients_new()
 	local a = {}
 	setmetatable(a, clients)
 	a.tab_perso = {}
-	a.main_client=1
+	a.id=nil
 	a.sync = 0
 	a.sync_dt=0.2
 	return a
@@ -18,8 +18,8 @@ function clients:add(data)
 	table.insert(self.tab_perso,perso_new("/textures/"..resolution.."/skin"..data[nb].skin ..".png",resolution,resolution))
 end
 
-function clients:set_main_client(nb)
-	self.main_client = nb
+function clients:set_main_client(id)
+	self.id = id
 end
 
 function clients:receive(data,msg)
@@ -41,10 +41,10 @@ end
 
 function clients:update(dt)
 	if self.sync > self.sync_dt then
-		print("send")
 		local send = {	cmd = "pos_update",
 						map = self:main():getmapnb(),
-						data = { posX=self:main().posX,
+						data = { id = self.id,
+								 posX=self:main().posX,
 								 posY=self:main().posY,
 								 dir=self:main().direction}
 					 }
@@ -58,5 +58,5 @@ function clients:update(dt)
 end
 
 function clients:main()
-	return self.tab_perso[self.main_client]
+	return self.tab_perso[self.id]
 end

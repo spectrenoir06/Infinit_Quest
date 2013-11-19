@@ -6,12 +6,12 @@ function serveur_new()
 	setmetatable(a, serveur)
 	a.player_map = {}
 	a.player_map[1] = {}
-	a.id = 0
+	a.id = 1
 	return a
 end
 
-function serveur:add_client(psedo,ip,port)
-	local client = {perso = player_new(psedo,self.id) , ip = ip , port = port}
+function serveur:add_client(name,ip,port)
+	local client = {perso = player_new(name,self.id) , ip = ip , port = port}
 	table.insert(self.player_map[1],client)
 	self:broadcast("new_player",self:getperso(1),nil)
 	self:update(1)
@@ -40,16 +40,16 @@ function serveur:broadcast(cmd,data,map)
 end
 
 function serveur:receive(data, ip, port)
-	print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
+	--print(data)
+	--print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
 	local tab = json.decode(data)
 	if tab.cmd == "connect" then
-		self:add_client(tab.data.psedo,ip,port)
+		self:add_client(tab.data.name,ip,port)
 	elseif tab.cmd == "pos_update" then
 		local list = self.player_map[tab.map]
 		for nb,client in ipairs(list) do
 			if client.perso.id == tab.data.id then
-				--print(json.encode(tab.data))
-				v:setinfo(tab.data)
+				client.perso:setinfo(tab.data)
 				break
 			end
 		end
@@ -79,7 +79,15 @@ function serveur:getlist()
 	local tab = {}
 	for k,zone in ipairs(self.player_map) do
 		for nb,client in ipairs(zone) do
-			table.insert(tab,{psedo = client.perso.name, ip = client.ip, port = client.port , map = k ,id = client.perso.id , posX=client.perso.posX , posY=client.perso.posY})
+			--print(json.encode(client))
+			table.insert(tab,{ 	name = client.perso.name,
+								ip = client.ip,
+								port = client.port,
+								map = k ,
+								id = client.perso.id,
+								posX=client.perso.posX, 
+								posY=client.perso.posY
+							 } )
 		end
 	end
 	return tab
@@ -103,7 +111,7 @@ end
 player = {}
 player.__index = player
 
-function player_new(psedo,id)
+function player_new(name,id)
 	local a = {}
 	setmetatable(a, player)
 	
@@ -111,7 +119,7 @@ function player_new(psedo,id)
 	a.skin=math.random(0, 7)
 	a.posX=10*64
 	a.posY=10*64
-	a.name=psedo
+	a.name=name
 	a.map=1
 	
 	return a
@@ -129,10 +137,6 @@ function player:getinfo()
 end
 
 function player:setinfo(data)
-	self.id = data.id
-	self.name = data.name
-	self.skin = data.skin
-	self.map = data.map
 	self.posX = data.posX
 	self.posY = data.posY
 	self.dir = data.dir
