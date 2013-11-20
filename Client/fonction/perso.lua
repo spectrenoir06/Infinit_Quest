@@ -1,13 +1,13 @@
 perso = {}
 perso.__index = perso
 
-function perso_new(fichier,LX,LY,map)
+function perso_new(fichier,x,y)
 
 
     local a={}
-	
-	a.globalPosX= 110 * resolution
-	a.globalPosY= 10 * resolution
+	local LX ,LY = 64,64
+	a.globalPosX= (100+x) * resolution
+	a.globalPosY= y * resolution
     a.LX = LX
     a.LY = LY
 	
