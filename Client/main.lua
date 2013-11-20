@@ -306,13 +306,13 @@ function game:init()
 	while 1 do
 		rep_data, rep_msg = udp:receive()
 		if rep_data then
-			print(rep_data)
 			local tab = json.decode(rep_data)
 			if tab.cmd == "new_player" then
 				local id = table.getn(tab.data)
 				clients:set_main_client(id)
 				for i=1,id do
-					local_clients:add(tab.data[i])
+					print(i.." = "..tab.data[i].skin)
+					local_clients:add(tab.data[i].skin,tab.data[i].posX,tab.data[i].posY)
 				end
 				break
 			end

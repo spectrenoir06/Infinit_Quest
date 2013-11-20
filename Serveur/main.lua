@@ -34,7 +34,7 @@ function game:init()
 	server = serveur_new()
 	
 	sync = 0
-	sync_dt = 0.5
+	sync_dt = 0.1
 	
 end
 

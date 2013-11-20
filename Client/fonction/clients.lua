@@ -7,12 +7,13 @@ function clients_new()
 	a.tab_perso = {}
 	a.id=nil
 	a.sync = 0
-	a.sync_dt=0.2
+	a.sync_dt=0.1
 	return a
 end
 
-function clients:add(data)
-	table.insert(self.tab_perso,perso_new("/textures/64/skin"..data.skin..".png",data.posX,data.posY))
+function clients:add(skin,x,y)
+	local new = perso_new("/textures/64/skin"..skin..".png",x,y)
+	table.insert(self.tab_perso,new)
 end
 
 function clients:set_main_client(id)
@@ -20,11 +21,13 @@ function clients:set_main_client(id)
 end
 
 function clients:receive(data,msg)
-	print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
+	--
 	local tab = json.decode(data)
 	if tab.cmd == "new_player" then
+		print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
 		local nb = table.getn(tab.data)
-		self:add(tab.data[nb])
+		print(json.encode(tab.data[nb].skin,tab.data[nb].posX,tab.data[nb].posY))
+		self:add(tab.data[nb].skin,tab.data[nb].posX,tab.data[nb].posY)
 	elseif tab.cmd == "update" then
 		self:perso_set_info(tab.data)
 	end
@@ -33,7 +36,8 @@ end
 
 function clients:draw()
 	for k,v in pairs(self.tab_perso) do
-		v:draw() 				-- afficher perso
+			print(json.encode(v.sprite))
+			v:draw() 				-- afficher perso
 	end
 end
 
@@ -51,7 +55,7 @@ function clients:update(dt)
 		self.sync = 0
 	end
 	for k,v in pairs(self.tab_perso) do
-		print(v.posX)
+		--print(v.posX)
 		v:update(dt) -- update perso
 	end
 	self.sync = self.sync +dt
@@ -66,7 +70,7 @@ function clients:perso_set_info(data)
 		--print(k,json.encode(v))
 		if k~=self.id then
 			self.tab_perso[k]:setPosX(v.posX)
-			self.tab_perso[k]:setPosX(v.posY)
+			self.tab_perso[k]:setPosY(v.posY)
 			self.tab_perso[k]:setdirection(v.dir)
 		end
 	end

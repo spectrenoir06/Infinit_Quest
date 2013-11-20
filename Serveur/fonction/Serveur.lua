@@ -14,7 +14,7 @@ function serveur:add_client(name,ip,port)
 	local client = {perso = player_new(name,self.id) , ip = ip , port = port}
 	table.insert(self.player_map[1],client)
 	self:broadcast("new_player",self:getperso(1),nil)
-	self:update(1)
+	--self:update(1)
 	self.id = self.id +1
 end
 
