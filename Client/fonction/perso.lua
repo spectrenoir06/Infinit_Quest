@@ -76,7 +76,7 @@ end
 
 function perso:update(dt)
 	self:updatePos()
-    --self.sprite:update(dt)
+    self.sprite:update(dt)
 	
 	--self:isOn()
 
@@ -215,7 +215,7 @@ end
 
 function perso:setPosX(x)
 	self.posX = x
-	self.X1 = self.posX -self.LX/2
+	self.X1 = self.posX - self.LX/2
 	self:updatePos()
 end
 
@@ -237,8 +237,8 @@ end
 
 function perso:updatePos()
 	self.X2 = self.X1 + self.LY
-	self.posX = self.X1 + (self.LX/2)
 	self.Y2 = self.Y1 + self.LY
+	self.posX = self.X1 + (self.LX/2)
 	self.posY = self.Y1 + (self.LY/2)
 	self.globalPosX = self.map.X*resolution + self.posX
 	self.globalPosY = self.map.Y*resolution + self.posY

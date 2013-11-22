@@ -34,14 +34,16 @@ function game:init()
 	server = serveur_new()
 	
 	sync = 0
-	sync_dt = 0.1
+	sync_dt = 0.05
 	
 end
 
 function game:draw()
-	for k,v in ipairs(server:getlist()) do
+	for k,zone in ipairs(server.client) do
+		for l,client in ipairs(zone) do
 		--print(json.encode(v))
-		love.graphics.print(k.." : id="..v.id.." ; psedo="..v.name.."  ;  ip="..v.ip..":"..v.port.." ; map="..v.map.." ; X="..v.posX, 10,15*k+10)
+			love.graphics.print(string.format("%d,%d : ip=%s:%f ; X=%f ; Y=%f",k,l,client.ip,client.port,server.perso[k][l].posX,server.perso[k][l].posY), 10,15*l+10)
+		end
 	end
 end
 
@@ -55,7 +57,7 @@ function game:update(dt)
 	end
 	
 	if sync > sync_dt then
-		server:update()
+		server:update(1)
 		sync = sync-sync_dt
 	end
 end

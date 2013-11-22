@@ -7,12 +7,12 @@ function clients_new()
 	a.tab_perso = {}
 	a.id=nil
 	a.sync = 0
-	a.sync_dt=0.1
+	a.sync_dt=0.05
 	return a
 end
 
-function clients:add(skin,x,y)
-	local new = perso_new("/textures/64/skin"..skin..".png",x,y)
+function clients:add(data)
+	local new = perso_new("/textures/64/skin"..data.skin..".png",data.posX,data.posY)
 	table.insert(self.tab_perso,new)
 end
 
@@ -24,19 +24,20 @@ function clients:receive(data,msg)
 	--
 	local tab = json.decode(data)
 	if tab.cmd == "new_player" then
-		print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
+		print("receive : cmd="..json.decode(data).cmd)
 		local nb = table.getn(tab.data)
-		print(json.encode(tab.data[nb].skin,tab.data[nb].posX,tab.data[nb].posY))
-		self:add(tab.data[nb].skin,tab.data[nb].posX,tab.data[nb].posY)
+		print(json.encode(tab.data[nb]))
+		self:add(tab.data[nb])
 	elseif tab.cmd == "update" then
-		self:perso_set_info(tab.data)
+		--print(data,msg)
+		self:perso_set_info(tab)
 	end
 
 end
 
 function clients:draw()
 	for k,v in pairs(self.tab_perso) do
-			print(json.encode(v.sprite))
+			--print(json.encode(v.sprite))
 			v:draw() 				-- afficher perso
 	end
 end
@@ -44,11 +45,11 @@ end
 function clients:update(dt)
 	if self.sync > self.sync_dt then
 		local send = {	cmd = "pos_update",
-						map = self:main():getmapnb(),
 						data = { id = self.id,
 								 posX=self:main().posX,
 								 posY=self:main().posY,
-								 dir=self:main().direction
+								 dir=self:main().direction,
+								 map = self:main():getmapnb(),
 							   }
 					 }
 		udp:send(json.encode(send))
@@ -65,10 +66,10 @@ function clients:main()
 	return self.tab_perso[self.id]
 end
 
-function clients:perso_set_info(data)
-	for k,v in ipairs(data) do
-		--print(k,json.encode(v))
-		if k~=self.id then
+function clients:perso_set_info(tab)
+	for k,v in ipairs(tab.data[1]) do
+		--print(json.encode(v))
+		if v.id~=self.id then
 			self.tab_perso[k]:setPosX(v.posX)
 			self.tab_perso[k]:setPosY(v.posY)
 			self.tab_perso[k]:setdirection(v.dir)

@@ -312,7 +312,7 @@ function game:init()
 				clients:set_main_client(id)
 				for i=1,id do
 					print(i.." = "..tab.data[i].skin)
-					local_clients:add(tab.data[i].skin,tab.data[i].posX,tab.data[i].posY)
+					local_clients:add(tab.data[i])
 				end
 				break
 			end

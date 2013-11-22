@@ -4,16 +4,21 @@ serveur.__index = serveur
 function serveur_new()
 	local a = {}
 	setmetatable(a, serveur)
-	a.player_map = {}
-	a.player_map[1] = {}
+	a.perso = {}
+	a.client = {}
+	for i=1,1 do
+		a.perso[i]  = {}
+		a.client[i] = {}
+	end
 	a.id = 1
 	return a
 end
 
 function serveur:add_client(name,ip,port)
-	local client = {perso = player_new(name,self.id) , ip = ip , port = port}
-	table.insert(self.player_map[1],client)
-	self:broadcast("new_player",self:getperso(1),nil)
+
+	table.insert(self.perso[1], player_new(name,self.id))
+	table.insert(self.client[1],{ip = ip , port = port})
+	self:broadcast("new_player",self.perso[1])
 	--self:update(1)
 	self.id = self.id +1
 end
@@ -25,13 +30,13 @@ end
 function serveur:broadcast(cmd,data,map)
 	local send = {cmd = cmd , data = data}
 	if map then
-		for nb,client in ipairs(self.player_map[map]) do
+		for nb,client in ipairs(self.client[map]) do
 			udp:sendto(json.encode(send), client.ip,  client.port)
 			--print("send : cmd="..cmd.." ; port="..client.port)
 		end
 	else
-		for k,v in ipairs(self.player_map) do
-			for nb,client in ipairs(v) do
+		for k,zone in ipairs(self.client) do
+			for nb,client in ipairs(zone) do
 				udp:sendto(json.encode(send), client.ip,  client.port)
 				--print("send : cmd="..cmd.." ; port="..client.port)
 			end
@@ -46,52 +51,51 @@ function serveur:receive(data, ip, port)
 	if tab.cmd == "connect" then
 		self:add_client(tab.data.name,ip,port)
 	elseif tab.cmd == "pos_update" then
-		local list = self.player_map[tab.map]
-		for nb,client in ipairs(list) do
-			if client.perso.id == tab.data.id then
-				client.perso:setinfo(tab.data)
+		--print(data)
+		for nb,perso in ipairs(self.perso[tab.data.map]) do
+			if perso.id == tab.data.id then
+				self.perso[tab.data.map][nb]:setinfo(tab.data)
 				break
 			end
 		end
 	end
-
 end
 
 function serveur:get_nb()
-	return #self.player_map
+	return table.getn(self.client)
 end
 
 function serveur:update(map)
 	if map then
-		for nb,client in ipairs(self.player_map[map]) do
-			self:broadcast("update",self:getperso(map),k)
+		for nb,client in ipairs(self.client[map]) do
+			self:broadcast("update",self.perso)
 		end
 	else
-		for k,zone in ipairs(self.player_map) do
+		for k,zone in ipairs(self.client) do
 			for nb,client in ipairs(zone) do
-				self:broadcast("update",self:getperso(k),k)
+				self:broadcast("update",self.perso[zone])
 			end
 		end
 	end
 end
 
-function serveur:getlist()
-	local tab = {}
-	for k,zone in ipairs(self.player_map) do
-		for nb,client in ipairs(zone) do
-			--print(json.encode(client))
-			table.insert(tab,{ 	name = client.perso.name,
-								ip = client.ip,
-								port = client.port,
-								map = k ,
-								id = client.perso.id,
-								posX=client.perso.posX, 
-								posY=client.perso.posY
-							 } )
-		end
-	end
-	return tab
-end
+-- function serveur:getlist()
+	-- local tab = {}
+	-- for k,zone in ipairs(self.client) do
+		-- for nb,client in ipairs(zone) do
+			-- print(json.encode(client))
+			-- table.insert(tab,{ 	name = self.perso[][].name,
+								-- ip = client.ip,
+								-- port = client.port,
+								-- map = k ,
+								-- id = client.perso.id,
+								-- posX=client.perso.posX, 
+								-- posY=client.perso.posY
+							 -- } )
+		-- end
+	-- end
+	-- return tab
+-- end
 
 function serveur:getperso(map)
 	local tab = {}
@@ -116,10 +120,11 @@ function player_new(name,id)
 	setmetatable(a, player)
 	
 	a.id = id
+	a.name=name
 	a.skin=math.random(0, 7)
 	a.posX=10*64
 	a.posY=10*64
-	a.name=name
+	a.dir = 1
 	a.map=1
 	
 	return a
@@ -133,7 +138,8 @@ function player:getinfo()
 	map = self.map,
 	posX = self.posX,
 	posY = self.posY,
-	dir = self.dir}
+	dir = self.dir
+			}
 end
 
 function player:setinfo(data)
