@@ -68,7 +68,7 @@ end
 
 function clients:perso_set_info(tab)
 	for k,v in ipairs(tab.data[1]) do
-		--print(json.encode(v))
+		print(json.encode(v))
 		if v.id~=self.id then
 			self.tab_perso[k]:setPosX(v.posX)
 			self.tab_perso[k]:setPosY(v.posY)
