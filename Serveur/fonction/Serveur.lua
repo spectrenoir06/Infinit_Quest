@@ -20,6 +20,7 @@ function serveur:add_client(name,ip,port)
 	table.insert(self.client[1],{ip = ip , port = port})
 	self:broadcast("new_player",self.perso[1])
 	--self:update(1)
+	print(string.format("add_player: name = %s ; ip=%s ; port = %d",name,ip,port))
 	self.id = self.id +1
 end
 
@@ -51,11 +52,14 @@ function serveur:receive(data, ip, port)
 	if tab.cmd == "connect" then
 		self:add_client(tab.data.name,ip,port)
 	elseif tab.cmd == "pos_update" then
-		--print(data)
-		for nb,perso in ipairs(self.perso[tab.data.map]) do
-			if perso.id == tab.data.id then
-				self.perso[tab.data.map][nb]:setinfo(tab.data)
-				break
+		if tab.data.map ~=1 then
+			udp:sendto(json.encode({cmd = "error sortit de map"}), ip, port)
+		else
+			for nb,perso in ipairs(self.perso[tab.data.map]) do
+				if perso.id == tab.data.id then
+					self.perso[tab.data.map][nb]:setinfo(tab.data)
+					break
+				end
 			end
 		end
 	end

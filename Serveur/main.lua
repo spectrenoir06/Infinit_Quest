@@ -30,7 +30,7 @@ function game:init()
 	udp = socket.udp()
 	udp:settimeout(0)
     udp:setsockname('*', 12345)
-	
+	print("serveur start on : "..udp:getsockname())
 	server = serveur_new()
 	
 	sync = 0

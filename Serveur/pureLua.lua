@@ -9,6 +9,7 @@
 	udp:settimeout(0)
     udp:setsockname('*', 12345)
 	server = serveur_new()
+		print("serveur start on : "..udp:getsockname())
 	
 	sync = 0
 	sync_dt = 0.05
