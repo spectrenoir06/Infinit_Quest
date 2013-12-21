@@ -4,6 +4,29 @@ serveur.__index = serveur
 function serveur_new()
 	local a = {}
 	setmetatable(a, serveur)
+	
+	a.init_dt = 0
+	a.sync = 0
+	a.sync_dt = 0.002
+	a.dt = 0
+	
+	a.tcp_attent = socket.bind("*", 1000)
+	
+	
+	local ip, port = a.tcp_attent:getsockname()
+	print(ip,port)
+	
+  -- -- local client = server:accept()
+  -- make sure we don't block waiting for this client's line
+  -- -- client:settimeout(10)
+  -- receive the line
+  -- -- local line, err = client:receive()
+  -- if there was no error, send it back to the client
+  -- -- if not err then client:send(line .. "\n") end
+  -- done with client, close the object
+  -- -- client:close()
+-- -- end
+	
 	a.perso = {}
 	a.client = {}
 	for i=1,1 do
@@ -69,18 +92,37 @@ function serveur:get_nb()
 	return table.getn(self.client)
 end
 
-function serveur:update(map)
-	if map then
-		for nb,client in ipairs(self.client[map]) do
-			self:broadcast("update",self.perso)
+function serveur:update()
+
+	self.init_dt = socket.gettime()
+	self.sync = self.sync + self.dt
+	
+	
+	
+	if self.sync > self.sync_dt then
+		self.sync = self.sync - self.sync_dt
+		if self.sync>self.sync_dt then
+			print("serveur dt trop haut")
 		end
-	else
-		for k,zone in ipairs(self.client) do
-			for nb,client in ipairs(zone) do
-				self:broadcast("update",self.perso[zone])
+		self:broadcast_update(1)
+	end
+	
+	self.dt = socket.gettime() - self.init_dt
+	
+end
+
+function serveur:broadcast_update(map)
+	if map then
+			for nb,client in ipairs(self.client[map]) do
+				self:broadcast("update",self.perso)
+			end
+		else
+			for k,zone in ipairs(self.client) do
+				for nb,client in ipairs(zone) do
+					self:broadcast("update",self.perso[zone])
+				end
 			end
 		end
-	end
 end
 
 -- function serveur:getlist()
