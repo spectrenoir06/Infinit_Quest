@@ -4,26 +4,17 @@
 	require "/lib/spectre/map_json"
     require "/lib/spectre/sprite"
 	require "/lib/spectre/button" 
-    --require "/lib/spectre/camera"
 	camera = require "/lib/hump/camera"
 	gamestate = require "/lib/hump/gamestate"
 	Timer = require "/lib/hump/timer"
+	Grid = require "lib.jumper.grid"
+	Pathfinder = require "lib.jumper.pathfinder"
 	----------------------------------
 	
 	--------function------------------
 	require "/fonction/option"
-    ----------------------------------
-	
 	require "/fonction/data" 
-	
-	Grid = require "lib.jumper.grid"
-	Pathfinder = require "lib.jumper.pathfinder"
-	
-   -- require "/fonction/dataobj"
-	
-	--G_port = "4321"
-	--G_host = "192.168.10.8"
-	--require "/android/android"
+    ----------------------------------
 	
 	start_screen = {}
 	game = {}
@@ -292,35 +283,40 @@ function game:init()
 	require "/fonction/mob"
 	require "/fonction/clients"
 	
-		loadmaps()
-	socket = require "socket"
-	address, port = "localhost", 12345
-	udp = socket.udp()
-	udp:settimeout(0)
-    udp:setpeername(address, port)
-	
-	udp:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
+	loadmaps()
+	multi = false
+	if multi then
+		socket = require "socket"
+		address, port = "localhost", 12345
+		udp = socket.udp()
+		udp:settimeout(0)
+		udp:setpeername(address, port)
 		
-	local_clients = clients_new()
-		
-	while 1 do
-		rep_data, rep_msg = udp:receive()
-		if rep_data then
-			local tab = json.decode(rep_data)
-			if tab.cmd == "new_player" then
-				local id = table.getn(tab.data)
-				clients:set_main_client(id)
-				for i=1,id do
-					print(i.." = "..tab.data[i].skin)
-					local_clients:add(tab.data[i])
+		udp:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
+			
+		local_clients = clients_new()
+			
+		while 1 do
+			rep_data, rep_msg = udp:receive()
+			if rep_data then
+				local tab = json.decode(rep_data)
+				if tab.cmd == "new_player" then
+					local id = table.getn(tab.data)
+					clients:set_main_client(id)
+					for i=1,id do
+						print("newplayer",rep_data)
+						local_clients:add(tab.data[i])
+					end
+					break
 				end
-				break
 			end
 		end
+	else
+		local_clients = clients_new()
+		local tab = {map=1,name="Antoine",skin=0,id=1,dir=1,posY=640,posX=640}
+		local_clients:add(tab)
+		clients:set_main_client(1)
 	end
-
-	
-
 
     info=true
 	
@@ -398,9 +394,11 @@ end
 
 function game:update(dt)
 
-	local udp_data, rep_msg = udp:receive()
-	if udp_data then
-		local_clients:receive(udp_data,rep_msg)
+	if multi then
+		local udp_data, rep_msg = udp:receive()
+		if udp_data then
+			local_clients:receive(udp_data,rep_msg)
+		end
 	end
 	
     local_clients:update(dt)

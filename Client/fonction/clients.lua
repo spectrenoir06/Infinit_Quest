@@ -45,7 +45,7 @@ function clients:draw()
 end
 
 function clients:update(dt)
-	if self.sync > self.sync_dt then
+	if self.sync > self.sync_dt and multi then
 		local send = {	cmd = "pos_update",
 						data = { id = self.id,
 								 posX=self:main().posX,
