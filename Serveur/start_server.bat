@@ -1,2 +1,2 @@
-﻿@ECHO OFF
-lua serveur.lua
+﻿echo off
+lua start.lua

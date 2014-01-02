@@ -16,6 +16,18 @@
 	require "/fonction/data" 
     ----------------------------------
 	
+		multi = true
+		
+	if multi then
+		socket = require "socket"
+		address, port = "localhost", 12345
+		udp = socket.udp()
+		tcp = socket.tcp()
+		
+		udp:settimeout(0)
+		udp:setpeername(address, port)
+	end
+	
 	start_screen = {}
 	game = {}
 	option = {}
@@ -284,14 +296,9 @@ function game:init()
 	require "/fonction/clients"
 	
 	loadmaps()
-	multi = false
+
 	if multi then
-		socket = require "socket"
-		address, port = "localhost", 12345
-		udp = socket.udp()
-		udp:settimeout(0)
-		udp:setpeername(address, port)
-		
+
 		udp:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
 			
 		local_clients = clients_new()

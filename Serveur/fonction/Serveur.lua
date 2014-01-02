@@ -1,9 +1,25 @@
 serveur = {}
 serveur.__index = serveur
 
-function serveur_new()
+function serveur_new(host,port,sync_dt)
 	local a = {}
 	setmetatable(a, serveur)
+
+	a.tcp_serveur = socket.tcp()
+	a.tcp_serveur:bind("*", port+1)
+	a.tcp_serveur:listen(10)
+	local localip , localport = a.tcp_serveur:getsockname()
+	print("serveur TCP start on port: "..localport)
+	
+	a.udp_serveur = socket.udp()
+    a.udp_serveur:setsockname("*", port)
+	local localip , localport = a.udp_serveur:getsockname()
+	print("serveur UDP start on port: "..localport)
+	
+	a.sync_dt = sync_dt -- frequence de sync
+	a.compteur = 0 -- initialisation du compteur
+	a.dt=0 -- init de dt
+	
 	a.perso = {}
 	a.client = {}
 	for i=1,1 do
@@ -12,6 +28,27 @@ function serveur_new()
 	end
 	a.id = 1
 	return a
+end
+
+function serveur:update()
+	self.sync = socket.gettime() -- temp du debut de la frame
+	local udp_data, msg_or_ip, port_or_nil = self.udp_serveur:receivefrom() -- reception udp
+	
+	if udp_data then
+		self:receive(udp_data, msg_or_ip, port_or_nil)
+	end
+	
+	if self.compteur > self.sync_dt then
+		self:send_update(1)
+		self.compteur = 0
+	end
+	
+	self.dt = socket.gettime() - self.sync -- temp de la frame
+	self.compteur = self.compteur + self.dt -- addition du temp de la frame
+	
+	if self.dt > self.sync_dt then
+		--print(string.format("(dt = %f) > (sync_dt = %f) ",self.dt,self.sync_dt))
+	end
 end
 
 function serveur:add_client(name,ip,port)
@@ -32,13 +69,13 @@ function serveur:broadcast(cmd,data,map)
 	local send = {cmd = cmd , data = data}
 	if map then
 		for nb,client in ipairs(self.client[map]) do
-			udp:sendto(json.encode(send), client.ip,  client.port)
+			self.udp_serveur:sendto(json.encode(send), client.ip,  client.port)
 			--print("send : cmd="..cmd.." ; port="..client.port)
 		end
 	else
 		for k,zone in ipairs(self.client) do
 			for nb,client in ipairs(zone) do
-				udp:sendto(json.encode(send), client.ip,  client.port)
+				self.udp_serveur:sendto(json.encode(send), client.ip,  client.port)
 				--print("send : cmd="..cmd.." ; port="..client.port)
 			end
 		end
@@ -53,7 +90,7 @@ function serveur:receive(data, ip, port)
 		self:add_client(tab.data.name,ip,port)
 	elseif tab.cmd == "pos_update" then
 		if tab.data.map ~=1 then
-			udp:sendto(json.encode({cmd = "error sortit de map"}), ip, port)
+			self.udp_serveur:sendto(json.encode({cmd = "error sortit de map"}), ip, port)
 		else
 			for nb,perso in ipairs(self.perso[tab.data.map]) do
 				if perso.id == tab.data.id then
@@ -69,7 +106,7 @@ function serveur:get_nb()
 	return table.getn(self.client)
 end
 
-function serveur:update(map)
+function serveur:send_update(map)
 	if map then
 		for nb,client in ipairs(self.client[map]) do
 			self:broadcast("update",self.perso)
