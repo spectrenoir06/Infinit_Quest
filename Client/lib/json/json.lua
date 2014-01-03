@@ -333,6 +333,7 @@ do
 		:link(true)                  :to "*"
 		
 	function decode (js_string)
+		--print(js_string)
 		local pos = 1 -- position in the string
 		
 		-- read the next byte value
@@ -386,6 +387,7 @@ do
 					--start = pos
 				end -- jump over escaped chars, no matter what
 			until t == true
+			print("return " .. js_string:sub(start-1, pos-1) )
 			return (base.loadstring("return " .. js_string:sub(start-1, pos-1) )())
 
 			-- We consider the situation where no escaped chars were encountered separately,
