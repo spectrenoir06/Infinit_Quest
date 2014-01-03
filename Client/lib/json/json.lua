@@ -387,7 +387,7 @@ do
 					--start = pos
 				end -- jump over escaped chars, no matter what
 			until t == true
-			print("return " .. js_string:sub(start-1, pos-1) )
+			--print("return " .. js_string:sub(start-1, pos-1) )
 			return (base.loadstring("return " .. js_string:sub(start-1, pos-1) )())
 
 			-- We consider the situation where no escaped chars were encountered separately,
