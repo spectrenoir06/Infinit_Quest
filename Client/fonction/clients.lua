@@ -54,7 +54,7 @@ function clients:update(dt)
 								 map = self:main():getmapnb(),
 							   }
 					 }
-		udp:send(json.encode(send))
+		udp_client:send(json.encode(send))
 		self.sync = 0
 	end
 	for k,v in pairs(self.tab_perso) do

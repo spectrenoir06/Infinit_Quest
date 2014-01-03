@@ -21,11 +21,12 @@
 	if multi then
 		socket = require "socket"
 		address, port = "localhost", 12345
-		udp = socket.udp()
-		tcp = socket.tcp()
 		
-		udp:settimeout(0)
-		udp:setpeername(address, port)
+		udp_client = socket.udp()
+		udp_client:settimeout(0)
+		udp_client:setpeername(address, port)
+		
+		tcp_client = socket.connect(address, port+1)
 	end
 	
 	start_screen = {}
@@ -297,14 +298,13 @@ function game:init()
 	
 	loadmaps()
 
+	local_clients = clients_new()
+	
 	if multi then
-
-		udp:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
-			
-		local_clients = clients_new()
-			
+		udp_client:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
+		
 		while 1 do
-			rep_data, rep_msg = udp:receive()
+			rep_data, err = udp_client:receive()
 			if rep_data then
 				local tab = json.decode(rep_data)
 				if tab.cmd == "new_player" then
@@ -319,7 +319,6 @@ function game:init()
 			end
 		end
 	else
-		local_clients = clients_new()
 		local tab = {map=1,name="Antoine",skin=0,id=1,dir=1,posY=640,posX=640}
 		local_clients:add(tab)
 		clients:set_main_client(1)
@@ -402,7 +401,7 @@ end
 function game:update(dt)
 
 	if multi then
-		local udp_data, rep_msg = udp:receive()
+		local udp_data, rep_msg = udp_client:receive()
 		if udp_data then
 			local_clients:receive(udp_data,rep_msg)
 		end

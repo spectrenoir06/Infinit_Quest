@@ -6,6 +6,7 @@ function serveur_new(host,port,sync_dt)
 	setmetatable(a, serveur)
 
 	a.tcp_serveur = socket.tcp()
+	a.tcp_serveur:settimeout(0.025)
 	a.tcp_serveur:bind("*", port+1)
 	a.tcp_serveur:listen(10)
 	local localip , localport = a.tcp_serveur:getsockname()
@@ -13,6 +14,7 @@ function serveur_new(host,port,sync_dt)
 	
 	a.udp_serveur = socket.udp()
     a.udp_serveur:setsockname("*", port)
+	a.udp_serveur:settimeout(0.025)
 	local localip , localport = a.udp_serveur:getsockname()
 	print("serveur UDP start on port: "..localport)
 	
@@ -32,10 +34,11 @@ end
 
 function serveur:update()
 	self.sync = socket.gettime() -- temp du debut de la frame
+	
 	local udp_data, msg_or_ip, port_or_nil = self.udp_serveur:receivefrom() -- reception udp
 	
 	if udp_data then
-		self:receive(udp_data, msg_or_ip, port_or_nil)
+		self:udp_receive(udp_data, msg_or_ip, port_or_nil)
 	end
 	
 	if self.compteur > self.sync_dt then
@@ -82,7 +85,27 @@ function serveur:broadcast(cmd,data,map)
 	end
 end
 
-function serveur:receive(data, ip, port)
+function serveur:udp_receive(data, ip, port)
+	--print(data)
+	--print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
+	local tab = json.decode(data)
+	if tab.cmd == "connect" then
+		self:add_client(tab.data.name,ip,port)
+	elseif tab.cmd == "pos_update" then
+		if tab.data.map ~=1 then
+			self.udp_serveur:sendto(json.encode({cmd = "error sortit de map"}), ip, port)
+		else
+			for nb,perso in ipairs(self.perso[tab.data.map]) do
+				if perso.id == tab.data.id then
+					self.perso[tab.data.map][nb]:setinfo(tab.data)
+					break
+				end
+			end
+		end
+	end
+end
+
+function serveur:tcp_receive(data, client)
 	--print(data)
 	--print("receive : port="..port.." ; cmd="..json.decode(data).cmd)
 	local tab = json.decode(data)
