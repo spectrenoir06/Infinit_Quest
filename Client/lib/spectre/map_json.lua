@@ -29,6 +29,7 @@ end
 function map_new(fichier,texture,music) --créer une map
     local a={}
     a["fichier"] = fichier
+	print(fichier)
     a["json"] = json.decode(love.filesystem.read( fichier, nil ))
     a["map_sol"]=map_read(a.json,1)
     a["map_block"]=map_read(a.json,2)

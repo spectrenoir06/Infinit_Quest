@@ -1,2 +1,0 @@
-?package(love):needs="X11|text|vc|wm" section="Games"\
-  title="LÖVE" command="/usr/bin/love"
