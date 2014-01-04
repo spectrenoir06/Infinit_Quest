@@ -16,7 +16,7 @@
 	require "/fonction/data" 
     ----------------------------------
 	
-		multi = true
+		multi = false
 		
 	if multi then
 		socket = require "socket"
@@ -412,12 +412,12 @@ function game:update(dt)
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
     if invent:get(love.mouse.getX(),love.mouse.getY(),click) then
-        steve:setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
+        local_clients:main():setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
     end   
 	
     if mobile then -- mode tactile mobil
         local touche = keypad:get(love.mouse.getX(),love.mouse.getY(),click)
-		print(touche)
+		--print(touche)
         if touche==1 then
              local_clients:main():GoUp()
         elseif touche == 2 then
@@ -429,7 +429,7 @@ function game:update(dt)
 		end
 		
         if A_key:isPress(love.mouse.getX(),love.mouse.getY(),click) then
-            steve:use()
+            local_clients:main():use()
         end
     else -- mode clavier
         if love.keyboard.isDown( "up" ) then
@@ -457,17 +457,7 @@ function game:mousepressed(x, y, button)
 
 end
     
-function game:keypressed(key)
-    if key == "kp+" then
-        if steve:getnbslot()<9 then
-            steve:setslot(steve:getnbslot()+1)
-        end
-    elseif key == "kp-" then
-        if steve:getnbslot()>1 then
-            steve:setslot(steve:getnbslot()-1)
-        end
-	end
-	
+function game:keypressed(key)	
     if key == "i" then
         if info then
             info=false
@@ -483,7 +473,7 @@ function game:keypressed(key)
 	if key=="e" then
 		if not mobile then
 			p:start()
-			p:setPosition(steve.posX, steve.posY)
+			p:setPosition(local_clients:main().posX, local_clients:main().posY)
 		end
 	end
 	

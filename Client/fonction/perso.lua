@@ -171,7 +171,7 @@ function perso:update(dt)
 					self:setPosX(self.globalPosX - v.X * resolution)
 					self:setPosY(self.globalPosY - v.Y * resolution)
 					self.mapnb = k
-					udp:send(json.encode( { cmd = "map_update" ,id = id , x1=self.X1 , y1=self.Y1 ,dir=self.direction , map = k } ))
+					--udp:send(json.encode( { cmd = "map_update" ,id = id , x1=self.X1 , y1=self.Y1 ,dir=self.direction , map = k } ))
 					break
 				end
 			end
