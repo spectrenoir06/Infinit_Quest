@@ -1,3 +1,5 @@
+require "/lib/spectre/sprite"
+
 perso = {}
 perso.__index = perso
 

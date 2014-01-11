@@ -2,11 +2,13 @@
 	------------- LIB ----------------
 	require "/lib/json/json"
 	require "/lib/spectre/map_json"
-    require "/lib/spectre/sprite"
+    --require "/lib/spectre/sprite"
 	require "/lib/spectre/button" 
+	
 	camera = require "/lib/hump/camera"
 	gamestate = require "/lib/hump/gamestate"
 	Timer = require "/lib/hump/timer"
+	
 	Grid = require "lib.jumper.grid"
 	Pathfinder = require "lib.jumper.pathfinder"
 	----------------------------------
@@ -20,13 +22,9 @@
 		
 	if multi then
 		socket = require "socket"
-		address, port = "localhost", 12345
-		
-		udp_client = socket.udp()
-		udp_client:settimeout(0)
-		udp_client:setpeername(address, port)
-		
-		tcp_client = socket.connect(address, port+1)
+		require "enet"
+		host = enet.host_create()
+		server = host:connect("localhost:12345")
 	end
 	
 	start_screen = {}
@@ -301,20 +299,23 @@ function game:init()
 	local_clients = clients_new()
 	
 	if multi then
-		udp_client:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
-		
 		while 1 do
-			rep_data, err = udp_client:receive()
-			if rep_data then
-				local tab = json.decode(rep_data)
-				if tab.cmd == "new_player" then
-					local id = table.getn(tab.data)
-					clients:set_main_client(id)
-					for i=1,id do
-						print("newplayer",rep_data)
-						local_clients:add(tab.data[i])
+			event = host:service(100)
+			if event then
+				print(event.type,event.data)
+				if event.type == "connect" then
+					event.peer:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
+				elseif event.type == "receive" then
+					local tab = json.decode(event.data)
+					if tab.cmd == "new_player" then
+						local id = table.getn(tab.data)
+						clients:set_main_client(id)
+						for i=1,id do
+							print("newplayer",rep_data)
+							local_clients:add(tab.data[i])
+						end
+						break
 					end
-					break
 				end
 			end
 		end
@@ -401,9 +402,9 @@ end
 function game:update(dt)
 
 	if multi then
-		local udp_data, rep_msg = udp_client:receive()
-		if udp_data then
-			local_clients:receive(udp_data,rep_msg)
+		local event = host:service(100)
+		if event and event.type == "receive" then
+			local_clients:receive(event.data)
 		end
 	end
 	

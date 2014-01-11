@@ -20,7 +20,7 @@ function clients:set_main_client(id)
 	self.id = id
 end
 
-function clients:receive(data,msg)
+function clients:receive(data)
 	--
 	local tab = json.decode(data)
 	if tab.cmd == "new_player" then

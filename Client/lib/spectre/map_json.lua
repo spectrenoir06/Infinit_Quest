@@ -5,7 +5,7 @@ function loadmaps()
     end
 end
 
-
+require "/lib/spectre/sprite"
 
 local map = {}
 map.__index = map

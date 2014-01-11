@@ -43,13 +43,13 @@ function serveur:update()
 	end
 end
 
-function serveur:add_client(name,peer)
+function serveur:add_client(data,peer)
 
-	table.insert(self.perso[1], player_new(name,self.id))
+	table.insert(self.perso[1], player_new(data.name,self.id))
 	table.insert(self.peer[1],peer)
 	
-	self:broadcast_map("new_player",self.perso[1][#self.perso])
-	print("add player",name,peer)
+	self:broadcast_map("new_player",self.perso[1][#self.perso],1)
+	print("add player",data.name,peer)
 	self.id = self.id +1
 end
 
