@@ -2,28 +2,30 @@
 	------------- LIB ----------------
 	require "/lib/json/json"
 	require "/lib/spectre/map_json"
-    require "/lib/spectre/sprite"
+    --require "/lib/spectre/sprite"
 	require "/lib/spectre/button" 
-    --require "/lib/spectre/camera"
+	
 	camera = require "/lib/hump/camera"
 	gamestate = require "/lib/hump/gamestate"
 	Timer = require "/lib/hump/timer"
+	
+	Grid = require "lib.jumper.grid"
+	Pathfinder = require "lib.jumper.pathfinder"
 	----------------------------------
 	
 	--------function------------------
 	require "/fonction/option"
+	require "/fonction/data" 
     ----------------------------------
 	
-	require "/fonction/data" 
-	
-	Grid = require "lib.jumper.grid"
-	Pathfinder = require "lib.jumper.pathfinder"
-	
-   -- require "/fonction/dataobj"
-	
-	--G_port = "4321"
-	--G_host = "192.168.10.8"
-	--require "/android/android"
+		multi = false
+		
+	if multi then
+		socket = require "socket"
+		require "enet"
+		host = enet.host_create()
+		server = host:connect("localhost:12345")
+	end
 	
 	start_screen = {}
 	game = {}
@@ -275,8 +277,8 @@ function game:init()
 		p:setSizes(2, 1)
 		p:setColors(220, 105, 20, 255, 194, 30, 18, 0)
 		p:setPosition(400, 300)
-		p:setLifetime(0.1)
-		p:setParticleLife(0.2)
+		p:setEmitterLifetime(0.1)
+		p:setParticleLifetime(0.2)
 		p:setDirection(0)
 		p:setSpread(360)
 		p:setTangentialAcceleration(1000)
@@ -290,19 +292,43 @@ function game:init()
     require "/fonction/Itemsprite"  
     require "/fonction/pnj"
 	require "/fonction/mob"
+	require "/fonction/clients"
 	
 	loadmaps()
+
+	local_clients = clients_new()
+	
+	if multi then
+		while 1 do
+			event = host:service(100)
+			if event then
+				print(event.type,event.data)
+				if event.type == "connect" then
+					event.peer:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
+				elseif event.type == "receive" then
+					local tab = json.decode(event.data)
+					if tab.cmd == "new_player" then
+						local id = table.getn(tab.data)
+						clients:set_main_client(id)
+						for i=1,id do
+							print("newplayer",rep_data)
+							local_clients:add(tab.data[i])
+						end
+						break
+					end
+				end
+			end
+		end
+	else
+		local tab = {map=1,name="Antoine",skin=0,id=1,dir=1,posY=640,posX=640}
+		local_clients:add(tab)
+		clients:set_main_client(1)
+	end
 
     info=true
 	
     cursor_x=0
     cursor_y=0
-    
-    steve = perso_new("/textures/"..resolution.."/sprite.png",resolution,resolution)
-	monster = new_mob(10,10)
-	monster1 = new_mob(20,20)
-	monster2 = new_mob(25,10)
-	monster3 = new_mob(10,25)
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
@@ -310,47 +336,33 @@ function game:init()
     A_key = button_new(16*resolution,9*resolution,"/textures/"..resolution.."/A.png")
     keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
 	
-    -- touche=0
-    -- mouse_x=0
-    -- mouse_y=0
-    -- click=0
-	
-	-- for y=0,steve:getmap().LY-1 do
-		-- test = ""
-		-- for x=0,steve:getmap().LX-1 do
-			-- test = test..(grid._map[y][x])
-		-- end
-		-- print(test)
-	-- end
-	--end
+
+	sync = 0
+	sync_dt = 0.5
 
    
 end
 
 function game:draw()
 	--love.graphics.setIcon(icone)
-	cam:lookAt(math.floor(steve.X1), math.floor(steve.Y1))
+	cam:lookAt(math.floor(local_clients:main().X1), math.floor(local_clients:main().Y1))
 	
     if cam.x<love.graphics.getWidth()/2 then
          cam.x = love.graphics.getWidth()/2
-    elseif cam.x>steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
-         cam.x = steve:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
+    elseif cam.x>local_clients:main():getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
+         cam.x = local_clients:main():getmap():getLX()*resolution-(love.graphics.getWidth()/2)
     end
     if cam.y<love.graphics.getHeight()/2 then
         cam.y = love.graphics.getHeight()/2
-    elseif cam.y>steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
-         cam.y = steve:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
+    elseif cam.y>local_clients:main():getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
+         cam.y = local_clients:main():getmap():getLY()*resolution-(love.graphics.getHeight()/2)
     end
 	
 	cam:attach()	 			-- mode camera
     
-	steve:getmap():draw(0,0)  	-- afficher map
-    steve:draw() 				-- afficher perso
-	monster:draw()
-	monster1:draw()
-	monster2:draw()
-	monster3:draw()
-	steve:getmap():drawdeco(0,0)-- afficher map deco
+	local_clients:main():getmap():draw(0,0)  	-- afficher map
+	local_clients:draw()
+	local_clients:main():getmap():drawdeco(0,0)-- afficher map deco
 	
 
 	-- if monster.nodes then
@@ -367,11 +379,9 @@ function game:draw()
 			-- love.graphics.setColor(255, 255, 255)
 		-- end
 	-- end
-	
-	if not mobile then
-		love.graphics.draw(p, 0, 0)	-- afficher particule
-	end
-	
+	-- for k,v in ipairs(tab_perso) do
+		-- love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY.." ; map="..v.mapnb, 10,15*k+10)
+	-- end
 	cam:detach()				-- fin du mode camera
 	
     if info then
@@ -391,54 +401,56 @@ end
 
 function game:update(dt)
 
-    steve:update(dt)  -- update steve
-	monster:update(dt)
-	monster1:update(dt)
-	monster2:update(dt)
-	monster3:update(dt)
-	if not mobile then
-		p:update(dt) --update particule
+	if multi then
+		local event = host:service(100)
+		if event and event.type == "receive" then
+			local_clients:receive(event.data)
+		end
 	end
+	
+    local_clients:update(dt)
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
-    if invent:get(love.mouse.getX( ),love.mouse.getY( ),click) then
-        steve:setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
+    if invent:get(love.mouse.getX(),love.mouse.getY(),click) then
+        local_clients:main():setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
     end   
 	
     if mobile then -- mode tactile mobil
-        local touche = keypad:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click)
+        local touche = keypad:get(love.mouse.getX(),love.mouse.getY(),click)
+		--print(touche)
         if touche==1 then
-            steve:GoUp()
+             local_clients:main():GoUp()
         elseif touche == 2 then
-            steve:GoDown()
+             local_clients:main():GoDown()
         elseif touche==3 then 
-            steve:GoLeft()
+             local_clients:main():GoLeft()
         elseif touche==4 then
-            steve:GoRight()
+             local_clients:main():GoRight()
 		end
 		
-        if A_key:isPress(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click) then
-            steve:use()
+        if A_key:isPress(love.mouse.getX(),love.mouse.getY(),click) then
+            local_clients:main():use()
         end
     else -- mode clavier
         if love.keyboard.isDown( "up" ) then
-            steve:GoUp()
+            local_clients:main():GoUp()
         elseif love.keyboard.isDown( "down" ) then
-            steve:GoDown()
+            local_clients:main():GoDown()
         elseif love.keyboard.isDown( "left" ) then
-            steve:GoLeft()
+            local_clients:main():GoLeft()
         elseif love.keyboard.isDown( "right" ) then
-           steve:GoRight()
+           local_clients:main():GoRight()
         end
         if love.keyboard.isDown( " " ) then
-            steve:use()
+            local_clients:main():use()
         end
 		if love.keyboard.isDown("f") then
 			finde = true
 		else
 			finde = false
 		end
+		
     end
 end
 
@@ -446,17 +458,7 @@ function game:mousepressed(x, y, button)
 
 end
     
-function game:keypressed(key)
-    if key == "kp+" then
-        if steve:getnbslot()<9 then
-            steve:setslot(steve:getnbslot()+1)
-        end
-    elseif key == "kp-" then
-        if steve:getnbslot()>1 then
-            steve:setslot(steve:getnbslot()-1)
-        end
-	end
-	
+function game:keypressed(key)	
     if key == "i" then
         if info then
             info=false
@@ -472,7 +474,7 @@ function game:keypressed(key)
 	if key=="e" then
 		if not mobile then
 			p:start()
-			p:setPosition(steve.posX, steve.posY)
+			p:setPosition(local_clients:main().posX, local_clients:main().posY)
 		end
 	end
 	
