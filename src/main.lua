@@ -8,6 +8,7 @@
 	Timer = require "/lib/hump/timer"
 	Grid = require "lib.jumper.grid"
 	Pathfinder = require "lib.jumper.pathfinder"
+	require("lib/json/json")
 	----------------------------------
 	
 	--------function------------------
@@ -23,7 +24,7 @@
 		multi = false
 		resolution = 64
 	if multi then
-		socket = require "socket"
+		--socket = require "socket"
 		require "enet"
 		host = enet.host_create()
 		server = host:connect("localhost:12345")

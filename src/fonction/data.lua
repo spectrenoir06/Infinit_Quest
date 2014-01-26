@@ -1,8 +1,11 @@
-	
+
+
+
 function import_data(str)
 
 	data = {}
 	data.json = {}
+	print(json)
 	local data_json = json.decode(love.filesystem.read( str, nil ))
 		
 	data.map = data_json.map

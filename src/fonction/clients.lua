@@ -24,7 +24,7 @@ function clients:receive(data)
 	--
 	local tab = json.decode(data)
 	if tab.cmd == "new_player" then
-		print("receive : cmd="..json.decode(data).cmd)
+		print("receive : cmd="..tab.cmd)
 		local nb = table.getn(tab.data)
 		print(json.encode(tab.data[nb]))
 		self:add(tab.data[nb])
@@ -34,7 +34,6 @@ function clients:receive(data)
 	elseif tab.cmd then
 		print(data)
 	end
-
 end
 
 function clients:draw()
