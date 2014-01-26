@@ -46,13 +46,13 @@ end
 function clients:update(dt)
 	if self.sync > self.sync_dt and multi then
 		local send = {	cmd = "pos_update",
-						data = { id = self.id,
-								 posX=self:main().posX,
-								 posY=self:main().posY,
-								 dir=self:main().direction,
-								 map = self:main():getmapnb(),
-							   }
-					 }
+						data = {  id = self.id,
+								      posX = self:main().posX,
+								      posY = self:main().posY,
+								      dir = self:main().direction,
+								      map = self:main():getmapnb(),
+							     }
+					       }
 		udp_client:send(json.encode(send))
 		self.sync = 0
 	end
