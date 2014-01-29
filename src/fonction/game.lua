@@ -26,15 +26,17 @@ function game:init()
 		p:stop()
 	end
 	
-    import_data("/data/data.json")
-    require "/fonction/perso"
-    require "/fonction/dispinfo"  
-    require "/fonction/Itemsprite"  
-    require "/fonction/pnj"
+  import_data("/data/data.json")
+  require "/fonction/perso"
+  require "/fonction/dispinfo"  
+  require "/fonction/Itemsprite"  
+  require "/fonction/pnj"
 	require "/fonction/mob"
 	require "/fonction/clients"
-	
+	require "/fonction/server"
 	loadmaps()
+
+
 
 	local_clients = clients_new()
 	
@@ -67,20 +69,15 @@ function game:init()
 
     info=true
 	
-    cursor_x=0
-    cursor_y=0
+    --cursor_x=0
+   --cursor_y=0
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
-    invent = inv_new(5.375*resolution,10*resolution,"/textures/"..resolution.."/inv.png")
+    --invent = inv_new(5.375*resolution,10*resolution,"/textures/"..resolution.."/inv.png")
     A_key = button_new(16*resolution,9*resolution,"/textures/"..resolution.."/A.png")
     keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
-	
-
-	sync = 0
-	sync_dt = 0.5
-
-   
+    
 end
 
 function game:draw()
@@ -185,12 +182,6 @@ function game:update(dt)
         if love.keyboard.isDown( " " ) then
             local_clients:main():use()
         end
-		if love.keyboard.isDown("f") then
-			finde = true
-		else
-			finde = false
-		end
-		
     end
 end
 
