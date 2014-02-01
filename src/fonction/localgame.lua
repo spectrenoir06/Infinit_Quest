@@ -36,6 +36,12 @@ function localgame:new_player(data) -- nouveau joueur
     print("nombre de joueurs="..#self.players)
 end
 
+function localgame:rem_player(data) -- nouveau joueur
+    table.remove(self.players,data.nb)
+    print("player "..data.nb.."disconnect")
+    print("nombre de joueurs="..#self.players)
+end
+
 function localgame:update_players_pos(data) -- rempli self.players avec le contenue de data sauf "me"
     for k,v in ipairs(data) do
       --print(json.encode(v))
@@ -55,6 +61,8 @@ function localgame:receive() -- recepetion
        localgame:update_players_pos(tab.data) -- modification de la position des joueurs ( sauf moi )
     elseif tab.cmd =="new_player" then
        localgame:new_player(tab.data)
+    elseif tab.cmd =="player_disconnect" then
+       localgame:rem_player(tab.data)
     else
       print("cmd inconu",tab.cmd)
     end
