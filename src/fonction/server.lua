@@ -57,9 +57,16 @@ end
 
 function server:receive()
   local event = self.host:service()
-  if event and event.type == "receive" then
+  if event then
+    if event.type == "receive" then
     --print(event.data)
-    return json.decode(event.data)
+      return json.decode(event.data)
+    elseif event.type == "disconnect" then
+      error("server disconnect")
+    else
+      print(event.type)
+      return false
+    end
   else
     return false
   end
