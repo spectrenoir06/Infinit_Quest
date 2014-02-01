@@ -31,42 +31,44 @@ function game:init()
   require "/fonction/dispinfo"  
   require "/fonction/Itemsprite"  
   require "/fonction/pnj"
-	require "/fonction/mob"
-	require "/fonction/clients"
-	require "/fonction/server"
-	loadmaps()
+  require "/fonction/mob"
+  require "/fonction/localgame"
+  require "/fonction/clients"
+  require "/fonction/server"
+  loadmaps()
 
+  localgame = create_localgame(true)
 
-
+      --[[
 	local_clients = clients_new()
 	
-	if multi then
-		while 1 do
-			event = host:service(100)
-			if event then
-				print(event.type,event.data)
-				if event.type == "connect" then
-					event.peer:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
-				elseif event.type == "receive" then
-					local tab = json.decode(event.data)
-					if tab.cmd == "new_player" then
-						local id = table.getn(tab.data)
-						clients:set_main_client(id)
-						for i=1,id do
-							print("newplayer",rep_data)
-							local_clients:add(tab.data[i])
-						end
-						break
-					end
-				end
-			end
-		end
-	else
-		local tab = {map=1,name="Antoine",skin=0,id=1,dir=1,posY=640,posX=640}
-		local_clients:add(tab)
-		clients:set_main_client(1)
-	end
-
+  	if multi then
+  		while 1 do
+  			event = host:service(100)
+  			if event then
+  				print(event.type,event.data)
+  				if event.type == "connect" then
+  					event.peer:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
+  				elseif event.type == "receive" then
+  					local tab = json.decode(event.data)
+  					if tab.cmd == "new_player" then
+  						local id = table.getn(tab.data)
+  						clients:set_main_client(id)
+  						for i=1,id do
+  							print("newplayer",rep_data)
+  							local_clients:add(tab.data[i])
+  						end
+  						break
+  					end
+  				end
+  			end
+  		end
+  	else
+  		local tab = {map=1,name="Antoine",skin=0,id=1,dir=1,posY=640,posX=640}
+  		local_clients:add(tab)
+  		clients:set_main_client(1)
+  	end
+    ]]--
     info=true
 	
     --cursor_x=0
@@ -82,24 +84,24 @@ end
 
 function game:draw()
 	--love.graphics.setIcon(icone)
-	cam:lookAt(math.floor(local_clients:main().X1), math.floor(local_clients:main().Y1))
+	cam:lookAt(math.floor(localgame.me.X1), math.floor(localgame.me.Y1))
 	
     if cam.x<love.graphics.getWidth()/2 then
          cam.x = love.graphics.getWidth()/2
-    elseif cam.x>local_clients:main():getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
-         cam.x = local_clients:main():getmap():getLX()*resolution-(love.graphics.getWidth()/2)
+    elseif cam.x>localgame.me:getmap():getLX()*resolution-(love.graphics.getWidth()/2) then
+         cam.x = localgame.me:getmap():getLX()*resolution-(love.graphics.getWidth()/2)
     end
     if cam.y<love.graphics.getHeight()/2 then
         cam.y = love.graphics.getHeight()/2
-    elseif cam.y>local_clients:main():getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
-         cam.y = local_clients:main():getmap():getLY()*resolution-(love.graphics.getHeight()/2)
+    elseif cam.y>localgame.me:getmap():getLY()*resolution-(love.graphics.getHeight()/2) then
+         cam.y = localgame.me:getmap():getLY()*resolution-(love.graphics.getHeight()/2)
     end
 	
 	cam:attach()	 			-- mode camera
     
-	local_clients:main():getmap():draw(0,0)  	-- afficher map
-	local_clients:draw()
-	local_clients:main():getmap():drawdeco(0,0)-- afficher map deco
+	localgame.me:getmap():draw(0,0)  	-- afficher map
+	localgame:draw()
+	localgame.me:getmap():drawdeco(0,0)-- afficher map deco
 	
 
 	-- if monster.nodes then
@@ -138,49 +140,49 @@ end
 
 function game:update(dt)
 
-	if multi then
+	--[[if multi then
 		local event = host:service(100)
 		if event and event.type == "receive" then
 			local_clients:receive(event.data)
 		end
-	end
+	end]]--
 	
-    local_clients:update(dt)
+    localgame:update(dt)
 	
     local click , cursor_x , cursor_y = love.mouse.isDown( "l" ) , cam:worldCoords(love.mouse.getX(),love.mouse.getY())  -- detection du click souris
  
-    if invent:get(love.mouse.getX(),love.mouse.getY(),click) then
-        local_clients:main():setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
-    end   
+    --if invent:get(love.mouse.getX(),love.mouse.getY(),click) then
+    --    localgame.me:setslot(invent:get(love.mouse.getX( )/scale,love.mouse.getY( )/scale,click))
+    --end   
 	
     if mobile then -- mode tactile mobil
         local touche = keypad:get(love.mouse.getX(),love.mouse.getY(),click)
 		--print(touche)
         if touche==1 then
-             local_clients:main():GoUp()
+             localgame.me:GoUp()
         elseif touche == 2 then
-             local_clients:main():GoDown()
+             localgame.me:GoDown()
         elseif touche==3 then 
-             local_clients:main():GoLeft()
+             localgame.me:GoLeft()
         elseif touche==4 then
-             local_clients:main():GoRight()
+             localgame.me:GoRight()
 		end
 		
         if A_key:isPress(love.mouse.getX(),love.mouse.getY(),click) then
-            local_clients:main():use()
+            localgame.me:use()
         end
     else -- mode clavier
         if love.keyboard.isDown( "up" ) then
-            local_clients:main():GoUp()
+            localgame.me:GoUp()
         elseif love.keyboard.isDown( "down" ) then
-            local_clients:main():GoDown()
+            localgame.me:GoDown()
         elseif love.keyboard.isDown( "left" ) then
-            local_clients:main():GoLeft()
+            localgame.me:GoLeft()
         elseif love.keyboard.isDown( "right" ) then
-           local_clients:main():GoRight()
+             localgame.me:GoRight()
         end
         if love.keyboard.isDown( " " ) then
-            local_clients:main():use()
+            localgame.me:use()
         end
     end
 end
@@ -205,7 +207,7 @@ function game:keypressed(key)
 	if key=="e" then
 		if not mobile then
 			p:start()
-			p:setPosition(local_clients:main().posX, local_clients:main().posY)
+			p:setPosition(localgame.me.posX, localgame.me.posY)
 		end
 	end
 	
