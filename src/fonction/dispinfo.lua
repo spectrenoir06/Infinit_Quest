@@ -7,6 +7,7 @@ function dispinfo(x,y)
     end
     love.graphics.draw(cache, x+0, 0)
     love.graphics.print("Fps = "..love.timer.getFPS(), x+10, y+10)
+    love.graphics.print("OS = "..love.system.getOS( ), x+100, y+10)
     love.graphics.print("map = "..localgame.me:getmap().fichier, x+300, y+10)
     love.graphics.print("Perso X1 = "..localgame.me.X1,x+10,y+30)
     love.graphics.print("Perso Y1 = "..localgame.me.Y1,x+10,y+50)

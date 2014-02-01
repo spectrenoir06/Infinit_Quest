@@ -9,7 +9,7 @@ function create_localgame(multi)
   
   if multi then
     a.multi = true
-    a.server = server_new("localhost","12345") -- ouverture de le connection au serveur
+    a.server = server_new("192.168.10.3","12345") -- ouverture de le connection au serveur
     local tab = a.server:connect("spectre") -- connection au serveur envoit des position perso et reception de la liste des joueurs
     
     for k,v in ipairs(tab.data.players) do

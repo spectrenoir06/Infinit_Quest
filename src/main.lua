@@ -20,15 +20,11 @@
 	require "/fonction/game"
 	require "/fonction/pause"
     ----------------------------------
-	
-		multi = false
+
 		resolution = 64
-	if multi then
-		--socket = require "socket"
-		require "enet"
-		host = enet.host_create()
-		server = host:connect("localhost:12345")
-	end
+		if love.system.getOS()=="Android" then
+		  mobile = true
+		end
   
 function love.load(arg)
 
