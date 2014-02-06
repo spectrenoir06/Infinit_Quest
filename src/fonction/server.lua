@@ -71,3 +71,16 @@ function server:receive()
     return false
   end
 end
+
+function server:sendAndWait(cmd,data,rep)
+  print(self.peer)
+  self:send(cmd,data)
+  while true do
+    local t = self:receive()
+    if t then
+      if not rep or (t.cmd == rep) then
+        return t.data
+      end
+    end
+  end
+end

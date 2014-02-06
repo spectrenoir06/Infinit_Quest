@@ -9,11 +9,11 @@ function create_localgame(multi)
   
   if multi then
     a.multi = true
-    a.server = server_new("localhost","12345") -- ouverture de le connection au serveur
+    a.server = server_new("ddodev.com","4432") -- ouverture de le connection au serveur
     local tab = a.server:connect("spectre") -- connection au serveur envoit des position perso et reception de la liste des joueurs
     
     for k,v in ipairs(tab.data.players) do
-      a.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY)  -- creation des personnages
+      a.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.mapNb)  -- creation des personnages
     end
     a.id = tab.data.id -- recuperation de mon id
    
@@ -85,6 +85,19 @@ function localgame:send(dt) -- envoit ma nouvelle position
   self.server:send_position(self.me,self.nb)
 end
 
+function localgame:changeMap(mapNb)
+   local data = self.server:sendAndWait("changeMap",mapNb,"welcome")
+   self.players = {}
+   
+   for k,v in ipairs(data.players) do
+      self.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.mapNb)  -- creation des personnages
+   end
+   
+   self.nb = #self.players
+   print("nombre de joueurs = "..self.nb)
+   self.me = self.players[self.nb] -- pointeur vers mon perso
+   
+end
 
 function localgame:update(dt)
   if self.multi then self:receive() end -- reception des donnes serveur

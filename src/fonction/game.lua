@@ -36,8 +36,10 @@ function game:init()
   require "/fonction/clients"
   require "/fonction/server"
   loadmaps()
+  
+  multi= true
 
-  localgame = create_localgame(true)
+  localgame = create_localgame(multi)
 
       --[[
 	local_clients = clients_new()
