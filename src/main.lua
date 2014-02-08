@@ -25,6 +25,10 @@
 		if love.system.getOS()=="Android" then
 		  mobile = true
 		end
+		
+		function printT(tab)
+		  print(json.encode(tab))
+		end
   
 function love.load(arg)
 

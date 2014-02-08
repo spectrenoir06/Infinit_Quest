@@ -4,30 +4,22 @@ perso = {}
 perso.__index = perso
 
 function perso_new(fichier,x,y,map)
-
-
-    local a={}
-	if map then
-		a.globalPosX= (data.map[map].X + x) *64
-		a.globalPosY= (data.map[map].Y + x) *64
-	else
-		a.globalPosX= 110 * resolution
-		a.globalPosY= 10 * resolution
-    end
-	a.LX = 64
-    a.LY = 64
+    
+  local a={}
 	
-	for k,v in ipairs(data.map) do
-		if (v.X<(a.globalPosX/resolution)) and (v.Y<(a.globalPosX/resolution)) then -- 
-			if ((a.globalPosX-v.X*resolution) < v.map.LX*resolution) and ((a.globalPosY-v.Y*resolution) < v.map.LY*resolution) then
-				a.map = data.map[k]
-				a.posX = a.globalPosX - v.X * resolution
-				a.posY = a.globalPosY - v.Y * resolution
-				a.mapnb = k
-				break
-			end
-		end
-	end
+	if map then
+		a.globalPosX= (data.map[map].X + x)
+		a.globalPosY= (data.map[map].Y + x)
+	else
+		print("pas de map en param")
+  end
+	a.LX = 64
+  a.LY = 64
+	
+		a.map = data.map[map]
+		a.posX = x
+		a.posY = y
+		a.mapnb = map
 	
     a.texture = fichier
     a.sprite = sprite_new(fichier,a.LX,a.LY)
@@ -153,29 +145,29 @@ function perso:update(dt)
 	self.dx = 0
 	
 	if (self.posX < 0) or (self.posX>self.map.map.LX*resolution) then -- si perso sort de la map local
-		print("------------------")
-		print("globalPosX"..self.globalPosX)
-		print("globalPosY"..self.globalPosY)
-		print(""                )
-		print("scan map:")
+	--	print("------------------")
+	--	print("globalPosX = "..self.globalPosX)
+	--	print("globalPosY = "..self.globalPosY)
+	--	print(""                )
+	--	print("scan map:")
 		for k,v in ipairs(data.map) do
-			print("map "..k)
-			print(" X = "..v.X)
-			print(" Y = "..v.Y)
-			print(" LX = "..v.map.LX)
-			print(" LY = "..v.map.LY)
+		--	print("map "..k)
+		--	print(" X = "..v.X)
+			--print(" Y = "..v.Y)
+			--print(" LX = "..v.map.LX)
+			--print(" LY = "..v.map.LY)
 			if (v.X<(self.globalPosX/resolution)) and (v.Y<(self.globalPosX/resolution)) then
 				if ((self.globalPosX-v.X*resolution) < v.map.LX*resolution) and ((self.globalPosY-v.Y*resolution) < v.map.LY*resolution) then
-					print("------------------")
-					print("= goto map "..k)
-					print("------------------")
+					--print("------------------")
+					--print("= goto map "..k)
+					--print("------------------")
 					self.map = data.map[k]
 					self:setPosX(self.globalPosX - v.X * resolution)
 					self:setPosY(self.globalPosY - v.Y * resolution)
 					self.mapnb = k
-					if multi then
-					print("send changemap")
-					  localgame:changeMap(k)
+					if localgame.multi then
+					  print("send changemap()",k)
+					  localgame:changeMap()
 					end
 					break
 				end

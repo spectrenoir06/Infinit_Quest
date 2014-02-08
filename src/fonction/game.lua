@@ -10,21 +10,6 @@ function game:init()
 	--love.audio.play(music)
 
 	cam:zoomTo(1)
-	if not mobile then
-		p = love.graphics.newParticleSystem( love.graphics.newImage("/textures/flame.png"), 200 )
-		p:setEmissionRate(1000)
-		p:setSpeed(300, 400)
-		p:setSizes(2, 1)
-		p:setColors(220, 105, 20, 255, 194, 30, 18, 0)
-		p:setPosition(400, 300)
-		p:setEmitterLifetime(0.1)
-		p:setParticleLifetime(0.2)
-		p:setDirection(0)
-		p:setSpread(360)
-		p:setTangentialAcceleration(1000)
-		p:setRadialAcceleration(-2000)
-		p:stop()
-	end
 	
   import_data("/data/data.json")
   require "/fonction/perso"
@@ -37,40 +22,8 @@ function game:init()
   require "/fonction/server"
   loadmaps()
   
-  multi= true
+  localgame = create_localgame(true,"antoinePC") -- (multi , psedo)
 
-  localgame = create_localgame(multi)
-
-      --[[
-	local_clients = clients_new()
-	
-  	if multi then
-  		while 1 do
-  			event = host:service(100)
-  			if event then
-  				print(event.type,event.data)
-  				if event.type == "connect" then
-  					event.peer:send(json.encode( { cmd = "connect" , data = {name = "Antoine"}} ))
-  				elseif event.type == "receive" then
-  					local tab = json.decode(event.data)
-  					if tab.cmd == "new_player" then
-  						local id = table.getn(tab.data)
-  						clients:set_main_client(id)
-  						for i=1,id do
-  							print("newplayer",rep_data)
-  							local_clients:add(tab.data[i])
-  						end
-  						break
-  					end
-  				end
-  			end
-  		end
-  	else
-  		local tab = {map=1,name="Antoine",skin=0,id=1,dir=1,posY=640,posX=640}
-  		local_clients:add(tab)
-  		clients:set_main_client(1)
-  	end
-    ]]--
     info=true
 	
     --cursor_x=0
@@ -123,13 +76,16 @@ function game:draw()
 	-- for k,v in ipairs(tab_perso) do
 		-- love.graphics.print(k.." : X="..v.posX.."  ;  Y="..v.posY.." ; map="..v.mapnb, 10,15*k+10)
 	-- end
+	
 	cam:detach()				-- fin du mode camera
 	
     if info then
         dispinfo(love.graphics.getWidth()-448,0)	-- cadre info
     end
+    
     --invent:draw(steve)
     --touchemobil:draw()
+    
     if mobile then -- aff touche mobil
         A_key:draw()
         keypad:draw()

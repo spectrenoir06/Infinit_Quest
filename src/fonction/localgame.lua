@@ -1,25 +1,26 @@
-localgame = {}
+localgame={}
 localgame.__index = localgame
 
-function create_localgame(multi)
+function create_localgame(multi,psedo)
   local a = {}
   setmetatable(a, localgame)
   
   a.players = {}
-  
+  a.psedo = psedo
   if multi then
     a.multi = true
-    a.server = server_new("ddodev.com","4432") -- ouverture de le connection au serveur
-    local tab = a.server:connect("spectre") -- connection au serveur envoit des position perso et reception de la liste des joueurs
+    a.server = server_new("localhost","4432") -- ouverture de le connection au serveur
+    local tab = a.server:login(psedo) -- connection au serveur envoit des position perso et reception de la liste des joueurs
     
     for k,v in ipairs(tab.data.players) do
-      a.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.mapNb)  -- creation des personnages
+      --print("perso_new",v.skin,v.posX,v.posY)
+      a.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.map)  -- creation des personnages
     end
-    a.id = tab.data.id -- recuperation de mon id
-   
+    
     a.nb = #a.players
      print("nombre de joueurs = "..a.nb)
     a.me = a.players[a.nb] -- pointeur vers mon perso
+    a.players[a.nb].name = psedo
   else
     a.mutli = false
     a.players[1]=perso_new("/textures/64/skin0.png",640,640) -- creation de l'unique personnage
@@ -31,15 +32,14 @@ function create_localgame(multi)
 end
 
 function localgame:new_player(data) -- nouveau joueur
-    local perso = perso_new("/textures/64/skin"..data.skin..".png",data.posX,data.posY)
+    local perso = perso_new("/textures/64/skin"..data.skin..".png",data.posX,data.posY,data.map)
     table.insert(self.players,perso)
-    print("nombre de joueurs="..#self.players)
+    print("perso new , nombre de joueurs="..#self.players)
 end
 
-function localgame:rem_player(data) -- nouveau joueur
+function localgame:rem_player(data) -- rm joueur
     table.remove(self.players,data.nb)
-    print("player "..data.nb.." disconnect")
-    print("nombre de joueurs="..#self.players)
+    print("player "..data.nb.." disconnect","nombre de joueurs="..#self.players)
 end
 
 function localgame:update_players_pos(data) -- rempli self.players avec le contenue de data sauf "me"
@@ -59,9 +59,9 @@ function localgame:receive() -- recepetion
     --print(tab.cmd,tab.data)
     if tab.cmd == "update_players_pos" then -- recepetion des positions des joueurs ( moi compris )
        localgame:update_players_pos(tab.data) -- modification de la position des joueurs ( sauf moi )
-    elseif tab.cmd =="new_player" then
+    elseif tab.cmd =="player_join_map" then
        localgame:new_player(tab.data)
-    elseif tab.cmd =="player_disconnect" then
+    elseif tab.cmd =="player_exit_map" then
        localgame:rem_player(tab.data)
     else
       print("cmd inconu",tab.cmd)
@@ -85,17 +85,28 @@ function localgame:send(dt) -- envoit ma nouvelle position
   self.server:send_position(self.me,self.nb)
 end
 
-function localgame:changeMap(mapNb)
-   local data = self.server:sendAndWait("changeMap",mapNb,"welcome")
+function localgame:changeMap()
+  local cmd = "change_map"
+  local data = {  posX = self.me.posX,
+                  posY = self.me.posY,
+                  dir  = self.me.direction,
+                  map  = self.me:getmapnb(),
+                  name = self.me.name
+                }
+               
+   self.server:send(cmd,data)
+   local tab = self.server:wait("join_map")
+   --print(json.encode(tab))   
    self.players = {}
    
-   for k,v in ipairs(data.players) do
-      self.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.mapNb)  -- creation des personnages
+   for k,v in ipairs(tab.players) do
+      self.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.map)  -- creation des personnages
    end
    
    self.nb = #self.players
-   print("nombre de joueurs = "..self.nb)
+   print("nombre de joueurs sur nouvelle map = "..self.nb)
    self.me = self.players[self.nb] -- pointeur vers mon perso
+   self.me.name = self.psedo
    
 end
 
