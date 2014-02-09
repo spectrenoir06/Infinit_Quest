@@ -22,7 +22,7 @@ function game:init()
   require "/fonction/server"
   loadmaps()
   
-  localgame = create_localgame(true,"antoinePC") -- (multi , psedo)
+  localgame = create_localgame(multi,"antoinePC") -- (multi , psedo)
 
     info=true
 	

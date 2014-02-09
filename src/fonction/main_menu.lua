@@ -60,6 +60,7 @@ function main_menu:mousepressed(Sx, Sy, button)
 		Timer.tween(temp, button_start, {x=1280}, 'linear')
 		Timer.tween(temp, button_option, {x=1280}, 'linear')
 		Timer.tween(temp, button_exit, {x=1280}, 'linear')
+		multi = false
 		Timer.add(temp,function() gamestate.switch(game) end)
 		
 	elseif button_option:isPress(x,y,button) then

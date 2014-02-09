@@ -35,7 +35,7 @@ function love.load(arg)
 	gamestate.registerEvents()
 	cam = camera()
 	--gamestate.switch(start_screen)
-	gamestate.switch(game)
+	gamestate.switch(start_screen)
 end
 
 

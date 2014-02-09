@@ -45,6 +45,8 @@ function option:mousepressed(Sx, Sy, button)
 	
 	if button_1:isPress(x,y,button) then
 		print("button_1")
+		multi = true
+    gamestate.switch(game)
 	elseif button_2:isPress(x,y,button) then
 		print("button_2")
 	elseif button_3:isPress(x,y,button) then

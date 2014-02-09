@@ -9,7 +9,7 @@ function create_localgame(multi,psedo)
   a.psedo = psedo
   if multi then
     a.multi = true
-    a.server = server_new("localhost","4432") -- ouverture de le connection au serveur
+    a.server = server_new("ddodev.com","4432") -- ouverture de le connection au serveur
     local tab = a.server:login(psedo) -- connection au serveur envoit des position perso et reception de la liste des joueurs
     
     for k,v in ipairs(tab.data.players) do
@@ -23,7 +23,7 @@ function create_localgame(multi,psedo)
     a.players[a.nb].name = psedo
   else
     a.mutli = false
-    a.players[1]=perso_new("/textures/64/skin0.png",640,640) -- creation de l'unique personnage
+    a.players[1]=perso_new("/textures/64/skin0.png",640,640,1) -- creation de l'unique personnage
     a.id = 1
     a.nb = 1
     a.me = a.players[1]
