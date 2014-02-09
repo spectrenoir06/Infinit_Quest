@@ -32,8 +32,8 @@ function game:init()
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")
     --invent = inv_new(5.375*resolution,10*resolution,"/textures/"..resolution.."/inv.png")
-    A_key = button_new(16*resolution,9*resolution,"/textures/"..resolution.."/A.png")
-    keypad = keypad_new(0.30*resolution,8*resolution,"/textures/"..resolution.."/key.png")
+    A_key = button_new(love.graphics.getWidth()-128,love.graphics.getHeight()-128,"/textures/"..resolution.."/A.png")
+    keypad = keypad_new(0,love.graphics.getHeight()-192,"/textures/"..resolution.."/key.png")
     
 end
 
@@ -124,12 +124,14 @@ function game:update(dt)
              localgame.me:GoLeft()
         elseif touche==4 then
              localgame.me:GoRight()
-		end
+		    end
 		
         if A_key:isPress(love.mouse.getX(),love.mouse.getY(),click) then
             localgame.me:use()
         end
-    else -- mode clavier
+     end
+        
+        -- mode clavier
         if love.keyboard.isDown( "up" ) then
             localgame.me:GoUp()
         elseif love.keyboard.isDown( "down" ) then
@@ -142,7 +144,7 @@ function game:update(dt)
         if love.keyboard.isDown( " " ) then
             localgame.me:use()
         end
-    end
+    
 end
 
 function game:mousepressed(x, y, button)
@@ -163,10 +165,8 @@ function game:keypressed(key)
     end
 	
 	if key=="e" then
-		if not mobile then
 			p:start()
 			p:setPosition(localgame.me.posX, localgame.me.posY)
-		end
 	end
 	
 	if key=="escape" then
