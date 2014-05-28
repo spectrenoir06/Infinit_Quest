@@ -1,9 +1,9 @@
 
 
 local sprite = {}
-sprite.__index = sprite
+ sprite.__index = sprite
 
-function sprite_new(fichier,LX,LY)
+function sprite.new(fichier,LX,LY)
     a = {}
     a.img=love.graphics.newImage(fichier)
     a.frame={}
@@ -22,8 +22,8 @@ function sprite_new(fichier,LX,LY)
     
     a.animation=1
     a.speed = 1
-	a.timer = 0
-	a.position = 1
+    a.timer = 0
+    a.position = 1
     a.playing = true
     a.mode=1
     
@@ -101,3 +101,5 @@ function sprite:setMode(mode)
 		self.mode = 2
 	end
 end
+
+return sprite

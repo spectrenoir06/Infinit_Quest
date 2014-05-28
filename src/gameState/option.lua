@@ -1,6 +1,6 @@
 ----------------------------Option-----------------------------
 
-option = {}
+local option = {}
 
 function option:init()
 
@@ -71,3 +71,5 @@ function option:keypressed(key)
 		love.event.push("quit")
 	end
 end
+
+return option

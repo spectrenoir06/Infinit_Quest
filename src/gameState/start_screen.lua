@@ -1,6 +1,6 @@
 -----------------------------start_screen---------------------------
 
-start_screen = {}
+local start_screen = {}
 
 function start_screen:init()
 	start = love.graphics.newImage("/textures/menu/720/start/start.png")
@@ -52,3 +52,4 @@ function start_screen:update(dt)
 	p:update(dt)
 end
 
+return start_screen

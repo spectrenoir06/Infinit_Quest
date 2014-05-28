@@ -1,6 +1,6 @@
 ------------------------------pause---------------------------------
 
-pause = {}
+local pause = {}
 
 function pause:init()
 
@@ -25,3 +25,5 @@ end
 function pause:keypressed(key)	
 
 end
+
+return pause

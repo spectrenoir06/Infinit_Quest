@@ -1,7 +1,7 @@
 ------------------------------Game---------------------------------
 
 
-game = {}
+local game = {}
 
 function game:init()
 
@@ -178,3 +178,5 @@ function game:keypressed(key)
 	end
 
 end
+
+return game

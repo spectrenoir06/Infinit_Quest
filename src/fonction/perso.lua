@@ -1,4 +1,4 @@
-require "/lib/spectre/sprite"
+sprite = require "/lib/spectre/sprite"
 
 perso = {}
 perso.__index = perso
@@ -22,7 +22,7 @@ function perso_new(fichier,x,y,map)
 		a.mapnb = map
 	
     a.texture = fichier
-    a.sprite = sprite_new(fichier,a.LX,a.LY)
+    a.sprite = sprite.new(fichier,a.LX,a.LY)
     a.vie = 100
 	
 	a.sprite:addAnimation({9,10,11})

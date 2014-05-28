@@ -1,17 +1,10 @@
-function loadmaps()
-    for k,v in pairs(data.map) do
-        v.map = map_new(v.fichier,v.texture,v.music)
-		v.map:createMapCol()
-    end
-end
-
-require "/lib/spectre/sprite"
+local sprite = require "/lib/spectre/sprite"
 
 local map = {}
 map.__index = map
 
 
-function map_read(tab,nb)
+function map.read(tab,nb)
     local carte={}
     for i=1,tab.width do
         carte[i]={}
@@ -26,14 +19,14 @@ function map_read(tab,nb)
     
 end
     
-function map_new(fichier,texture,music) --créer une map
+function map:new(fichier,texture,music) --crï¿½er une map
     local a={}
     a["fichier"] = fichier
 	print(fichier)
     a["json"] = json.decode(love.filesystem.read( fichier, nil ))
-    a["map_sol"]=map_read(a.json,1)
-    a["map_block"]=map_read(a.json,2)
-	a["map_deco"]=map_read(a.json,3)
+    a["map_sol"]=self.read(a.json,1)
+    a["map_block"]=self.read(a.json,2)
+	a["map_deco"]=self.read(a.json,3)
     a["LX"]=a.json.width
     a["LY"]=a.json.height
     a["tileLX"]=resolution
@@ -97,7 +90,7 @@ function map_new(fichier,texture,music) --créer une map
     end
     
     for k,v in ipairs(a.pnj) do
-        v.sprite = sprite_new("textures/"..resolution.."/"..v.data.skin,resolution,resolution)
+        v.sprite = sprite.new("textures/"..resolution.."/"..v.data.skin,resolution,resolution)
     end
 
     return setmetatable(a, map)
@@ -292,5 +285,14 @@ function map:createMapCol()
 	self.pathfinder:setHeuristic('CARDINTCARD')
 	
 end
+
+function loadmaps()
+    for k,v in pairs(data.map) do
+        v.map = map:new(v.fichier,v.texture,v.music)
+    v.map:createMapCol()
+    end
+end
+
+return map
 
 

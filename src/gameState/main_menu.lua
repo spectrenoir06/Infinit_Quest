@@ -1,6 +1,6 @@
 -----------------------------Main_menu----------------------------
 
-main_menu = {}
+local main_menu = {}
 
 function main_menu:init()
 	fond = love.graphics.newImage("/textures/menu/720/fond.png")
@@ -90,3 +90,5 @@ function main_menu:keypressed(key)
 		love.event.push("quit")
 	end
 end
+
+return main_menu
