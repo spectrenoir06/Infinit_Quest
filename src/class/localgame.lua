@@ -1,11 +1,12 @@
 local Server = require "class.server"
+local Perso	 = require "class.Perso"
 
-local localgame={}
-localgame.__index = localgame
+local Localgame={}
+Localgame.__index = Localgame
 
-function localgame.new(multi,psedo,host,port)
+function Localgame.new(multi,psedo,host,port)
 	local a = {}
-	setmetatable(a, localgame)
+	setmetatable(a, Localgame)
 	  
 	a.players = {}																				-- list de tout les joueurs sur map
 	a.psedo = psedo
@@ -26,7 +27,7 @@ function localgame.new(multi,psedo,host,port)
 		a.players[a.nb].name = psedo
 	else
 		a.mutli = false
-		a.players[1]=perso_new("/textures/64/skin0.png",640,640,1) 								-- creation de l'unique personnage
+		a.players[1] = Perso.new("/textures/64/skin0.png",640,640,1) 								-- creation de l'unique personnage
 		a.id = 1
 		a.nb = 1
 		a.me = a.players[1]
@@ -36,22 +37,22 @@ function localgame.new(multi,psedo,host,port)
 
 end
 
-function localgame:new_player(data) 															-- nouveau joueur
+function Localgame:new_player(data) 															-- nouveau joueur
 
-	local perso = perso_new("/textures/64/skin"..data.skin..".png",data.posX,data.posY,data.map)
+	local perso = Perso.new("/textures/64/skin"..data.skin..".png",data.posX,data.posY,data.map)
 	table.insert(self.players,perso)
 	print("perso new , nombre de joueurs="..#self.players)
 
 end
 
-function localgame:rem_player(data) 															-- rm joueur
+function Localgame:rem_player(data) 															-- rm joueur
 
 	table.remove(self.players,data.nb)
 	print("player "..data.nb.." disconnect","nombre de joueurs="..#self.players)
 
 end
 
-function localgame:update_players_pos(data) -- rempli self.players avec le contenue de data sauf "me"
+function Localgame:update_players_pos(data) -- rempli self.players avec le contenue de data sauf "me"
     
 	for k,v in ipairs(data) do
 		--print(json.encode(v))
@@ -64,17 +65,17 @@ function localgame:update_players_pos(data) -- rempli self.players avec le conte
 
 end
 
-function localgame:receive() -- recepetion 
+function Localgame:receive() -- recepetion 
 
 	local tab = self.server:receive()
 	if tab then
 		--print(tab.cmd,tab.data)
 		if tab.cmd == "update_players_pos" then -- recepetion des positions des joueurs ( moi compris )
-			localgame:update_players_pos(tab.data) -- modification de la position des joueurs ( sauf moi )
+			Localgame:update_players_pos(tab.data) -- modification de la position des joueurs ( sauf moi )
 		elseif tab.cmd =="player_join_map" then
-			localgame:new_player(tab.data)
+			Localgame:new_player(tab.data)
 		elseif tab.cmd =="player_exit_map" then
-			localgame:rem_player(tab.data)
+			Localgame:rem_player(tab.data)
 		else
 			print("cmd inconu",tab.cmd)
 		end
@@ -82,7 +83,7 @@ function localgame:receive() -- recepetion
 
 end
 
-function localgame:update_players(dt) -- update de tout les perso de self.player
+function Localgame:update_players(dt) -- update de tout les perso de self.player
 	
 	for k,v in pairs(self.players) do
 		v:update(dt) -- update perso
@@ -90,7 +91,7 @@ function localgame:update_players(dt) -- update de tout les perso de self.player
 	
 end
 
-function localgame:draw() -- affichage de tout les perso de self.player
+function Localgame:draw() -- affichage de tout les perso de self.player
 
 	for k,v in pairs(self.players) do
 		v:draw() -- draw perso
@@ -98,11 +99,11 @@ function localgame:draw() -- affichage de tout les perso de self.player
 
 end
 
-function localgame:send(dt) -- envoit ma nouvelle position
+function Localgame:send(dt) -- envoit ma nouvelle position
 	self.server:send_position(self.me,self.nb)
 end
 
-function localgame:changeMap()
+function Localgame:changeMap()
 	local cmd = "change_map"
 	local data=	{	posX = self.me.posX,
 					posY = self.me.posY,
@@ -127,10 +128,10 @@ function localgame:changeMap()
    
 end
 
-function localgame:update(dt)
+function Localgame:update(dt)
 	if self.multi then self:receive() end -- reception des donnes serveur
 	self:update_players(dt) -- maj des perso
 	if self.multi then self:send(dt) end   -- envoit des donne au serveur
 end
 
-return localgame
+return Localgame

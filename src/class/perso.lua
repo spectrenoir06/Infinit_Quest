@@ -65,7 +65,7 @@ function Perso:update(dt)
 	self:updatePos()
     self.sprite:update(dt)
 	
-	local grid = resolution/2
+	local grid = resolution/4
 	
 	if self.dx~=0 or self.dy ~=0 then 										-- si mouvement
 		self.sprite:play()

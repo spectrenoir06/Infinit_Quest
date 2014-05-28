@@ -57,7 +57,7 @@ function dispinfo(x,y)
     
     
     
-    love.graphics.print("slot de l'inventaire = "..localgame.me:getnbslot(),x+10,y+270)
+   -- love.graphics.print("slot de l'inventaire = "..localgame.me:getnbslot(),x+10,y+270)
     
     love.graphics.print("x1 = "..localgame.me.X1,x+300,y+270)
     love.graphics.print("y1 = "..localgame.me.Y1,x+300,y+280)

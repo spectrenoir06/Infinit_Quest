@@ -18,14 +18,13 @@ function map.read(tab,nb)
 	
 end
     
-function map.new(fichier,texture,music) --creer une map
+function map.new(file,texture,music) --creer une map
     local a={}
-	print(json.encode(fichier))
-    a.fichier	= fichier
-    a.json		= json.decode(love.filesystem.read( fichier, nil ))
-    a.map_sol	= self.read(a.json,1)
-    a.map_block	= self.read(a.json,2)
-	a.map_deco 	= self.read(a.json,3)
+    a.fichier	= file
+    a.json		= json.decode(love.filesystem.read( file, nil ))
+    a.map_sol	= map.read(a.json,1)
+    a.map_block	= map.read(a.json,2)
+	a.map_deco 	= map.read(a.json,3)
     a.LX		= a.json.width
     a.LY		= a.json.height
     a.tileLX	= resolution
@@ -290,7 +289,7 @@ function loadmaps()
     for k,v in pairs(data.map) do
 		print(json.encode(v))
 
-        v.map = map:new(v.fichier,v.texture,v.music)
+        v.map = map.new(v.fichier,v.texture,v.music)
 		v.map:createMapCol()
     end
 end

@@ -1,6 +1,7 @@
 GameState_Game = {}
 
 local Perso = require "/class/Perso"
+local Localgame = require "/class/localgame"
 
 function GameState_Game:init()
 
@@ -15,17 +16,16 @@ function GameState_Game:init()
 	require "/class/Itemsprite"  
 	require "/class/pnj"
 	require "/class/mob"
-	require "/class/localgame"
 	require "/class/clients"
 	require "/class/server"
 	loadmaps()
   
-	localgame = create_localgame(multi,"antoinePC") -- (multi , psedo)
+	localgame = Localgame.new(multi,"antoinePC") -- (multi , psedo)
 
     info=true
 	
     --cursor_x=0
-   --cursor_y=0
+	--cursor_y=0
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")

@@ -30,10 +30,10 @@ local function map_read(tab)
 	return layers
 end
     
-function Map:new(fichier,texture) --cree une map
+function Map:new(file,texture) --cree une map
     
 	local a={}
-    a.fichier 	= 	fichier
+    a.fichier 		= 	file
     a.json 			= 	json.decode(love.filesystem.read( fichier, nil ))
     a.layers 		= 	map_read(a.json)
 	if texture==nil then texture = a.json.tilesets[1].image end
