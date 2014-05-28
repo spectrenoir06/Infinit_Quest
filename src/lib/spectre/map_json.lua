@@ -15,37 +15,37 @@ function map.read(tab,nb)
         end
     end
     return carte
-    
-    
+	
 end
     
-function map:new(fichier,texture,music) --cr�er une map
+function map.new(fichier,texture,music) --creer une map
     local a={}
-    a["fichier"] = fichier
-	print(fichier)
-    a["json"] = json.decode(love.filesystem.read( fichier, nil ))
-    a["map_sol"]=self.read(a.json,1)
-    a["map_block"]=self.read(a.json,2)
-	a["map_deco"]=self.read(a.json,3)
-    a["LX"]=a.json.width
-    a["LY"]=a.json.height
-    a["tileLX"]=resolution
-    a["tileLY"]=resolution
-    a["tileset"]=love.graphics.newImage("/textures/"..resolution.."/"..texture)
-    a["tilesetLX"]=a.tileset:getWidth()
-    a["tilesetLY"]=a.tileset:getHeight()
-    a["music"]=music
-    a.tile={}
-    for y=0,(a.tilesetLY/a.tileLY)-1 do
+	print(json.encode(fichier))
+    a.fichier	= fichier
+    a.json		= json.decode(love.filesystem.read( fichier, nil ))
+    a.map_sol	= self.read(a.json,1)
+    a.map_block	= self.read(a.json,2)
+	a.map_deco 	= self.read(a.json,3)
+    a.LX		= a.json.width
+    a.LY		= a.json.height
+    a.tileLX	= resolution
+    a.tileLY	= resolution
+    a.tileset	= love.graphics.newImage("/textures/"..resolution.."/"..texture)
+    a.tilesetLX	= a.tileset:getWidth()
+    a.tilesetLY	= a.tileset:getHeight()
+    a.music		= music
+    a.tile		= {}
+    
+	for y=0,(a.tilesetLY/a.tileLY)-1 do
         for x=0,(a.tilesetLX/a.tileLX)-1 do
             a.tile[x+(y*a.tilesetLX/a.tileLX)] = love.graphics.newQuad(x*a.tileLX,y*a.tileLY, a.tileLX, a.tileLY ,a.tilesetLX, a.tilesetLY)
         end
     end
-    a["spriteBatch_sol"] = love.graphics.newSpriteBatch( a.tileset, a.LX*a.LY )
+    a.spriteBatch_sol = love.graphics.newSpriteBatch( a.tileset, a.LX*a.LY )
     a.spriteBatch_sol:clear()
-    a["spriteBatch_block"] = love.graphics.newSpriteBatch( a.tileset, a.LX*a.LY )
+    a.spriteBatch_block = love.graphics.newSpriteBatch( a.tileset, a.LX*a.LY )
     a.spriteBatch_block:clear()
-	a["spriteBatch_deco"] = love.graphics.newSpriteBatch( a.tileset, a.LX*a.LY )
+	a.spriteBatch_deco = love.graphics.newSpriteBatch( a.tileset, a.LX*a.LY )
     a.spriteBatch_deco:clear()
     
     for x=0,(a.LX)-1 do
@@ -78,8 +78,8 @@ function map:new(fichier,texture,music) --cr�er une map
 	--end
 	
     a.data = a.json.layers[4].objects
-    a["pnj"] = {}
-    a["obj"] = {}
+    a.pnj = {}
+    a.obj = {}
     
     for k,v in ipairs(a.data) do
         if v.type=="pnj" then
@@ -200,7 +200,7 @@ function map:getLY()
 end
 
 function map:setmap(nb)
-    map = data.map[nb]["map"]
+    map = data.map[nb].map
 end
 
 function map:getmap()
@@ -288,8 +288,10 @@ end
 
 function loadmaps()
     for k,v in pairs(data.map) do
+		print(json.encode(v))
+
         v.map = map:new(v.fichier,v.texture,v.music)
-    v.map:createMapCol()
+		v.map:createMapCol()
     end
 end
 

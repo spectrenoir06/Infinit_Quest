@@ -1,7 +1,5 @@
-
-
 local sprite = {}
- sprite.__index = sprite
+sprite.__index = sprite
 
 function sprite.new(fichier,LX,LY)
     a = {}

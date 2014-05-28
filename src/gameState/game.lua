@@ -1,9 +1,8 @@
-------------------------------Game---------------------------------
+GameState_Game = {}
 
+local Perso = require "/class/Perso"
 
-local game = {}
-
-function game:init()
+function GameState_Game:init()
 
 	--love.audio.stop(intro_music)
 	--music = love.audio.newSource("/music/main.mp3")
@@ -11,18 +10,17 @@ function game:init()
 
 	cam:zoomTo(1)
 	
-  import_data("/data/data.json")
-  require "/fonction/perso"
-  require "/fonction/dispinfo"  
-  require "/fonction/Itemsprite"  
-  require "/fonction/pnj"
-  require "/fonction/mob"
-  require "/fonction/localgame"
-  require "/fonction/clients"
-  require "/fonction/server"
-  loadmaps()
+
+	require "/class/dispinfo"  
+	require "/class/Itemsprite"  
+	require "/class/pnj"
+	require "/class/mob"
+	require "/class/localgame"
+	require "/class/clients"
+	require "/class/server"
+	loadmaps()
   
-  localgame = create_localgame(multi,"antoinePC") -- (multi , psedo)
+	localgame = create_localgame(multi,"antoinePC") -- (multi , psedo)
 
     info=true
 	
@@ -37,7 +35,7 @@ function game:init()
     
 end
 
-function game:draw()
+function GameState_Game:draw()
 	--love.graphics.setIcon(icone)
 	cam:lookAt(math.floor(localgame.me.X1), math.floor(localgame.me.Y1))
 	
@@ -96,7 +94,7 @@ function game:draw()
 	
 end
 
-function game:update(dt)
+function GameState_Game:update(dt)
 
 	--[[if multi then
 		local event = host:service(100)
@@ -147,36 +145,31 @@ function game:update(dt)
     
 end
 
-function game:mousepressed(x, y, button)
+function GameState_Game:mousepressed(x, y, button)
 
 end
     
-function game:keypressed(key)	
-    if key == "i" then
-        if info then
-            info=false
-        else
-            info=true
-        end
+function GameState_Game:keypressed(key)
+
+	if key == "i" then
+		if info then
+			info=false
+		else
+			info=true
+		end
 	end
 	
 	if key == "p" then
 		gamestate.push(pause)
-    end
+	end
 	
 	if key=="e" then
-			p:start()
-			p:setPosition(localgame.me.posX, localgame.me.posY)
+		p:start()
+		p:setPosition(localgame.me.posX, localgame.me.posY)
 	end
 	
 	if key=="escape" then
 		love.event.push("quit")
 	end
 	
-	if key=="o" then
-
-	end
-
 end
-
-return game

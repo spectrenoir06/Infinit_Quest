@@ -1,9 +1,9 @@
-clients = {}
-clients.__index = clients
+Clients = {}
+Clients.__index = Clients
 
-function clients_new()
+function Clients.new()
 	local a = {}
-	setmetatable(a, clients)
+	setmetatable(a, Clients)
 	a.tab_perso = {}
 	a.id=nil
 	a.sync = 0
@@ -11,16 +11,16 @@ function clients_new()
 	return a
 end
 
-function clients:add(data)
+function Clients:add(data)
 	local new = perso_new("/textures/64/skin"..data.skin..".png",data.posX,data.posY)
 	table.insert(self.tab_perso,new)
 end
 
-function clients:set_main_client(id)
+function Clients:set_main_client(id)
 	self.id = id
 end
 
-function clients:receive(data)
+function Clients:receive(data)
 	--
 	local tab = json.decode(data)
 	if tab.cmd == "new_player" then
@@ -36,14 +36,14 @@ function clients:receive(data)
 	end
 end
 
-function clients:draw()
+function Clients:draw()
 	for k,v in pairs(self.tab_perso) do
 			--print(json.encode(v.sprite))
 			v:draw() 				-- afficher perso
 	end
 end
 
-function clients:update(dt)
+function Clients:update(dt)
 	if self.sync > self.sync_dt and multi then
 		local send = {	cmd = "pos_update",
 						data = {  id = self.id,
@@ -63,11 +63,11 @@ function clients:update(dt)
 	self.sync = self.sync +dt
 end
 
-function clients:main()
+function Clients:main()
 	return self.tab_perso[self.id]
 end
 
-function clients:perso_set_info(tab)
+function Clients:perso_set_info(tab)
 	for k,v in ipairs(tab.data[1]) do
 		--print(json.encode(v))
 		if v.id~=self.id then
@@ -77,3 +77,5 @@ function clients:perso_set_info(tab)
 		end
 	end
 end
+
+return Clients
