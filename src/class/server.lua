@@ -8,7 +8,7 @@ function Server.new(ip,port)
 	setmetatable(a, Server)
 	  
 	a.tcpSocket = assert(socket.connect(ip, port))			-- connection socket tcp
-	a.tcpSocket:settimeout(1)
+	a.tcpSocket:settimeout(0)
 	a.udpSocket = assert(socket.udp())
 	a.udpSocket:settimeout(0)
 	a.udpSocket:setpeername(ip,port+1)				-- connection socket udp
@@ -53,14 +53,20 @@ function Server:send_position(perso)
 end
 
 function Server:udpReceive()
-	if self.udpSocket:receive() then
+	local data = self.udpSocket:receive()
+	if data then
 		return json.decode(data)
 	end
 end
 
 function Server:tcpReceive()
-	if self.tcpSocket:receive() then
+	local data, status, partial = self.tcpSocket:receive()
+	if data then
+		print(data)
 		return json.decode(data)
+	end
+	if status=="closed" then
+		error("Server closed")
 	end
 end
 

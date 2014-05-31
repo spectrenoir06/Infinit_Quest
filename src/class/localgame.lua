@@ -38,7 +38,7 @@ function Localgame.new(multi,psedo,ip,port)
 end
 
 function Localgame:new_player(data) 															-- nouveau joueur
-
+	print("new perso",self.player)
 	local perso = Perso.new("/textures/64/skin"..data.skin..".png",data.posX,data.posY,data.map)
 	table.insert(self.players,perso)
 	print("perso new , nombre de joueurs="..#self.players)
@@ -71,19 +71,21 @@ function Localgame:receive() -- recepetion
 	local tcpTab = self.server:tcpReceive()
 	
 	if tcpTab then
-	
+		if tcpTab.cmd == "player_join_map" then
+			self:new_player(tcpTab.data)
+		elseif tcpTab.cmd =="player_exit_map" then
+			self:rem_player(tcpTab.data)
+		else
+			print("cmd tcp inconu",tcpTab.cmd)
+		end
 	end
 	
 	if udpTab then
-		--print(tab.cmd,tab.data)
+		print(udpTab.cmd)
 		if udpTab.cmd == "update_players_pos" then -- recepetion des positions des joueurs ( moi compris )
-			Localgame:update_players_pos(tab.data) -- modification de la position des joueurs ( sauf moi )
-		elseif udpTab.cmd =="player_join_map" then
-			Localgame:new_player(tab.data)
-		elseif udpTab.cmd =="player_exit_map" then
-			Localgame:rem_player(tab.data)
+			self:update_players_pos(udpTab.data) -- modification de la position des joueurs ( sauf moi )
 		else
-			print("cmd inconu",tab.cmd)
+			print("cmd udp inconu",udpTab.cmd)
 		end
 	end
 
