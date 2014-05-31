@@ -1,10 +1,10 @@
-local Server = require "class.server"
+local Server = require "class.Server"
 local Perso	 = require "class.Perso"
 
 local Localgame={}
 Localgame.__index = Localgame
 
-function Localgame.new(multi,psedo,host,port)
+function Localgame.new(multi,psedo,ip,port)
 	local a = {}
 	setmetatable(a, Localgame)
 	  
@@ -12,13 +12,13 @@ function Localgame.new(multi,psedo,host,port)
 	a.psedo = psedo
 	
 	if multi then
-		a.multi = true
-		a.server = Server:new(host,port) 														-- ouverture de le connection au serveur
-		local tab = a.server:login(psedo) 														-- connection au serveur envoit des position perso et reception de la liste des joueurs
-    
+		a.multi 	= true
+		a.server 	= Server.new(ip,port) 															-- ouverture de le connection au serveur
+		local tab 	= a.server:login(psedo) 														-- connection au serveur envoit des position perso et reception de la liste des joueurs
+		
 		for k,v in ipairs(tab.data.players) do
-			--print("perso_new",v.skin,v.posX,v.posY)
-			a.players[k] = perso_new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.map)  -- creation des personnages
+			print("perso_new",v.skin,v.posX,v.posY,v.map)
+			a.players[k] = Perso.new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.map)  -- creation des personnages
 		end
     
 		a.nb = #a.players
@@ -27,7 +27,7 @@ function Localgame.new(multi,psedo,host,port)
 		a.players[a.nb].name = psedo
 	else
 		a.mutli = false
-		a.players[1] = Perso.new("/textures/64/skin0.png",640,640,1) 								-- creation de l'unique personnage
+		a.players[1] = Perso.new("/textures/64/skin0.png",640,640,1) 							-- creation de l'unique personnage
 		a.id = 1
 		a.nb = 1
 		a.me = a.players[1]
@@ -67,14 +67,20 @@ end
 
 function Localgame:receive() -- recepetion 
 
-	local tab = self.server:receive()
-	if tab then
+	local udpTab = self.server:udpReceive()
+	local tcpTab = self.server:tcpReceive()
+	
+	if tcpTab then
+	
+	end
+	
+	if udpTab then
 		--print(tab.cmd,tab.data)
-		if tab.cmd == "update_players_pos" then -- recepetion des positions des joueurs ( moi compris )
+		if udpTab.cmd == "update_players_pos" then -- recepetion des positions des joueurs ( moi compris )
 			Localgame:update_players_pos(tab.data) -- modification de la position des joueurs ( sauf moi )
-		elseif tab.cmd =="player_join_map" then
+		elseif udpTab.cmd =="player_join_map" then
 			Localgame:new_player(tab.data)
-		elseif tab.cmd =="player_exit_map" then
+		elseif udpTab.cmd =="player_exit_map" then
 			Localgame:rem_player(tab.data)
 		else
 			print("cmd inconu",tab.cmd)

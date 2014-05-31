@@ -1,7 +1,7 @@
 GameState_Game = {}
 
-local Perso = require "/class/Perso"
-local Localgame = require "/class/localgame"
+local Perso 	= require "/class/Perso"
+local LocalGame = require "/class/LocalGame"
 
 function GameState_Game:init()
 
@@ -16,11 +16,10 @@ function GameState_Game:init()
 	require "/class/Itemsprite"  
 	require "/class/pnj"
 	require "/class/mob"
-	require "/class/clients"
-	require "/class/server"
+	
 	loadmaps()
   
-	localgame = Localgame.new(multi,"antoinePC") -- (multi , psedo)
+	localgame = LocalGame.new(true,"AntoinePC","127.0.0.1",100)
 
     info=true
 	

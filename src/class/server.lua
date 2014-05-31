@@ -1,84 +1,67 @@
-server = {}
-server.__index = server
+local Server = {}
+Server.__index = Server
 
-require "enet"
+local socket = require "socket"
 
-function server_new(ip,port)
-  local a = {}
-  setmetatable(a, server)
-  
-  a.host = enet.host_create() -- creation de l'host
-  a.server = a.host:connect(ip..":"..port) -- connection a l'host
-
-  while true do
-    local event = a.host:service(100) 
-    if event then
-      if event.type == "connect" then
-        print("Connected to", event.peer)
-        a.peer = event.peer  -- sauvegarde du server
-        return a
-      else
-        print(event.type)
-      end
-    end
-  end
+function Server.new(ip,port)
+	local a = {}
+	setmetatable(a, Server)
+	  
+	a.tcpSocket = assert(socket.connect(ip, port))			-- connection socket tcp
+	a.tcpSocket:settimeout(1)
+	a.udpSocket = assert(socket.udp())
+	a.udpSocket:settimeout(0)
+	a.udpSocket:setpeername(ip,port+1)				-- connection socket udp
+	
+	a.udp_ip, a.udp_port = a.udpSocket:getsockname()	-- recuper info socket udp
+	
+	a.tcpSocket:send(a.udp_ip..":"..a.udp_port.."\n")	-- envoit info socket udp au server par tcp
+	return a
 end
 
-function server:send(cmd,data)
-  --print(json.encode({cmd = cmd,data = data}))
-  self.peer:send(json.encode({cmd = cmd,data = data}))
+function Server:tcpSend(cmd,data)
+	--print(json.encode({cmd = cmd,data = data}))
+	self.tcpSocket:send(json.encode({cmd = cmd,data = data}).."\n")
 end
 
-function server:login(name) 
-  self:send("login",{name=name})
-  while true do
-    local data = self:receive()
-    if data then
-        return data
-    end
-  end
+function Server:udpSend(cmd,data)
+	--print(json.encode({cmd = cmd,data = data}))
+	self.udpSocket:send(json.encode({cmd = cmd,data = data}))
 end
 
-function server:send_position(perso)
-  local cmd = "pos_update"
-  local data = {  posX = perso.posX,
-                  posY = perso.posY,
-                  dir = perso.direction,
-                  map = perso:getmapnb(),
-                  name = perso.name
-                }
-  --print(cmd,json.encode(data))                
-  self:send(cmd,data)
+function Server:login(name)
+	print"login"
+	self:tcpSend("login",{name=name})
+	while true do
+		local data = self.tcpSocket:receive()
+		if data then
+			return json.decode(data)
+		end
+	end
 end
 
-function server:receive(wait)
-  repeat
-    local event = self.host:service()
-    if event then
-      if event.type == "receive" then
-        --print(event.data)
-        return json.decode(event.data)
-      elseif event.type == "disconnect" then
-        error("server disconnect")
-      else
-        print(event.type)
-        return false
-      end
-    else
-      return false
-    end
-  until wait
+function Server:send_position(perso)
+	local cmd = "pos_update"
+	local data = { 	posX = perso.posX,
+					posY = perso.posY,
+					dir = perso.direction,
+					map = perso:getmapnb(),
+					name = perso.name
+				}
+	--print(cmd,json.encode(data))                
+	self:udpSend(cmd,data)
 end
 
-function server:wait(cmd)
-  while true do
-    local t = self:receive()
-    if t then
-      if (t.cmd == cmd) then
-        return t.data
-      else
-        print(t.cmd)
-      end
-    end
-  end
+function Server:udpReceive()
+	if self.udpSocket:receive() then
+		return json.decode(data)
+	end
 end
+
+function Server:tcpReceive()
+	if self.tcpSocket:receive() then
+		return json.decode(data)
+	end
+end
+
+return Server

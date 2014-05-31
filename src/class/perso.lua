@@ -7,7 +7,7 @@ function Perso.new(fichier,x,y,mapNb)
     
   local a={}
 	
-	if map then
+	if mapNb then
 		a.map = data.map[mapNb]
 	else
 		print("pas de map en param map 1 select")
