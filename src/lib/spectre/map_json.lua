@@ -287,7 +287,7 @@ end
 
 function loadmaps()
     for k,v in pairs(data.map) do
-		print(json.encode(v))
+		--print(json.encode(v))
 
         v.map = map.new(v.fichier,v.texture,v.music)
 		v.map:createMapCol()

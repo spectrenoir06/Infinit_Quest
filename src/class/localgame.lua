@@ -17,7 +17,7 @@ function Localgame.new(multi,psedo,ip,port)
 		local tab 	= a.server:login(psedo) 														-- connection au serveur envoit des position perso et reception de la liste des joueurs
 		
 		for k,v in ipairs(tab.data.players) do
-			print("perso_new",v.skin,v.posX,v.posY,v.map)
+			--print("perso_new",v.skin,v.posX,v.posY,v.map)
 			a.players[k] = Perso.new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.map)  -- creation des personnages
 		end
     
@@ -45,10 +45,9 @@ function Localgame:new_player(data) 															-- nouveau joueur
 
 end
 
-function Localgame:rem_player(data) 															-- rm joueur
-
+function Localgame:rem_player(data)
 	table.remove(self.players,data.nb)
-	print("player "..data.nb.." disconnect","nombre de joueurs="..#self.players)
+	print(" nb"..data.nb.." disconnect","nombre de joueurs="..#self.players)
 
 end
 
@@ -81,7 +80,7 @@ function Localgame:receive() -- recepetion
 	end
 	
 	if udpTab then
-		print(udpTab.cmd)
+		--print(udpTab.cmd)
 		if udpTab.cmd == "update_players_pos" then -- recepetion des positions des joueurs ( moi compris )
 			self:update_players_pos(udpTab.data) -- modification de la position des joueurs ( sauf moi )
 		else
