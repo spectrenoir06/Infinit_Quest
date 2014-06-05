@@ -19,7 +19,7 @@ function GameState_Game:init()
 	
 	loadmaps()
   
-	localgame = LocalGame.new(true,"Android","ddodev.com",4434)
+	localgame = LocalGame.new(false,"Android","ddodev.com",4434)
 	--localgame = LocalGame.new(true,"Android","127.0.0.1",4434)
 
     info=true
@@ -157,6 +157,13 @@ function GameState_Game:keypressed(key)
 		else
 			info=true
 		end
+	end
+	
+	if key == "u" then
+		cam:zoom(1.1)
+	end
+	if key == "i" then
+		cam:zoom(.9)
 	end
 	
 	if key == "p" then

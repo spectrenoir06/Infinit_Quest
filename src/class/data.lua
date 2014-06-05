@@ -5,6 +5,7 @@ function import_data(str)
 	a = {}
 	
 	local data_json = json.decode(love.filesystem.read( str, nil ))
+	local data_tileInfo = json.decode(love.filesystem.read( "/data/tileInfo.json", nil ))
 	
 	
 	a.map = {} 						-- info map, position, fichier ...
@@ -17,7 +18,7 @@ function import_data(str)
 	
 	a.tab = {}						-- info tiles
 	
-	for k,v in pairs(data_json.tile) do
+	for k,v in pairs(data_tileInfo) do
 		a.tab[tonumber(k)] = v
 	end
 	

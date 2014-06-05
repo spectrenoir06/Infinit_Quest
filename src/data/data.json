@@ -4,24 +4,6 @@
 		"fichier": "/map/1/1.json",
 		"X": 100,
 		"texture": "tileset.png"
-	},
-	{
-		"Y": 800,
-		"fichier": "/map/2/2.json",
-		"X": 800,
-		"texture": "tileset.png"
-	},
-	{
-		"Y": 0,
-		"fichier": "/map/3/3.json",
-		"X": 0,
-		"texture": "tileset.png"
-	},
-	{
-		"Y": 500,
-		"fichier": "/map/4/4.json",
-		"X": 500,
-		"texture": "tileset.png"
 	}],
 	"pnj": [{
 		"talk_str": "",

@@ -1,4 +1,4 @@
-local sprite = require "/lib/spectre/sprite"
+local sprite = require "/lib/spectre/Sprite"
 
 local map = {}
 map.__index = map
@@ -57,7 +57,7 @@ function map.new(file,texture,music) --creer une map
         for y=0,(a.LY)-1 do
             local id = a.map_block[x+1][y+1]
             if id<0 then
-                error("ID inferieur a 0 : "..fichier.." ; x="..(x).." ; y="..(y).." ; id = "..id)
+                error("ID inferieur a 0 : "..a.fichier.." ; x="..(x).." ; y="..(y).." ; id = "..id)
             end
             a.spriteBatch_block:add(a.tile[id], x*a.tileLX, y*a.tileLY)
         end
@@ -66,7 +66,7 @@ function map.new(file,texture,music) --creer une map
         for y=0,(a.LY)-1 do
             local id = a.map_deco[x+1][y+1]
             if id<0 then
-                error("ID inferieur a 0 : "..fichier.." ; x="..(x).." ; y="..(y).." ; id = "..id)
+                error("ID inferieur a 0 : "..a.fichier.." ; x="..(x).." ; y="..(y).." ; id = "..id)
             end
             a.spriteBatch_deco:add(a.tile[id], x*a.tileLX, y*a.tileLY)
         end
@@ -239,6 +239,11 @@ function map:scancol(tilex,tiley) -- return true si colision
 	local block = self:getblock(tilex,tiley)
 	local blockDataSol = data.tab[block.idsol]
 	local blockDataBlock = data.tab[block.idblock]
+	
+	if (blockDataSol==nil) then
+		error(tilex..", "..tiley.."  noblock "..self.fichier)
+	end
+	
 	if block.idblock==nil or block.idsol==nil then
 		return false
 	else
