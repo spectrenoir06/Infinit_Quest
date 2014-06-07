@@ -10,6 +10,19 @@ function Localgame.new(multi,psedo,ip,port)
 	  
 	a.players = {}																				-- list de tout les joueurs sur map
 	a.psedo = psedo
+	a.sync = 0.05
+	a.time = 0
+	a.globalTime = 0
+	
+	for i=0,1000 do
+		if not love.filesystem.exists( "/log"..i..".txt" ) then
+			a.log = ("/log"..i..".txt")
+			love.filesystem.write(a.log,"")
+			break
+		end
+	end
+	--print("fichier log : "..a.log)
+	
 	
 	if multi then
 		a.multi 	= true
@@ -70,6 +83,9 @@ function Localgame:receive() -- recepetion
 	local tcpTab = self.server:tcpReceive()
 	
 	if tcpTab then
+		if self.log then
+			love.filesystem.append(self.log, (self.globalTime.."	tcp	"..tcpTab.cmd.."\n"))
+		end
 		if tcpTab.cmd == "player_join_map" then
 			self:new_player(tcpTab.data)
 		elseif tcpTab.cmd =="player_exit_map" then
@@ -81,8 +97,11 @@ function Localgame:receive() -- recepetion
 	
 	if udpTab then
 		--print(udpTab.cmd)
-		if udpTab.cmd == "update_players_pos" then -- recepetion des positions des joueurs ( moi compris )
-			self:update_players_pos(udpTab.data) -- modification de la position des joueurs ( sauf moi )
+		if self.log then
+			love.filesystem.append(self.log, (self.globalTime.."	udp	"..udpTab.cmd.."\n"))
+		end
+		if udpTab.cmd == "update_players_pos" then 	-- recepetion des positions des joueurs ( moi compris )
+			self:update_players_pos(udpTab.data) 	-- modification de la position des joueurs ( sauf moi )
 		else
 			print("cmd udp inconu",udpTab.cmd)
 		end
@@ -107,7 +126,12 @@ function Localgame:draw() -- affichage de tout les perso de self.player
 end
 
 function Localgame:send(dt) -- envoit ma nouvelle position
-	self.server:send_position(self.me,self.nb)
+	self.time = self.time + dt
+	if self.time > self.sync then
+		--print("send")
+		self.server:send_position(self.me,self.nb)
+		self.time = 0
+	end
 end
 
 function Localgame:changeMap()
@@ -136,6 +160,8 @@ function Localgame:changeMap()
 end
 
 function Localgame:update(dt)
+	self.globalTime = self.globalTime + dt
+	--print(self.globalTime)
 	if self.multi then self:receive() end -- reception des donnes serveur
 	self:update_players(dt) -- maj des perso
 	if self.multi then self:send(dt) end   -- envoit des donne au serveur

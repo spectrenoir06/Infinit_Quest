@@ -1,1 +1,1 @@
-love ./src/ --console
+start love ./src/ --console
