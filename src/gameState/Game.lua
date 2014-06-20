@@ -19,13 +19,11 @@ function GameState_Game:init()
 	
 	loadmaps()
   
-	localgame = LocalGame.new(true,"Android","localhost",4434)
-	--localgame = LocalGame.new(true,"Android","127.0.0.1",4434)
-
-    info=true
+	localgame = LocalGame.new(false,"Android","localhost",4434)
+	
+   info=true
 	
     --cursor_x=0
-	--cursor_y=0
     
     inventaire = invsprite_new("/textures/"..resolution.."/tileset.png",resolution,resolution)
     cache = love.graphics.newImage("/textures/"..resolution.."/cache.png")

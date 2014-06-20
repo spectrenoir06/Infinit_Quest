@@ -2,6 +2,7 @@ local Server = {}
 Server.__index = Server
 
 local socket = require "socket"
+local struct = require "struct"
 
 function Server.new(ip,port)
 	local a = {}
@@ -15,26 +16,35 @@ function Server.new(ip,port)
 	
 	a.udp_ip, a.udp_port = a.udpSocket:getsockname()	-- recuper info socket udp
 	
-	a:udpSend("getUdp",{hello = "hello"})
+	a:udpSend("getUdp")
 	local tab
 	while not tab do
 		tab = a:udpReceive()
 	end
 	print(tab.cmd,tab.data.ip,tab.data.port)
 	
-	a.tcpSocket:send(tab.data.ip..":"..tab.data.port.."\n")		-- envoit info socket udp au server par tcp
-	
+	a:tcpSend("udpInfo",{ip = tab.data.ip..":"..tab.data.port})
 	return a
 end
 
 function Server:tcpSend(cmd,data)
 	--print(json.encode({cmd = cmd,data = data}))
-	self.tcpSocket:send(json.encode({cmd = cmd,data = data}).."\n")
+	local s
+  
+  if cmd == "udpInfo" then
+	    s = stuct.pack("Bs",0x00,data.ip)
+	end
+	self.tcpSocket:send(s.."\n")
 end
 
 function Server:udpSend(cmd,data)
-	--print(json.encode({cmd = cmd,data = data}))
-	self.udpSocket:send(json.encode({cmd = cmd,data = data}))
+  local s
+	if cmd=="getUdp" then
+	   s = struct.pack("B",0x00)
+	elseif cmd == "pos_update" then
+      s = struct.pack("BffBB", 0x01, data.posX, data.posY, data.dir,data.mv )
+  end
+	self.udpSocket:send(s)
 end
 
 function Server:login(name)
@@ -50,11 +60,11 @@ end
 
 function Server:send_position(perso)
 	local cmd = "pos_update"
-	local data = { 	posX = perso.posX,
+	local data = {
+	        posX = perso.posX,
 					posY = perso.posY,
 					dir = perso.direction,
-					map = perso:getmapnb(),
-					name = perso.name
+					mv  = (perso.dx~=0 or perso.dy~=0)
 				}
 	--print(cmd,json.encode(data))                
 	self:udpSend(cmd,data)

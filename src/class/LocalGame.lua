@@ -31,7 +31,7 @@ function Localgame.new(multi,psedo,ip,port)
 		
 		for k,v in ipairs(tab.data.players) do
 			--print("perso_new",v.skin,v.posX,v.posY,v.map)
-			a.players[k] = Perso.new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.map)  -- creation des personnages
+			a.players[k] = Perso:new("/textures/64/skin"..v.skin..".png",v.posX,v.posY,v.map)  -- creation des personnages
 		end
     
 		a.nb = #a.players
@@ -40,7 +40,7 @@ function Localgame.new(multi,psedo,ip,port)
 		a.players[a.nb].name = psedo
 	else
 		a.mutli = false
-		a.players[1] = Perso.new("/textures/64/skin0.png",640,640,1) 							-- creation de l'unique personnage
+		a.players[1] = Perso:new("/textures/64/skin0.png",640,640,1) 							-- creation de l'unique personnage
 		a.id = 1
 		a.nb = 1
 		a.me = a.players[1]
@@ -52,7 +52,7 @@ end
 
 function Localgame:new_player(data) 															-- nouveau joueur
 	print("new perso",self.player)
-	local perso = Perso.new("/textures/64/skin"..data.skin..".png",data.posX,data.posY,data.map)
+	local perso = Perso:new("/textures/64/skin"..data.skin..".png",data.posX,data.posY,data.map)
 	table.insert(self.players,perso)
 	print("perso new , nombre de joueurs="..#self.players)
 

@@ -1,50 +1,47 @@
 local Sprite = require "lib.spectre.Sprite"
 
-local Perso = {}
-Perso.__index = Perso
+local class = require 'lib.kikito.middleclass'
 
-function Perso.new(fichier,x,y,mapNb)
+local Perso = class('Perso') 
+
+function Perso:initialize(fichier,x,y,mapNb)
     
-  local a={}
-	
 	if mapNb then
-		a.map = data.map[mapNb]
+		self.map = data.map[mapNb]
 	else
 		print("pas de map en param map 1 select")
-		a.map = data.map[1]
+		self.map = data.map[1]
 	end
 	
-	a.globalPosX = (a.map.X + x)
-	a.globalPosY = (a.map.Y + x)
+	self.globalPosX = (self.map.X + x)
+	self.globalPosY = (self.map.Y + x)
 	
-	a.LX = 64
-	a.LY = 64
+	self.LX = 64
+	self.LY = 64
 	
-	a.posX 		= x					-- position X local
-	a.posY 		= y					-- position Y local
-	a.mapnb 	= mapNb				-- map nb
+	self.posX 		= x					-- position X local
+	self.posY 		= y					-- position Y local
+	self.mapnb 	= mapNb				-- map nb
 	
-    a.texture 	= fichier
-    a.sprite 	= Sprite.new(fichier,a.LX,a.LY)
-    a.vie 		= 100
+    self.texture 	= fichier
+    self.sprite 	= Sprite.new(fichier,self.LX,self.LY)
+    self.vie 		= 100
 	
-	a.sprite:addAnimation({9,10,11})
-    a.sprite:addAnimation({0,1,2})
-    a.sprite:addAnimation({3,4,5})
-    a.sprite:addAnimation({6,7,8})
+	self.sprite:addAnimation({9,10,11})
+    self.sprite:addAnimation({0,1,2})
+    self.sprite:addAnimation({3,4,5})
+    self.sprite:addAnimation({6,7,8})
 
-    a.speed 	= 4 * resolution
-    a.direction = 1
-    a.dx 		= 0
-    a.dy 		= 0
+    self.speed 	= 4 * resolution
+    self.direction = 1
+    self.dx 		= 0
+    self.dy 		= 0
 	
-	a.X1 		= a.posX - a.LX/2
-	a.Y1 		= a.posY - a.LY/2
-	a.X2 		= a.posX + a.LX/2
-	a.Y2 		= a.posY + a.LY/2
+	self.X1 		= self.posX - self.LX/2
+	self.Y1 		= self.posY - self.LY/2
+	self.X2 		= self.posX + self.LX/2
+	self.Y2 		= self.posY + self.LY/2
 
-    return setmetatable(a, Perso)
-    
 end
 
 function Perso:getmap()
