@@ -1,4 +1,4 @@
-local sprite = require "/lib/spectre/Sprite"
+local Sprite = require "lib.spectre.Sprite"
 
 local map = {}
 map.__index = map
@@ -89,7 +89,7 @@ function map.new(file,texture,music) --creer une map
     end
     
     for k,v in ipairs(a.pnj) do
-        v.sprite = sprite.new("textures/"..resolution.."/"..v.data.skin,resolution,resolution)
+        v.sprite = Sprite:new("textures/"..resolution.."/"..v.data.skin,resolution,resolution)
     end
 
     return setmetatable(a, map)

@@ -1,11 +1,13 @@
-local Sprite = require "lib.spectre.Sprite"
-
 local class = require 'lib.kikito.middleclass'
 
-local Perso = class('Perso') 
+local Entity = require "class.Entity"
+local Sprite = require "lib.spectre.Sprite"
+
+local Perso = class('Perso',Entity) 
 
 function Perso:initialize(fichier,x,y,mapNb)
-    
+
+  Entity.initialize(self, x, y, 64, 64)
 	if mapNb then
 		self.map = data.map[mapNb]
 	else
@@ -13,21 +15,18 @@ function Perso:initialize(fichier,x,y,mapNb)
 		self.map = data.map[1]
 	end
 	
-	self.globalPosX = (self.map.X + x)
-	self.globalPosY = (self.map.Y + x)
+	 self.globalPosX = (self.map.X + x)
+	 self.globalPosY = (self.map.Y + x)
+
+  
+
+	 self.mapnb 	= mapNb				-- map nb
 	
-	self.LX = 64
-	self.LY = 64
+    self.texture 	 = fichier
+    self.sprite 	 = Sprite:new(fichier,self.lx,self.ly)
+    self.vie 		   = 100
 	
-	self.posX 		= x					-- position X local
-	self.posY 		= y					-- position Y local
-	self.mapnb 	= mapNb				-- map nb
-	
-    self.texture 	= fichier
-    self.sprite 	= Sprite.new(fichier,self.LX,self.LY)
-    self.vie 		= 100
-	
-	self.sprite:addAnimation({9,10,11})
+	  self.sprite:addAnimation({9,10,11})
     self.sprite:addAnimation({0,1,2})
     self.sprite:addAnimation({3,4,5})
     self.sprite:addAnimation({6,7,8})
@@ -37,10 +36,10 @@ function Perso:initialize(fichier,x,y,mapNb)
     self.dx 		= 0
     self.dy 		= 0
 	
-	self.X1 		= self.posX - self.LX/2
-	self.Y1 		= self.posY - self.LY/2
-	self.X2 		= self.posX + self.LX/2
-	self.Y2 		= self.posY + self.LY/2
+	 self.X1 		= self.x - self.lx/2
+	 self.Y1 		= self.y - self.ly/2
+	 self.X2 		= self.x + self.lx/2
+	 self.Y2 		= self.y + self.ly/2
 
 end
 
@@ -67,7 +66,7 @@ function Perso:update(dt)
 	if self.dx~=0 or self.dy ~=0 then 										-- si mouvement
 		self.sprite:play()
 		if self.dx~=0 and (self.Y1 % (grid))~=0 then 						-- si mouvement sur X mais Y pas sur le grid
-			--print(self.posY % grid /grid)
+			--print(self.y % grid /grid)
 			if ((self.Y1 % (grid)/grid)<=0.5) then 							-- realignement en -y
 				if (((self.Y1 - dt*self.speed)%grid)/grid)>0.5 then
 					self:setY1(math.floor(self.Y1/grid)*grid)
@@ -108,7 +107,7 @@ function Perso:update(dt)
 			end
 			if self.dy<0 then
 				self:setY1(math.ceil((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution) 	-- si colision en -y position arrondie au tile au dessus
-				-- print(math.ceil(self.posY +(dt*self.dy*self.speed)/64))
+				-- print(math.ceil(self.y +(dt*self.dy*self.speed)/64))
 			elseif self.dy>0 then
 				self:setY1(math.floor((self.Y1 +(dt*self.dy*self.speed))/resolution)*resolution) 	-- si colision en +y position arrondie au tile au dessous
 			end
@@ -121,7 +120,7 @@ function Perso:update(dt)
 	self.dy = 0
 	self.dx = 0
 	
-	if (self.posX < 0) or (self.posX>self.map.map.LX*resolution) then -- si Perso sort de la map local
+	if (self.x < 0) or (self.x>self.map.map.LX*resolution) then -- si Perso sort de la map local
 	--	print("------------------")
 	--	print("globalPosX = "..self.globalPosX)
 	--	print("globalPosY = "..self.globalPosY)
@@ -131,10 +130,10 @@ function Perso:update(dt)
 		--	print("map "..k)
 		--	print(" X = "..v.X)
 			--print(" Y = "..v.Y)
-			--print(" LX = "..v.map.LX)
-			--print(" LY = "..v.map.LY)
+			--print(" lx = "..v.map.lx)
+			--print(" ly = "..v.map.ly)
 			if (v.X<(self.globalPosX/resolution)) and (v.Y<(self.globalPosX/resolution)) then
-				if ((self.globalPosX-v.X*resolution) < v.map.LX*resolution) and ((self.globalPosY-v.Y*resolution) < v.map.LY*resolution) then
+				if ((self.globalPosX-v.X*resolution) < v.map.lx*resolution) and ((self.globalPosY-v.Y*resolution) < v.map.ly*resolution) then
 					--print("------------------")
 					--print("= goto map "..k)
 					--print("------------------")
@@ -157,7 +156,7 @@ end
 
 -------------------------------------------------------------------------------------------------------------------------------
 function Perso:draw()
-    self.sprite:draw(math.floor(self:getX()-32),math.floor(self:getY()-32)) 
+    self.sprite:draw(math.floor(self.x-32),math.floor(self.y-32)) 
 end
 
 function Perso:setPos(tilex,tiley,dir,map)
@@ -174,22 +173,22 @@ function Perso:setPos(tilex,tiley,dir,map)
 end
 
 function Perso:getX()
-    return self.posX
+    return self.x
 end
 
 function Perso:getY()
-    return self.posY
+    return self.y
 end
 
 function Perso:getPos()
 	self:updatePos()
-    return self.posX , self.posY , self.X1 ,  self.Y1 , self.X2 , self.Y2
+    return self.x , self.y , self.X1 ,  self.Y1 , self.X2 , self.Y2
 end
 
 
 function Perso:setPosX(x)
-	self.posX = x
-	self.X1 = self.posX - self.LX/2
+	self.x = x
+	self.X1 = self.x - self.lx/2
 	self:updatePos()
 end
 
@@ -199,8 +198,8 @@ function Perso:setX1(x)
 end
 
 function Perso:setPosY(y)
-	self.posY = y
-	self.Y1 = self.posY -self.LY/2
+	self.y = y
+	self.Y1 = self.y -self.ly/2
 	self:updatePos()
 end
 
@@ -210,12 +209,12 @@ function Perso:setY1(y)
 end
 
 function Perso:updatePos()
-	self.X2 = self.X1 + self.LY
-	self.Y2 = self.Y1 + self.LY
-	self.posX = self.X1 + (self.LX/2)
-	self.posY = self.Y1 + (self.LY/2)
-	self.globalPosX = self.map.X*resolution + self.posX
-	self.globalPosY = self.map.Y*resolution + self.posY
+	self.X2 = self.X1 + self.ly
+	self.Y2 = self.Y1 + self.ly
+	self.x = self.X1 + (self.lx/2)
+	self.y = self.Y1 + (self.ly/2)
+	self.globalPosX = self.map.X*resolution + self.x
+	self.globalPosY = self.map.Y*resolution + self.y
 end
 
 
