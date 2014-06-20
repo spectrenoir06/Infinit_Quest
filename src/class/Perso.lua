@@ -480,8 +480,8 @@ end
 
 function Perso:GoLeft()
 	self:setdirection(3)
-    self.dy = 0
-    self.dx = -1
+  self.dy = 0
+  self.dx = -1
 end
 
 function Perso:GoRight()
