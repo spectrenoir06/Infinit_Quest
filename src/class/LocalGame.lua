@@ -40,7 +40,7 @@ function Localgame.new(multi,psedo,ip,port)
 		a.players[a.nb].name = psedo
 	else
 		a.mutli = false
-		a.players[1] = Perso:new("/textures/64/skin0.png",640,640,1) 							-- creation de l'unique personnage
+		a.players[1] = Perso:new(640,640,"/textures/64/skin0.png",data.map[1]) 							-- creation de l'unique personnage
 		a.id = 1
 		a.nb = 1
 		a.me = a.players[1]

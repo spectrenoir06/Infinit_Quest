@@ -5,25 +5,14 @@ local Sprite = require "lib.spectre.Sprite"
 
 local Perso = class('Perso',Entity) 
 
-function Perso:initialize(fichier,x,y,mapNb)
+Perso.static.LX = 64
+Perso.static.LY = 64
 
-  Entity.initialize(self, x, y, 64, 64)
-	if mapNb then
-		self.map = data.map[mapNb]
-	else
-		print("pas de map en param map 1 select")
-		self.map = data.map[1]
-	end
-	
-	 self.globalPosX = (self.map.X + x)
-	 self.globalPosY = (self.map.Y + x)
+function Perso:initialize(x, y, spriteFile, map)
 
-  
+    Entity.initialize(self, x, y, Perso.LX, Perso.LY, map)
 
-	 self.mapnb 	= mapNb				-- map nb
-	
-    self.texture 	 = fichier
-    self.sprite 	 = Sprite:new(fichier,self.lx,self.ly)
+    self.sprite 	 = Sprite:new(spriteFile,self.lx,self.ly)
     self.vie 		   = 100
 	
 	  self.sprite:addAnimation({9,10,11})
@@ -31,43 +20,24 @@ function Perso:initialize(fichier,x,y,mapNb)
     self.sprite:addAnimation({3,4,5})
     self.sprite:addAnimation({6,7,8})
 
-    self.speed 	= 4 * resolution
-    self.direction = 1
-    self.dx 		= 0
-    self.dy 		= 0
-	
-	 self.X1 		= self.x - self.lx/2
-	 self.Y1 		= self.y - self.ly/2
-	 self.X2 		= self.x + self.lx/2
-	 self.Y2 		= self.y + self.ly/2
+    self.speed 	    = 4 * resolution
+    self.direction  = 1
+    self.dx 		    = 0
+    self.dy 		    = 0
 
 end
-
-function Perso:getmap()
-    return self.map.map
-end
-
-function Perso:getmapnb()
-    return self.mapnb
-end
-
-function Perso:setmap(map)
-    self.map = data.map[map]
-	self.mapnb = map
-end
-
 
 function Perso:update(dt)
-	self:updatePos()
-    self.sprite:update(dt)
+	Entity.update(self)
+  self.sprite:update(dt)
 	
 	local grid = resolution/4
 	
-	if self.dx~=0 or self.dy ~=0 then 										-- si mouvement
+	if self.dx~=0 or self.dy ~=0 then 										     -- si mouvement
 		self.sprite:play()
-		if self.dx~=0 and (self.Y1 % (grid))~=0 then 						-- si mouvement sur X mais Y pas sur le grid
+		if self.dx~=0 and (self.Y1 % (grid))~=0 then 						 -- si mouvement sur X mais Y pas sur le grid
 			--print(self.y % grid /grid)
-			if ((self.Y1 % (grid)/grid)<=0.5) then 							-- realignement en -y
+			if ((self.Y1 % (grid)/grid)<=0.5) then 							   -- realignement en -y
 				if (((self.Y1 - dt*self.speed)%grid)/grid)>0.5 then
 					self:setY1(math.floor(self.Y1/grid)*grid)
 				else
@@ -95,9 +65,9 @@ function Perso:update(dt)
 					self:setX1(self.X1 +(dt*self.speed))
 				end
 			end
-		elseif not self:colision(dt) then 					-- si aligner sur l'axe perpendiculaire au mouvement ( si +x alors y%grid = 0 ) et pas de colision
-			self:setX1( self.X1 +(dt*self.dx*self.speed) ) 	-- mouvement sur X
-			self:setY1( self.Y1 +(dt*self.dy*self.speed) ) 	-- mouvement sur Y
+		elseif not self:colision(dt) then 					             -- si aligner sur l'axe perpendiculaire au mouvement ( si +x alors y%grid = 0 ) et pas de colision
+			self:setX1( self.X1 +(dt*self.dx*self.speed) )         -- mouvement sur X
+			self:setY1( self.Y1 +(dt*self.dy*self.speed) ) 	       -- mouvement sur Y
 			--self.sprite:play()
 		else
 			if self.dx<0 then
@@ -116,7 +86,7 @@ function Perso:update(dt)
 	else
 		self.sprite:stop()
     end
-	self:updatePos()
+
 	self.dy = 0
 	self.dx = 0
 	
@@ -150,7 +120,6 @@ function Perso:update(dt)
 			end
 		end
 	end
-	self:updatePos()
 	
 end
 
@@ -159,75 +128,16 @@ function Perso:draw()
     self.sprite:draw(math.floor(self.x-32),math.floor(self.y-32)) 
 end
 
-function Perso:setPos(tilex,tiley,dir,map)
-    self:setX(tilex*resolution+(resolution/2))
-    self:setY(tiley*resolution+(resolution/2))
-    if dir then
-        self:setdirection(dir)
-    end
-    --if map then
-       -- self:setmap(map)
-        --love.audio.stop()
-        --love.audio.play(self.map.music)
-   -- end
-end
-
-function Perso:getX()
-    return self.x
-end
-
-function Perso:getY()
-    return self.y
-end
-
-function Perso:getPos()
-	self:updatePos()
-    return self.x , self.y , self.X1 ,  self.Y1 , self.X2 , self.Y2
-end
-
-
-function Perso:setPosX(x)
-	self.x = x
-	self.X1 = self.x - self.lx/2
-	self:updatePos()
-end
-
-function Perso:setX1(x)
-	self.X1 = x
-	self:updatePos()
-end
-
-function Perso:setPosY(y)
-	self.y = y
-	self.Y1 = self.y -self.ly/2
-	self:updatePos()
-end
-
-function Perso:setY1(y)
-	self.Y1 = y
-	self:updatePos()
-end
-
-function Perso:updatePos()
-	self.X2 = self.X1 + self.ly
-	self.Y2 = self.Y1 + self.ly
-	self.x = self.X1 + (self.lx/2)
-	self.y = self.Y1 + (self.ly/2)
-	self.globalPosX = self.map.X*resolution + self.x
-	self.globalPosY = self.map.Y*resolution + self.y
-end
-
-
 function Perso:getvie()
     return self.vie
 end
 
 function Perso:changevie(dx)
-    self.vie=self.vie+dx
+    self.vie  = self.vie + dx
 end
 
 function Perso:setvie(x)
-    self.vie=x
+    self.vie  = x
 end
 
 function Perso:colision(dt) -- return true si Perso en colision au coordoner
@@ -259,9 +169,9 @@ function Perso:colision(dt) -- return true si Perso en colision au coordoner
 end
 
 function Perso:scancol(tilex,tiley) -- return true si colision
-	local block = self:getblock(tilex,tiley)
+	local block = self.map:getblock(tilex,tiley)
 		--print(idsol,idblock)
-	local blockDataSol = data.tab[block.idsol]
+	local blockDataSol   = data.tab[block.idsol]
 	local blockDataBlock = data.tab[block.idblock]
 	if block.idblock==nil or block.idsol==nil then
 		return false
@@ -280,24 +190,24 @@ function Perso:getdirection()
 end
 
 
-function Perso:getblock(tilex,tiley)
+function Perso:getblock(tileX,tileY)
 
-        local idsol, idblock, iddeco = self.map.map:gettile(tilex,tiley)
-        local pnj = self.map.map:getPnj(tilex,tiley)
-        local obj = self.map.map:getObj(tilex,tiley)
-		local tab =
-		{pnj=pnj,
-		 idsol = idsol,
-		 idblock = idblock,
-		 iddeco = iddeco,
-		 obj = obj,
-		 pnj = pnj,
-		 tilex=tilex,
-		 tiley=tiley,
-		}
-        return tab
+    local idSol, idBlock, idDeco = self.map:gettile(tileX,tileY)
+    local pnj = self.map:getPnj(tileX,tileY)
+    local obj = self.map:getObj(tileX,tileY)
+    
+    return      { pnj   = pnj,
+                  idSol = idSol,
+                  idBlock = idBlock,
+                  idDeco = idDeco,
+                  obj = obj,
+                  pnj = pnj,
+                  tileX=tileX,
+                  tileY=tileY
+                }
 end
--------------------------------------------------
+
+
 function Perso:use()
 	local posX , posY , X1 , Y1 , X2 ,Y2 = self:getPos()
 	local x,y = 0,0
