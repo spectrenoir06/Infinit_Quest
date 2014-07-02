@@ -19,7 +19,7 @@ function GameState_Game:init()
 	
 	loadmaps()
   
-	localgame = LocalGame.new(false,"Android","ddodev.com",4434)
+	localgame = LocalGame.new(true,"test","ddodev.com",4434)
 	--localgame = LocalGame.new(true,"Android","127.0.0.1",4434)
 
     info=true
